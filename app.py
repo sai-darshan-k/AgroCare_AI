@@ -10,7 +10,6 @@ from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv
 import logging
 import requests  # For weather API integration
-import gdown  # To download the model from Google Drive
 
 # Load environment variables
 load_dotenv()
@@ -21,23 +20,10 @@ app.secret_key = os.getenv("SECRET_KEY", "your_secret_key")
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
-# Google Drive link for the model
-drive_link = "https://drive.google.com/uc?id=1BWj3__QLBGIR8mmspc6Hp8eP7-lBGqfC"  # Model ID extracted
+# Directly set the path to the model
 model_path = os.getenv("MODEL_PATH", "my_model.keras")
 
-# Function to download model from Google Drive
-def download_model_from_drive(drive_link, destination):
-    if not os.path.exists(destination):
-        try:
-            logging.info('Downloading model from Google Drive...')
-            gdown.download(drive_link, destination, quiet=False)
-            logging.info('Model downloaded successfully.')
-        except Exception as e:
-            logging.error(f"Error downloading model: {str(e)}")
-            raise e
-
-# Download and load the model
-download_model_from_drive(drive_link, model_path)
+# Load the model
 model = load_model(model_path)
 logging.info('Model loaded. Check http://127.0.0.1:5000/')
 
