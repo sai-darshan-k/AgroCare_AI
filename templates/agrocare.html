@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroCare</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            background-image: url('{{ url_for("static", filename="bg15.avif") }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: Arial, sans-serif;
+            color: #131111;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .logo h1 {
+            font-size: 35px;
+            margin: 0;
+        }
+
+        .title h2 {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .language-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .question-input {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .question-input input[type="text"] {
+            width: 60%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .upload-btn, .submit-btn {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .examples {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .examples ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .examples li {
+            cursor: pointer;
+            margin-bottom: 10px;
+            color: #007BFF;
+        }
+
+        .examples li:hover {
+            text-decoration: underline;
+        }
+
+        .uploaded-image img {
+            max-width: 100%;
+            margin: 20px 0;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .bot-response {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{{ url_for('static', filename='mainlogo.png') }}" alt="AgroCare">
+            <h1>AgroCare</h1>
+        </div>
+        <div class="title">
+            <h2>AI SOLUTIONS FOR MODERN AGRICULTURE</h2>
+        </div>
+        <div class="language-switcher">
+            <button id="Home" onclick="window.location.href='{{ url_for('agrocare') }}'">Logout</button>
+        </div>
+    </header>
+    <main>
+        <div class="button-container">
+            <button id="letsTalkButton" onclick="window.location.href='{{ url_for('speech') }}'">Let's Talk</button>
+            <button id="weatherButton" onclick="window.location.href='{{ url_for('weather') }}'">Weather</button>
+            <button id="refresh-button" onclick="location.reload();">Refresh</button>
+        </div>        
+        <div class="question-input">
+            <input type="text" id="questionInput" placeholder="Type your question..." onfocus="clearExamples()" oninput="clearExamples()">
+            <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="uploadImage();">
+            <button class="upload-btn" onclick="document.getElementById('imageInput').click();">
+                <img src="{{ url_for('static', filename='cam2.png') }}" alt="Camera" style="width: 30px; height: 30px;">
+            </button>
+            <button class="submit-btn" onclick="submitQuestion()">
+                <img src="{{ url_for('static', filename='send1.png') }}" alt="Send">
+            </button>
+        </div>
+        <div class="examples" id="examples">
+            <p>Few examples to ask!</p>
+            <ul>
+                <li onclick="insertExample('What are the benefits of crop rotation?')">What are the benefits of crop rotation?</li>
+                <li onclick="insertExample('How can I conserve water in my farming practices?')">How can I conserve water in my farming practices?</li>
+                <li onclick="insertExample('What fertilizers are best for organic farming?')">What fertilizers are best for organic farming?</li>
+                <li onclick="insertExample('How can I protect my crops from frost damage?')">How can I protect my crops from frost damage?</li>
+            </ul>
+        </div>
+        <div class="uploaded-image" id="uploadedImage" style="display: none;">
+            <img id="imagePreview" src="" alt="Uploaded Image">
+        </div>
+        <div class="bot-response" id="botResponse"></div>
+    </main>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        function clearExamples() {
+            document.getElementById('examples').style.display = 'none';
+        }
+
+        function insertExample(exampleText) {
+            document.getElementById('questionInput').value = exampleText;
+            clearExamples();
+        }
+
+        function submitQuestion() {
+            var question = document.getElementById('questionInput').value;
+            if (!question) return;
+            
+            $.ajax({
+                url: '/ask',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ question: question }),
+                success: function(response) {
+                    var answer = response.answer;
+                    console.log('Answer:', answer);
+                    document.getElementById('botResponse').innerHTML = `<div class="completion">${answer}</div>`;
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                    alert('Error occurred. Please try again later.');
+                }
+            });
+        }
+
+        function uploadImage() {
+            var imageInput = document.getElementById('imageInput').files[0];
+            var formData = new FormData();
+            formData.append('file', imageInput);
+
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('imagePreview').src = e.target.result;
+                document.getElementById('uploadedImage').style.display = 'block';
+                clearExamples();
+            };
+            reader.readAsDataURL(imageInput);
+
+            $.ajax({
+                url: '/predict',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    var prediction = response.prediction;
+                    console.log('Prediction:', prediction);
+                    document.getElementById('botResponse').innerHTML = `<div class="completion">Prediction: ${prediction}</div>`;
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                    alert('Error occurred while uploading the image. Please try again later.');
+                }
+            });
+        }
+    </script>
+</body>
+</html>

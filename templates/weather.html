@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <!-- Leaflet.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('{{ url_for("static", filename="bg15.avif") }}');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .weather-info {
+            margin: 20px 0;
+        }
+        .weather-info p {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .back-link a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 1.1em;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        /* Map styling */
+        #weatherMap {
+            height: 400px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Weather Dashboard</h1>
+        <div class="weather-info">
+            <p><strong>Location:</strong> {{ weather_data.name }}, {{ weather_data.country }}</p>
+            <p><strong>Temperature:</strong> {{ weather_data.temperature }} °C</p>
+            <p><strong>Feels Like:</strong> {{ weather_data.feels_like }} °C</p>
+            <p><strong>Weather:</strong> {{ weather_data.description }}</p>
+            <p><strong>Humidity:</strong> {{ weather_data.humidity }} %</p>
+            <p><strong>Pressure:</strong> {{ weather_data.pressure }} hPa</p>
+            <p><strong>Wind Speed:</strong> {{ weather_data.wind_speed }} m/s</p>
+            <p><strong>Wind Gust:</strong> {{ weather_data.wind_gust }} m/s</p>
+            <p><strong>Visibility:</strong> {{ weather_data.visibility }} meters</p>
+        </div>
+        <div id="weatherMap"></div>
+        <div class="back-link">
+            <a href="{{ url_for('agrocare') }}">Back to AgroCare</a>
+        </div>
+    </div>
+
+    <!-- Leaflet.js JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        function initializeMap(lat, lon) {
+            var map = L.map('weatherMap').setView([lat, lon], 10);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            L.tileLayer('https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=YOUR_OPENWEATHERMAP_API_KEY', {
+                maxZoom: 18,
+                attribution: '&copy; <a href="https://openweathermap.org/">OpenWeatherMap</a>'
+            }).addTo(map);
+
+            L.marker([lat, lon]).addTo(map)
+                .bindPopup("You are here!")
+                .openPopup();
+        }
+
+        // Fetch user's current location and update the map
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var userLat = position.coords.latitude;
+                var userLon = position.coords.longitude;
+
+                // Update map with user's location
+                initializeMap(userLat, userLon);
+
+                // Fetch weather data from the backend using user's location
+                fetch('/weather', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        lat: userLat,
+                        lon: userLon
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Dynamically update the weather information
+                    document.querySelector('.weather-info').innerHTML = `
+                        <p><strong>Location:</strong> ${data.name}, ${data.country}</p>
+                        <p><strong>Temperature:</strong> ${data.temperature} °C</p>
+                        <p><strong>Feels Like:</strong> ${data.feels_like} °C</p>
+                        <p><strong>Weather:</strong> ${data.description}</p>
+                        <p><strong>Humidity:</strong> ${data.humidity} %</p>
+                        <p><strong>Pressure:</strong> ${data.pressure} hPa</p>
+                        <p><strong>Wind Speed:</strong> ${data.wind_speed} m/s</p>
+                        <p><strong>Wind Gust:</strong> ${data.wind_gust} m/s</p>
+                        <p><strong>Visibility:</strong> ${data.visibility} meters</p>
+                    `;
+                })
+                .catch(error => console.error('Error fetching weather data:', error));
+            }, function(error) {
+                console.error('Error getting location:', error);
+            });
+        } else {
+            console.warn('Geolocation is not supported by this browser.');
+        }
+    </script>
+</body>
+</html>
