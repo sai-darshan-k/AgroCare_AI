@@ -1,47 +1,46 @@
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <style>
-body {
-    font-family: 'Roboto', sans-serif;
-    position: relative;
-    margin: 0;
-    padding: 0;
-    /* Remove overflow: hidden; */
-}
-    
-    /* Video background */
-    #video-bg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        min-width: 100%;
-        min-height: 100%;
-        z-index: -1; /* Set the video behind the content */
-        object-fit: cover; /* Ensures the video covers the entire page */
-    }
+        body {
+            font-family: 'Roboto', sans-serif;
+            position: relative;
+            margin: 0;
+            padding: 0;
+        }
+        
+        #video-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+            object-fit: cover;
+        }
 
-    /* Content styling to appear above the video */
-    .content {
-        position: relative;
-        z-index: 1; /* Ensure content stays above video */
-    }
+        .content {
+            position: relative;
+            z-index: 1;
+        }
 
-    #map {
-        height: 200px;
-    }
+        #map {
+            height: 200px;
+        }
     </style>
-
 </head>
-<video id="video-bg" autoplay muted loop>
-    <source src="{{ url_for('static', filename='wtr.mp4') }}" type="video/mp4">
-    Your browser does not support HTML5 video.
-</video>
 <body class="bg-blue-500 text-white">
+    <video id="video-bg" autoplay muted loop>
+        <source src="{{ url_for('static', filename='wtr.mp4') }}" type="video/mp4">
+        Your browser does not support HTML5 video.
+    </video>
     <div class="max-w-screen-lg mx-auto p-4">
         <div class="flex justify-between items-center">
             <div class="text-sm" id="time">
@@ -122,207 +121,211 @@ body {
                 </div>
             </div>
         </div>
+        <div class="flex justify-center mt-4">
+            <button onclick="window.location.href='{{ url_for('agrocare') }}'" class="p-2 bg-blue-700 rounded-lg mr-2">Go Back</button>
+            <button onclick="window.location.href='{{ url_for('speech') }}'" class="p-2 bg-blue-700 rounded-lg">Let's Talk</button>
+        </div>
     </div>
 
-<script>
-    const apiKey = 'e10f65c590d431935edaaf55555c6146';
-    let city = 'Chennai';
-    let map;
-    let marker;
+    <script>
+        const apiKey = 'e10f65c590d431935edaaf55555c6146';
+        let city = 'Chennai';
+        let map;
+        let marker;
 
-    async function fetchWeatherData(lat, lon) {
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`);
-        const data = await response.json();
-        return data;
-    }
+        async function fetchWeatherData(lat, lon) {
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`);
+            const data = await response.json();
+            return data;
+        }
 
-    async function fetchHourlyForecast(lat, lon) {
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`);
-        const data = await response.json();
-        return data;
-    }
+        async function fetchHourlyForecast(lat, lon) {
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`);
+            const data = await response.json();
+            return data;
+        }
 
-    async function fetchOneCallData(lat, lon) {
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`);
-        const data = await response.json();
-        return data;
-    }
+        async function fetchOneCallData(lat, lon) {
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`);
+            const data = await response.json();
+            return data;
+        }
 
-    async function fetchAirQualityData(lat, lon) {
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`);
-        const data = await response.json();
-        return data;
-    }
+        async function fetchAirQualityData(lat, lon) {
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`);
+            const data = await response.json();
+            return data;
+        }
 
-    function updateDateTime() {
-        const now = new Date();
-        document.getElementById('time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        document.getElementById('date').innerText = now.toDateString();
-    }
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('time').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('date').innerText = now.toDateString();
+        }
 
-    function updateWeatherUI(data) {
-        document.getElementById('city').innerText = data.name;
-        document.getElementById('temperature').innerText = `${Math.round(data.main.temp)}°`;
-        document.getElementById('weather-description').innerText = data.weather[0].description;
-        document.getElementById('high-low').innerText = `H:${Math.round(data.main.temp_max)}° L:${Math.round(data.main.temp_min)}°`;
-    }
+        function updateWeatherUI(data) {
+            document.getElementById('city').innerText = data.name;
+            document.getElementById('temperature').innerText = `${Math.round(data.main.temp)}°`;
+            document.getElementById('weather-description').innerText = data.weather[0].description;
+            document.getElementById('high-low').innerText = `H:${Math.round(data.main.temp_max)}° L:${Math.round(data.main.temp_min)}°`;
+        }
 
-    function updateHourlyForecastUI(data) {
-        const hourlyForecastTop = document.getElementById('hourly-forecast-top');
-        const hourlyForecastBottom = document.getElementById('hourly-forecast-bottom');
-        hourlyForecastTop.innerHTML = '';
-        hourlyForecastBottom.innerHTML = '';
-        for (let i = 0; i < 5; i++) {
-            const forecast = data.list[i];
-            const time = new Date(forecast.dt * 1000).getHours();
-            const temp = Math.round(forecast.main.temp);
-            const icon = forecast.weather[0].icon;
-            hourlyForecastTop.innerHTML += `
-                <div>
-                    <div>${time % 12 || 12}${time >= 12 ? 'PM' : 'AM'}</div>
-                    <div><img src="http://openweathermap.org/img/wn/${icon}.png" alt="weather icon" /></div>
-                    <div>${temp}°</div>
-                </div>
+        function updateHourlyForecastUI(data) {
+            const hourlyForecastTop = document.getElementById('hourly-forecast-top');
+            const hourlyForecastBottom = document.getElementById('hourly-forecast-bottom');
+            hourlyForecastTop.innerHTML = '';
+            hourlyForecastBottom.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const forecast = data.list[i];
+                const time = new Date(forecast.dt * 1000).getHours();
+                const temp = Math.round(forecast.main.temp);
+                const icon = forecast.weather[0].icon;
+                hourlyForecastTop.innerHTML += `
+                    <div>
+                        <div>${time % 12 || 12}${time >= 12 ? 'PM' : 'AM'}</div>
+                        <div><img src="http://openweathermap.org/img/wn/${icon}.png" alt="weather icon" /></div>
+                        <div>${temp}°</div>
+                    </div>
+                `;
+            }
+            for (let i = 5; i < 10; i++) {
+                const forecast = data.list[i];
+                const time = new Date(forecast.dt * 1000).getHours();
+                const temp = Math.round(forecast.main.temp);
+                const icon = forecast.weather[0].icon;
+                hourlyForecastBottom.innerHTML += `
+                    <div>
+                        <div>${time % 12 || 12}${time >= 12 ? 'PM' : 'AM'}</div>
+                        <div><img src="http://openweathermap.org/img/wn/${icon}.png" alt="weather icon" /></div>
+                        <div>${temp}°</div>
+                    </div>
+                `;
+            }
+        }
+
+        function updateDailyForecastUI(data) {
+            const dailyForecast = document.getElementById('daily-forecast');
+            dailyForecast.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                const forecast = data.list[i * 8];
+                const day = new Date(forecast.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' });
+                const tempMin = Math.round(forecast.main.temp_min);
+                const tempMax = Math.round(forecast.main.temp_max);
+                const icon = forecast.weather[0].icon;
+                dailyForecast.innerHTML += `
+                    <div class="flex justify-between">
+                        <div>${day}</div>
+                        <div>${tempMin}° - ${tempMax}°</div>
+                        <div><img src="http://openweathermap.org/img/wn/${icon}.png" alt="weather icon" /></div>
+                    </div>
+                `;
+            }
+        }
+
+        function updateMap(lat, lon, temp) {
+            if (!map) {
+                map = L.map('map').setView([lat, lon], 10);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                map.on('click', async function(e) {
+                    const { lat, lng } = e.latlng;
+                    const weatherData = await fetchWeatherData(lat, lng);
+                    updateWeatherUI(weatherData);
+                    const forecastData = await fetchHourlyForecast(lat, lng);
+                    updateHourlyForecastUI(forecastData);
+                    updateDailyForecastUI(forecastData);
+                    updateMap(lat, lng, weatherData.main.temp);
+
+                    // Fetch Air Quality data
+                    const airQualityData = await fetchAirQualityData(lat, lng);
+                    updateAirQualityUI(airQualityData);
+
+                    // Update Wind data
+                    updateWindUI(weatherData);
+                });
+            } else {
+                map.setView([lat, lon], 10);
+            }
+
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            marker = L.marker([lat, lon]).addTo(map)
+                .bindPopup(`Temperature: ${Math.round(temp)}°`)
+                .openPopup();
+        }
+
+        function updateAirQualityUI(data) {
+            const aqi = data.list[0].main.aqi;
+            const pollutants = data.list[0].components;
+            document.getElementById('air-quality').innerText = `AQI: ${aqi}`;
+            document.getElementById('air-quality-description').innerText = getAQIDescription(aqi);
+            document.getElementById('pollutants').innerHTML = `
+                <div class="text-lg">CO: ${pollutants.co} µg/m³</div>
+                <div class="text-lg">NO2: ${pollutants.no2} µg/m³</div>
+                <div class="text-lg">O3: ${pollutants.o3} µg/m³</div>
+                <div class="text-lg">SO2: ${pollutants.so2} µg/m³</div>
+                <div class="text-lg">PM2.5: ${pollutants.pm2_5} µg/m³</div>
+                <div class="text-lg">PM10: ${pollutants.pm10} µg/m³</div>
             `;
         }
-        for (let i = 5; i < 10; i++) {
-            const forecast = data.list[i];
-            const time = new Date(forecast.dt * 1000).getHours();
-            const temp = Math.round(forecast.main.temp);
-            const icon = forecast.weather[0].icon;
-            hourlyForecastBottom.innerHTML += `
-                <div>
-                    <div>${time % 12 || 12}${time >= 12 ? 'PM' : 'AM'}</div>
-                    <div><img src="http://openweathermap.org/img/wn/${icon}.png" alt="weather icon" /></div>
-                    <div>${temp}°</div>
-                </div>
-            `;
-        }
-    }
 
-    function updateDailyForecastUI(data) {
-        const dailyForecast = document.getElementById('daily-forecast');
-        dailyForecast.innerHTML = '';
-        for (let i = 0; i < 5; i++) {
-            const forecast = data.list[i * 8];
-            const day = new Date(forecast.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' });
-            const tempMin = Math.round(forecast.main.temp_min);
-            const tempMax = Math.round(forecast.main.temp_max);
-            const icon = forecast.weather[0].icon;
-            dailyForecast.innerHTML += `
-                <div class="flex justify-between">
-                    <div>${day}</div>
-                    <div>${tempMin}° - ${tempMax}°</div>
-                    <div><img src="http://openweathermap.org/img/wn/${icon}.png" alt="weather icon" /></div>
-                </div>
-            `;
-        }
-    }
-
-    function updateMap(lat, lon, temp) {
-        if (!map) {
-            map = L.map('map').setView([lat, lon], 10);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-
-            map.on('click', async function(e) {
-                const { lat, lng } = e.latlng;
-                const weatherData = await fetchWeatherData(lat, lng);
-                updateWeatherUI(weatherData);
-                const forecastData = await fetchHourlyForecast(lat, lng);
-                updateHourlyForecastUI(forecastData);
-                updateDailyForecastUI(forecastData);
-                updateMap(lat, lng, weatherData.main.temp);
-
-                // Fetch Air Quality data
-                const airQualityData = await fetchAirQualityData(lat, lng);
-                updateAirQualityUI(airQualityData);
-
-                // Update Wind data
-                updateWindUI(weatherData);
-            });
-        } else {
-            map.setView([lat, lon], 10);
+        function getAQIDescription(aqi) {
+            if (aqi == 1) return "Good";
+            if (aqi == 2) return "Fair";
+            if (aqi == 3) return "Moderate";
+            if (aqi == 4) return "Poor";
+            if (aqi == 5) return "Very Poor";
+            return "Unknown";
         }
 
-        if (marker) {
-            map.removeLayer(marker);
+        function updateWindUI(data) {
+            const windSpeed = data.wind.speed;
+            const windDirection = data.wind.deg;
+            const windDirectionText = getWindDirectionText(windDirection);
+            document.getElementById('wind').innerText = `Speed: ${windSpeed} mph, Direction: ${windDirectionText}`;
         }
 
-        marker = L.marker([lat, lon]).addTo(map)
-            .bindPopup(`Temperature: ${Math.round(temp)}°`)
-            .openPopup();
-    }
+        function getWindDirectionText(deg) {
+            if (deg >= 0 && deg < 45) return 'North';
+            if (deg >= 45 && deg < 90) return 'Northeast';
+            if (deg >= 90 && deg < 135) return 'East';
+            if (deg >= 135 && deg < 180) return 'Southeast';
+            if (deg >= 180 && deg < 225) return 'South';
+            if (deg >= 225 && deg < 270) return 'Southwest';
+            if (deg >= 270 && deg < 315) return 'West';
+            if (deg >= 315 && deg < 360) return 'Northwest';
+            return 'Unknown';
+        }
 
-    function updateAirQualityUI(data) {
-        const aqi = data.list[0].main.aqi;
-        const pollutants = data.list[0].components;
-        document.getElementById('air-quality').innerText = `AQI: ${aqi}`;
-        document.getElementById('air-quality-description').innerText = getAQIDescription(aqi);
-        document.getElementById('pollutants').innerHTML = `
-            <div class="text-lg">CO: ${pollutants.co} µg/m³</div>
-            <div class="text-lg">NO2: ${pollutants.no2} µg/m³</div>
-            <div class="text-lg">O3: ${pollutants.o3} µg/m³</div>
-            <div class="text-lg">SO2: ${pollutants.so2} µg/m³</div>
-            <div class="text-lg">PM2.5: ${pollutants.pm2_5} µg/m³</div>
-            <div class="text-lg">PM10: ${pollutants.pm10} µg/m³</div>
-        `;
-    }
+        async function updateWeather() {
+            city = document.getElementById('search-bar').value || 'Koramangala';
+            const weatherData = await fetchWeatherDataByCity(city);
+            updateWeatherUI(weatherData);
+            const forecastData = await fetchHourlyForecast(weatherData.coord.lat, weatherData.coord.lon);
+            updateHourlyForecastUI(forecastData);
+            updateDailyForecastUI(forecastData);
+            updateMap(weatherData.coord.lat, weatherData.coord.lon, weatherData.main.temp);
 
-    function getAQIDescription(aqi) {
-        if (aqi == 1) return "Good";
-        if (aqi == 2) return "Fair";
-        if (aqi == 3) return "Moderate";
-        if (aqi == 4) return "Poor";
-        if (aqi == 5) return "Very Poor";
-        return "Unknown";
-    }
+            // Fetch Air Quality data
+            const airQualityData = await fetchAirQualityData(weatherData.coord.lat, weatherData.coord.lon);
+            updateAirQualityUI(airQualityData);
 
-    function updateWindUI(data) {
-        const windSpeed = data.wind.speed;
-        const windDirection = data.wind.deg;
-        const windDirectionText = getWindDirectionText(windDirection);
-        document.getElementById('wind').innerText = `Speed: ${windSpeed} mph, Direction: ${windDirectionText}`;
-    }
+            // Update Wind data
+            updateWindUI(weatherData);
+        }
 
-    function getWindDirectionText(deg) {
-        if (deg >= 0 && deg < 45) return 'North';
-        if (deg >= 45 && deg < 90) return 'Northeast';
-        if (deg >= 90 && deg < 135) return 'East';
-        if (deg >= 135 && deg < 180) return 'Southeast';
-        if (deg >= 180 && deg < 225) return 'South';
-        if (deg >= 225 && deg < 270) return 'Southwest';
-        if (deg >= 270 && deg < 315) return 'West';
-        if (deg >= 315 && deg < 360) return 'Northwest';
-        return 'Unknown';
-    }
+        async function fetchWeatherDataByCity(city) {
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`);
+            const data = await response.json();
+            return data;
+        }
 
-    async function updateWeather() {
-        city = document.getElementById('search-bar').value || 'Koramangala';
-        const weatherData = await fetchWeatherDataByCity(city);
-        updateWeatherUI(weatherData);
-        const forecastData = await fetchHourlyForecast(weatherData.coord.lat, weatherData.coord.lon);
-        updateHourlyForecastUI(forecastData);
-        updateDailyForecastUI(forecastData);
-        updateMap(weatherData.coord.lat, weatherData.coord.lon, weatherData.main.temp);
-
-        // Fetch Air Quality data
-        const airQualityData = await fetchAirQualityData(weatherData.coord.lat, weatherData.coord.lon);
-        updateAirQualityUI(airQualityData);
-
-        // Update Wind data
-        updateWindUI(weatherData);
-    }
-
-    async function fetchWeatherDataByCity(city) {
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`);
-        const data = await response.json();
-        return data;
-    }
-
-    setInterval(updateDateTime, 1000);
-    updateWeather();
-</script>
+        setInterval(updateDateTime, 1000);
+        updateWeather();
+    </script>
 </body>
 </html>
