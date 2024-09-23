@@ -1,14 +1,13 @@
 import os
 import numpy as np
-from tensorflow.keras.models import load_model
+from flask import Flask, render_template, request, redirect, url_for, jsonify, logging
+import tflite_runtime.interpreter as tflite
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
-from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, session
 from werkzeug.utils import secure_filename
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_groq import ChatGroq
 from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv
-import logging
 import requests  # For weather API integration
 
 # Load environment variables
@@ -20,12 +19,13 @@ app.secret_key = os.getenv("SECRET_KEY", "your_secret_key")
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
-# Directly set the path to the model
-model_path = os.getenv("MODEL_PATH", "my_model.keras")
+# Directly set the path to the TFLite model
+tflite_model_path = os.getenv("TFLITE_MODEL_PATH", "my_model.tflite")
 
-# Load the model
-model = load_model(model_path)
-logging.info('Model loaded. Check http://127.0.0.1:5000/')
+# Load the TensorFlow Lite model
+interpreter = tflite.Interpreter(model_path=tflite_model_path)
+interpreter.allocate_tensors()
+logging.info('TFLite model loaded. Check http://127.0.0.1:5000/')
 
 # Load the language model
 groqllm = ChatGroq(model="llama3-8b-8192", temperature=0)
@@ -85,19 +85,29 @@ def upload():
     file_path = os.path.join(uploads_dir, secure_filename(f.filename))
     f.save(file_path)
     try:
-        predictions = getResult(file_path)
+        predictions = get_result(file_path)
         predicted_label = labels[np.argmax(predictions)]
         return jsonify({'prediction': predicted_label})
     except Exception as e:
         logging.error(f"Error processing image: {str(e)}")
         return jsonify({'prediction': f'Error processing image: {str(e)}'}), 500
 
-def getResult(image_path):
+def get_result(image_path):
     img = load_img(image_path, target_size=(225, 225))
     x = img_to_array(img)
     x = x.astype('float32') / 255.
     x = np.expand_dims(x, axis=0)
-    predictions = model.predict(x)[0]
+
+    # Get input and output tensor details
+    input_details = interpreter.get_input_details()[0]
+    output_details = interpreter.get_output_details()[0]
+
+    # Set the tensor
+    interpreter.set_tensor(input_details['index'], x)
+    interpreter.invoke()
+
+    # Get the result
+    predictions = interpreter.get_tensor(output_details['index'])[0]
     return predictions
 
 @app.route('/weather')
