@@ -13,6 +13,15 @@
             background-repeat: no-repeat;
             font-family: Arial, sans-serif;
             color: #131111;
+            background-color: transparent;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bot-response {
+            background-color: transparent;
+            color: #131111;
         }
 
         .logo {
@@ -72,8 +81,22 @@
         }
 
         .examples {
-            text-align: center;
-            margin-bottom: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    transition: opacity 0.3s ease;
+    height: auto;
+    max-width: 80%; /* Restricts the width to 80% of the container */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+        .examples.hidden {
+            opacity: 0;
+            visibility: hidden;
+            height: 0;
+            margin: 0;
+            padding: 0;
         }
 
         .examples ul {
@@ -103,6 +126,22 @@
             text-align: center;
             margin-top: 20px;
             font-size: 18px;
+            flex-grow: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
     </style>
 </head>
@@ -117,45 +156,47 @@
         </div>
     </header>
     <main>
-        <div class="button-container">
-            <button id="letsTalkButton" onclick="window.location.href='{{ url_for('speech') }}'">Let's Talk</button>
-            <button id="weatherButton" onclick="window.location.href='{{ url_for('weather') }}'">Weather</button>
-            <button id="refresh-button" onclick="location.reload();">Refresh</button>
-        </div>        
-        <div class="question-input">
-            <input type="text" id="questionInput" placeholder="Type your question..." onfocus="clearExamples()" oninput="clearExamples()">
-            <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="uploadImage();">
-            <button class="upload-btn" onclick="document.getElementById('imageInput').click();">
-                <img src="{{ url_for('static', filename='cam2.png') }}" alt="Camera" style="width: 30px; height: 30px;">
-            </button>
-            <button class="submit-btn" onclick="submitQuestion()">
-                <img src="{{ url_for('static', filename='send1.png') }}" alt="Send">
-            </button>
+        <div class="content-wrapper">
+            <div class="button-container">
+                <button id="letsTalkButton" onclick="window.location.href='{{ url_for('speech') }}'">Let's Talk</button>
+                <button id="weatherButton" onclick="window.location.href='{{ url_for('weather') }}'">Weather</button>
+                <button id="refresh-button" onclick="location.reload();">Refresh</button>
+            </div>        
+            <div class="question-input">
+                <input type="text" id="questionInput" placeholder="Type your question..." onfocus="hideExamples()" oninput="hideExamples()">
+                <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="uploadImage();">
+                <button class="upload-btn" onclick="document.getElementById('imageInput').click();">
+                    <img src="{{ url_for('static', filename='cam2.png') }}" alt="Camera" style="width: 30px; height: 30px;">
+                </button>
+                <button class="submit-btn" onclick="submitQuestion()">
+                    <img src="{{ url_for('static', filename='send1.png') }}" alt="Send">
+                </button>
+            </div>
+            <div class="examples" id="examples">
+                <p>Few examples to ask!</p>
+                <ul>
+                    <li onclick="insertExample('What are the benefits of crop rotation?')">What are the benefits of crop rotation?</li>
+                    <li onclick="insertExample('How can I conserve water in my farming practices?')">How can I conserve water in my farming practices?</li>
+                    <li onclick="insertExample('What fertilizers are best for organic farming?')">What fertilizers are best for organic farming?</li>
+                    <li onclick="insertExample('How can I protect my crops from frost damage?')">How can I protect my crops from frost damage?</li>
+                </ul>
+            </div>
+            <div class="uploaded-image" id="uploadedImage" style="display: none;">
+                <img id="imagePreview" src="" alt="Uploaded Image">
+            </div>
+            <div class="bot-response" id="botResponse"></div>
         </div>
-        <div class="examples" id="examples">
-            <p>Few examples to ask!</p>
-            <ul>
-                <li onclick="insertExample('What are the benefits of crop rotation?')">What are the benefits of crop rotation?</li>
-                <li onclick="insertExample('How can I conserve water in my farming practices?')">How can I conserve water in my farming practices?</li>
-                <li onclick="insertExample('What fertilizers are best for organic farming?')">What fertilizers are best for organic farming?</li>
-                <li onclick="insertExample('How can I protect my crops from frost damage?')">How can I protect my crops from frost damage?</li>
-            </ul>
-        </div>
-        <div class="uploaded-image" id="uploadedImage" style="display: none;">
-            <img id="imagePreview" src="" alt="Uploaded Image">
-        </div>
-        <div class="bot-response" id="botResponse"></div>
     </main>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
-        function clearExamples() {
-            document.getElementById('examples').style.display = 'none';
+        function hideExamples() {
+            document.getElementById('examples').classList.add('hidden');
         }
 
         function insertExample(exampleText) {
             document.getElementById('questionInput').value = exampleText;
-            clearExamples();
+            hideExamples();
         }
 
         function submitQuestion() {
@@ -188,7 +229,7 @@
             reader.onload = function(e) {
                 document.getElementById('imagePreview').src = e.target.result;
                 document.getElementById('uploadedImage').style.display = 'block';
-                clearExamples();
+                hideExamples();
             };
             reader.readAsDataURL(imageInput);
 
