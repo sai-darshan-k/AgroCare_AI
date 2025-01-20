@@ -14,7 +14,6 @@ import gdown  # To download the model from Google Drive
 from langdetect import detect, DetectorFactory
 from langdetect.lang_detect_exception import LangDetectException
 from gtts import gTTS
-from PIL import Image 
 import time
 
 # Ensure consistent language detection
@@ -207,7 +206,5 @@ def weather():
     return render_template('weather.html')
 
 if __name__ == '__main__':
-    # Render sets the PORT environment variable for the application
-    port = int(os.environ.get("PORT", 5000))  # Default to 5000 if not set
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(debug=True)
 
