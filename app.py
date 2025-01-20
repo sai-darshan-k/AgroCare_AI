@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from flask import Flask, render_template, request, jsonify, send_from_directory
@@ -15,12 +16,22 @@ from langdetect import detect, DetectorFactory
 from langdetect.lang_detect_exception import LangDetectException
 from gtts import gTTS
 import time
+import subprocess
 
 # Ensure consistent language detection
 DetectorFactory.seed = 0
 
 # Load environment variables
 load_dotenv()
+
+# Limit GPU memory usage
+physical_devices = tf.config.list_physical_devices('GPU')
+if physical_devices:
+    for device in physical_devices:
+        tf.config.experimental.set_memory_growth(device, True)
+
+# Force CPU usage if GPU memory is insufficient
+# tf.config.set_visible_devices([], 'GPU')
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "your_secret_key")
