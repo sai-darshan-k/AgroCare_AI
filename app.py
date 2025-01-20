@@ -2,7 +2,7 @@ import os
 import numpy as np
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
-from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, session
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_groq import ChatGroq
@@ -10,8 +10,14 @@ from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv
 from datetime import datetime
 import logging
-import requests  # For weather API integration
 import gdown  # To download the model from Google Drive
+from langdetect import detect, DetectorFactory
+from langdetect.lang_detect_exception import LangDetectException
+from gtts import gTTS
+import time
+
+# Ensure consistent language detection
+DetectorFactory.seed = 0
 
 # Load environment variables
 load_dotenv()
@@ -44,11 +50,15 @@ logging.info('Model loaded. Check http://127.0.0.1:5000/')
 
 # Load the language model
 groqllm = ChatGroq(model="llama3-8b-8192", temperature=0)
-prompt = """(system: You are a crop assistant specializing in agriculture. If the user's question is related to agriculture, provide a detailed and helpful response. If the question is unrelated to agriculture, respond with "I'm sorry, I can only assist with agriculture-related queries.")
+prompt = """(System: You are a crop assistant designed to give responses in the primary language as English. However, if the user asks a question in any language you should respond in the same language as the input. If the language is not one of these, the response will be in English. The system should detect the language of the input and provide a response accordingly. Do not repeat points and keep the response clear and concise.)
+
 (user: Question: {question})"""
 promptinstance = ChatPromptTemplate.from_template(prompt)
 
 labels = {0: 'Healthy', 1: 'Powdery', 2: 'Rust'}
+# Create a directory for storing the audio files if it doesn't exist
+AUDIO_DIR = os.path.join(os.getcwd(), 'static', 'audio')
+os.makedirs(AUDIO_DIR, exist_ok=True)
 
 @app.route('/')
 def index():
@@ -62,22 +72,81 @@ def agrocare():
 def speech():
     return render_template('speech.html')
 
+# Create a directory for storing the audio files if it doesn't exist
+AUDIO_DIR = os.path.join(os.getcwd(), 'static', 'audio')
+os.makedirs(AUDIO_DIR, exist_ok=True)
+
+# Add a new route specifically for speech responses
+@app.route('/ask_speech', methods=['POST'])
+def ask_speech():
+    question = request.json.get('question')
+    logging.info(f"Received speech question: {question}")
+    try:
+        # Detect language and generate response
+        detected_language = detect_language(question)
+        response = promptinstance | groqllm | StrOutputParser()
+        answer = response.invoke({'question': question})
+        formatted_answer = format_answer(answer)
+
+        # Generate audio only for speech interface
+        audio_filename = generate_audio(formatted_answer.replace('<div style=\'text-align: left;\'>', '')
+                                     .replace('</div>', '')
+                                     .replace('<p>', '')
+                                     .replace('</p>', ''), 
+                                     detected_language)
+
+        return jsonify({
+            'answer': formatted_answer,
+            'audio_url': f"/static/audio/{audio_filename}?t={int(time.time())}"
+        })
+    except Exception as e:
+        logging.error(f"Error in speech response: {str(e)}")
+        return jsonify({'answer': f'Error processing your request: {str(e)}'}), 500
+
+# Modify the original ask route to handle text-only responses
 @app.route('/ask', methods=['POST'])
 def ask():
     question = request.json.get('question')
-    logging.info(f"Received question: {question}")
+    logging.info(f"Received text question: {question}")
     try:
+        # Generate text response only
         response = promptinstance | groqllm | StrOutputParser()
         answer = response.invoke({'question': question})
-
         formatted_answer = format_answer(answer)
-        logging.info(f"Response generated: {formatted_answer}")
+        
         return jsonify({'answer': formatted_answer})
     except Exception as e:
-        logging.error(f"Error generating response: {str(e)}")
+        logging.error(f"Error in text response: {str(e)}")
         return jsonify({'answer': f'Error processing your request: {str(e)}'}), 500
 
+def generate_audio(text, lang='en'):
+    try:
+        # Use a fixed filename
+        audio_filename = "response.mp3"
+        audio_path = os.path.join(AUDIO_DIR, audio_filename)
+        
+        # Generate audio file using gTTS
+        tts = gTTS(text=text, lang=lang, slow=False)
+        tts.save(audio_path)
+        logging.info(f"Audio file generated: {audio_path}")
+        return audio_filename
+    except Exception as e:
+        logging.error(f"Error generating audio: {str(e)}")
+        return None
+
+def detect_language(text):
+    """
+    Detect the language of the input text.
+    """
+    try:
+        return detect(text)
+    except LangDetectException:
+        raise LangDetectException("Language detection failed.")
+
 def format_answer(answer):
+    """
+    Format the response to include HTML tags for better display.
+    """
     answer = answer.replace("**", "<strong>").replace("**", "</strong>")
     formatted_answer = "<div style='text-align: left;'>"
     lines = answer.split('\n')
@@ -107,6 +176,9 @@ def upload():
         return jsonify({'prediction': f'Error processing image: {str(e)}'}), 500
 
 def getResult(image_path):
+    """
+    Process the uploaded image and predict the crop disease.
+    """
     img = load_img(image_path, target_size=(225, 225))
     x = img_to_array(img)
     x = x.astype('float32') / 255.

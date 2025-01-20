@@ -160,20 +160,6 @@ main {
     margin-top: 20px;
 }
 
-.completion {
-    background-color: #e9ffe9; /* Light green background for completion */
-    border: 1px solid #4caf60; /* Green border */
-    border-radius: 20px; /* Rounded corners */
-    padding: 15px; /* Padding for the response */
-    padding-left: 25mm; /* Extra space on the left side */
-    font-size: 18px; /* Larger font size */
-    color: #333; /* Dark text color */
-    max-width: 1000px; /* Limit max width */
-    margin: 20px auto; /* Center the response horizontally with vertical spacing */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    text-align: left; /* Align text to the left */
-}
-
 
  
 
@@ -290,15 +276,9 @@ main {
     height: auto;            /* Maintain aspect ratio */
 }
 
-.bot-response {
-    display: flex;
-    justify-content: Justify;  /* Center the response horizontally */
-    margin-top: 20px;        /* Add margin for spacing */
-}
 
-.completion {
-    text-align: center;       /* Center align the text */
-}
+
+
 /* Style for the Let's Talk button */
 #letsTalkButton {
     background-color: green; /* Green background */
@@ -333,31 +313,6 @@ main {
     background-color: darkgreen; /* Darker green on hover */
 }
 
-/* Styles for the container holding the question and response */
-.qa-container {
-    display: flex;
-    flex-direction: column; /* Stack question and response vertically */
-    margin: 20px auto;
-    padding: 15px;
-    max-width: 600px;
-    background-color: #f4fff4; /* Light green background */
-    border-radius: 10px;
-    border: 1px solid #ddd; /* Light border for separation */
-}
-
-/* Individual styling for question and response */
-.qa-container .completion {
-    margin-bottom: 15px;
-    padding: 10px;
-    background-color: #eafbe8; /* Slightly darker green for distinction */
-    border-radius: 5px;
-}
-
-.qa-container .completion strong {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
 
 
 /* Style for the Go Back button */

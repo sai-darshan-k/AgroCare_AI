@@ -9,9 +9,16 @@
         body {
             background-image: url('{{ url_for("static", filename="bg4.webp") }}');
             background-size: cover;
-            background-position: right;
+            background-position: center;
+            background-repeat: no-repeat;
             font-family: Arial, sans-serif;
-            color: #eff5ef;
+            color: #131111;
+            background-color: transparent;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         header {
             text-align: center;
@@ -72,11 +79,56 @@
             border-radius: 8px;
         }
         .completion {
-            margin-bottom: 20px;
+            white-space: pre-wrap;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            margin-bottom: 10px;
+        }
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .play-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            flex-basis: 100%;
+        }
+        .play-button:hover {
+            background-color: #45a049;
+        }
+        /* Center the audio player */
+        .audio-player-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
+    <div style="position: fixed; top: 10px; left: 10px;">
+        <label for="language-select">Select Language:</label>
+        <select id="language-select">
+            <option value="en-US">English</option>
+            <option value="kn-IN">Kannada</option>
+            <option value="ta-IN">Tamil</option>
+            <option value="hi-IN">Hindi</option>
+            <option value="te-IN">Telugu</option>
+        </select>
+    </div>
     <header>
         <div class="logo">
             <img src="{{ url_for('static', filename='mainlogo.png') }}" alt="AgroCare">
@@ -85,105 +137,90 @@
         <div class="title">
             <h2>Ask Your Questions!!</h2>
         </div>
-        <div class="language-switcher">
-            <button id="lang-toggle">English</button>
-        </div>
     </header>
+    
+    <!-- Centered Audio Player -->
+    <div class="audio-player-container">
+        <audio controls>
+            <source src="{{ audio_url }}" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
     <main>
         <div class="speech-input">
-            <button id="startSpeechButton" onclick="startSpeechRecognition()">🎤 Start Talking</button>
-            <button class="go-back-button" onclick="window.history.back()">Go Back</button> <!-- Go Back button -->
+            <button id="startSpeechButton" onclick="startSpeechRecognition()">Start Talking</button>
+            <button class="go-back-button" onclick="window.history.back()">Go Back</button>
         </div>
-        <!-- Container for displaying the question and response -->
-        <div class="qa-container" id="botResponse"></div>
+        <div class="qa-container" id="botResponse">
+            <!-- Response will be appended here -->
+        </div>
     </main>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
-        // Check for browser support
-        if (!('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
-            alert('Speech recognition is not supported in this browser.');
-        }
+        let utterance;
+        let isPlaying = false;
+        let playPauseButton;
+        let selectedLanguage = "en-US"; // Default language
+
+        // Update language selection
+        document.getElementById("language-select").addEventListener("change", function () {
+            selectedLanguage = this.value;
+        });
 
         function startSpeechRecognition() {
-            // Clear previous messages
             document.getElementById('botResponse').innerHTML = '';
-
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'en-US';
-            recognition.interimResults = false; // Only return final results
+            recognition.lang = selectedLanguage; // Use selected language
+            recognition.interimResults = false;
 
-            recognition.onstart = function() {
-                console.log('Voice recognition started. Speak into the microphone.');
-            };
-
-            recognition.onresult = function(event) {
+            recognition.onresult = function (event) {
                 const transcript = event.results[0][0].transcript;
-
-                // Create a div for the question
                 const questionDiv = document.createElement('div');
                 questionDiv.classList.add('completion');
-                questionDiv.innerHTML = `<strong>Question:</strong> ${transcript}`; // Display the question
-
-                // Append the question to the bot response div
+                questionDiv.innerHTML = `<strong>Question:</strong> ${transcript}`;
                 document.getElementById('botResponse').appendChild(questionDiv);
-
-                speakText(transcript); // Read the transcript aloud
-                submitQuestion(transcript); // Send the recognized text to the backend
+                submitQuestion(transcript, selectedLanguage);
             };
 
-            recognition.onerror = function(event) {
+            recognition.onerror = function (event) {
                 console.error('Speech recognition error:', event.error);
                 alert('Error occurred in speech recognition: ' + event.error);
-            };
-
-            recognition.onend = function() {
-                console.log('Voice recognition ended.');
             };
 
             recognition.start();
         }
 
-        function speakText(text) {
-            if (text) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.onend = function() {
-                    console.log('Speech finished.');
-                };
-                utterance.onerror = function(event) {
-                    console.error('Speech synthesis error:', event);
-                };
-                window.speechSynthesis.speak(utterance);
-            } else {
-                console.warn('No text to speak.');
-            }
+        function submitQuestion(question, lang) {
+    $.ajax({
+        url: '/ask_speech',  // New endpoint for speech interface
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ question: question, language: lang }),
+        success: function(response) {
+            const answer = response.answer;
+            const audioUrl = response.audio_url;
+
+            // Display the response
+            const botResponseDiv = document.getElementById('botResponse');
+            const answerDiv = document.createElement('div');
+            answerDiv.classList.add('completion');
+            answerDiv.innerHTML = `<strong>Response:</strong> <br>${answer}`;
+            botResponseDiv.appendChild(answerDiv);
+
+            // Update the audio player
+            const audioElement = document.querySelector('audio');
+            audioElement.src = audioUrl;
+            audioElement.style.display = 'block';
+            audioElement.play();
+        },
+        error: function(error) {
+            console.error('Error:', error);
+            alert('Error occurred while sending the question. Please try again later.');
         }
-
-        function submitQuestion(question) {
-            $.ajax({
-                url: '/ask', // Replace with your backend URL
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ question: question }),
-                success: function(response) {
-                    var answer = response.answer;
-                    console.log('Answer:', answer);
-                    // Create a div for the answer
-                    const answerDiv = document.createElement('div');
-                    answerDiv.classList.add('completion');
-                    answerDiv.innerHTML = `<strong>Response:</strong> ${answer}`; // Display the answer
-
-                    // Append the answer to the bot response div
-                    document.getElementById('botResponse').appendChild(answerDiv);
-
-                    speakText(answer); // Read the answer aloud
-                },
-                error: function(error) {
-                    console.error('Error:', error);
-                    alert('Error occurred while sending the question. Please try again later.');
-                }
-            });
-        }
+    });
+}
     </script>
 </body>
 </html>
