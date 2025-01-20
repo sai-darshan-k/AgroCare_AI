@@ -206,4 +206,7 @@ def weather():
     return render_template('weather.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Render sets the PORT environment variable for the application
+    port = int(os.environ.get("PORT", 5000))  # Default to 5000 if not set
+    app.run(host="0.0.0.0", port=port, debug=True)
+
