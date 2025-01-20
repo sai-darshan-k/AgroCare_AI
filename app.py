@@ -14,6 +14,7 @@ import gdown  # To download the model from Google Drive
 from langdetect import detect, DetectorFactory
 from langdetect.lang_detect_exception import LangDetectException
 from gtts import gTTS
+from PIL import Image 
 import time
 
 # Ensure consistent language detection
