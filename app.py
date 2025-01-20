@@ -28,8 +28,7 @@ app.secret_key = os.getenv("SECRET_KEY", "your_secret_key")
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
-# Google Drive link for the model
-drive_link = "https://drive.google.com/file/d/1rFdr51QVWy3mpzWPCYgdRH1XCH7Yefv6"  # Model ID extracted
+# Google Drive link for the model  # Model ID extracted
 model_path = os.getenv("MODEL_PATH", "my_model.tflite")
 
 # Function to download model from Google Drive
@@ -44,7 +43,7 @@ def download_model_from_drive(drive_link, destination):
             raise e
 
 # Download and load the TensorFlow Lite model
-download_model_from_drive(drive_link, model_path)
+download_model_from_drive(model_path)
 
 # Load the TensorFlow Lite model using the interpreter
 interpreter = lite.Interpreter(model_path=model_path)
