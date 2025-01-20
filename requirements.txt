@@ -6,10 +6,10 @@ tensorflow==2.18.0
 langchain==0.2.11
 langchain-core==0.3.30
 langchain-groq==0.2.3
-python-dotenv==1.0.1
+python-dotenv
 gdown==5.2.0
 numpy==1.26.4
 werkzeug==3.0.3
 langdetect==1.0.9
 gTTS==2.5.3
-dotenv==1.0.1
+dotenv
