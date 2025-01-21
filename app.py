@@ -66,7 +66,7 @@ os.makedirs(AUDIO_DIR, exist_ok=True)
 
 @app.route('/')
 def index():
-    return render_template('agrocare.html')
+    return render_template('index.html')
 
 @app.route('/agrocare')
 def agrocare():
