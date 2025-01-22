@@ -6,115 +6,102 @@
   <title>Kissan 4.0 - The Future of Agriculture</title>
   <style>
     /* General Styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+/* General Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    body {
-      font-family: 'Arial', sans-serif;
-      line-height: 1.6;
-      color: #333;
-    }
+body {
+  font-family: 'Arial', sans-serif;
+  line-height: 1.6;
+  color: #333;
+}
 
-    .container {
-      width: 90%;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-    h1, h2, h3 {
-      color: #2c5f2d;
-    }
+h1, h2, h3 {
+  color: #2c5f2d;
+}
 
-    a {
-      text-decoration: none;
-      color: #fff;
-    }
+a {
+  text-decoration: none;
+  color: #fff;
+}
 
-    .cta-btn {
-      display: inline-block;
-      background-color: #4caf50;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 5px;
-      font-weight: bold;
-      transition: background 0.3s;
-    }
+.cta-btn {
+  display: inline-block;
+  background-color: #4caf50;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
 
-    .cta-btn:hover {
-      background-color: #45a049;
-    }
+.cta-btn:hover {
+  background-color: #45a049;
+}
 
-    /* Navbar Section */
-    .navbar {
-      position: sticky;
-      top: 0;
-      background-color: #2c5f58; /* Dark green background */
-      z-index: 1000;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 20px;
-      color: #fff;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
+/* Navbar Section */
+.navbar {
+  position: sticky;
+  top: 0;
+  background-color: #2c5f58; /* Dark green background */
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
 
-    .navbar .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
+.navbar .logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
 
-    .nav-links {
-      display: flex; /* Aligns links horizontally */
-      list-style: none;
-      gap: 20px; /* Adds space between links */
-    }
+.nav-links {
+  display: flex; /* Aligns links horizontally */
+  list-style: none;
+  gap: 20px; /* Adds space between links */
+}
 
-    .nav-links li {
-      display: inline-block;
-    }
+.nav-links li {
+  display: inline-block;
+}
 
-    .nav-links a {
-      color: #fff;
-      font-weight: bold;
-      text-decoration: none;
-      transition: color 0.3s;
-      padding: 8px 10px;
-    }
+.nav-links a {
+  color: #fff;
+  font-weight: bold;
+  text-decoration: none;
+  transition: color 0.3s;
+  padding: 8px 10px;
+}
 
-    .nav-links a:hover {
-      color: #45a049; /* Lighter green on hover */
-    }
+.nav-links a:hover {
+  color: #45a049; /* Lighter green on hover */
+}
 
-    .cta-btn {
-      background-color: #4caf50; /* Green button */
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 5px;
-      font-weight: bold;
-      text-decoration: none;
-      transition: background 0.3s;
-    }
+/* Hero Section */
+.hero {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  text-align: center;
+  overflow: hidden; /* Ensure content doesn't overflow */
+}
 
-    .cta-btn:hover {
-      background-color: #45a049; /* Lighter green on hover */
-    }
-
-    /* Hero Section */
-    .hero {
-      position: relative;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
-      text-align: center;
-      overflow: hidden; /* Ensure content doesn't overflow */
-    }
-
-    .hero-content {
+.hero-content {
   position: relative;
   z-index: 1;
   margin-top: -50px; /* Move the content upward */
@@ -132,119 +119,103 @@
   margin-bottom: 30px;
 }
 
-    .hero-video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -1;
-    }
+.hero-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
 
-    /* Features Section */
-    .features {
-      padding: 50px 0;
-      background: #f9f9f9;
-    }
+/* Features Section */
+.features {
+  padding: 50px 0;
+  background: #f9f9f9;
+}
 
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-    }
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
 
-    .feature-card {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
+.feature-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
 
-    .feature-card img {
-      max-width: 80px;
-      margin-bottom: 20px;
-    }
+.feature-card img {
+  max-width: 80px;
+  margin-bottom: 20px;
+}
 
-    /* About Section */
-    .about {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 50px 0;
-    }
+/* About Section */
+.about {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 50px 0;
+}
 
-    .about-content {
-      flex: 1;
-      padding-right: 20px;
-    }
+.about-content {
+  flex: 1;
+  padding-right: 20px;
+}
 
-    .about img {
-      max-width: 100%;
-      border-radius: 10px;
-    }
+.about img {
+  max-width: 100%;
+  border-radius: 10px;
+}
 
-    /* Contact Section */
-    .contact {
-      padding: 50px 0;
-      text-align: center;
-    }
+/* Contact Section */
+.contact {
+  padding: 50px 0;
+  text-align: center;
+}
 
-    .contact-form {
-      max-width: 600px;
-      margin: 20px auto;
-      display: flex;
-      flex-direction: column;
-    }
+.contact-form {
+  max-width: 600px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+}
 
-    .contact-form input, .contact-form textarea {
-      margin-bottom: 15px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
+.contact-form input, .contact-form textarea {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
 
-    .contact-form button {
-      background: #4caf50;
-      color: #fff;
-      padding: 10px;
-      border: none;
-      border-radius: 5px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
+.contact-form button {
+  background: #4caf50;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+}
 
-    .contact-form button:hover {
-      background: #45a049;
-    }
+.contact-form button:hover {
+  background: #45a049;
+}
 
-    /* Footer */
-    .footer {
-      text-align: center;
-      padding: 20px 0;
-      background: #2c5f2d;
-      color: #fff;
-    }
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 20px 0;
+  background: #2c5f2d;
+  color: #fff;
+}
 
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .about {
-        flex-direction: column;
-        text-align: center;
-      }
-
-      .about-content {
-        padding-right: 0;
-        margin-bottom: 20px;
-      }
-
-      .nav-links {
-        flex-direction: column;
-        gap: 10px;
-      }
-    }
-    .objectives {
+/* Objectives Section */
+.objectives {
   padding: 50px 0;
 }
 
@@ -295,6 +266,45 @@
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .about {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .about-content {
+    padding-right: 0;
+    margin-bottom: 20px;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+
+  .objective-row {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .objective-image, .objective-description {
+    padding: 10px;
+  }
+
+  .objective-row::after {
+    display: none; /* Remove the line between objectives on mobile */
+  }
+}
   </style>
 </head>
 <body>
@@ -306,7 +316,7 @@
       <li><a href="#about">About</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
-    <a href="/agrocare" class="cta-btn">Get Started</a>
+    <a href="/agrocare" class="cta-btn">Get Start with AI</a>
   </header>
 
   <!-- Hero Section -->
