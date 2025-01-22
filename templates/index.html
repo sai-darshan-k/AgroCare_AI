@@ -5,319 +5,445 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kissan 4.0 - The Future of Agriculture</title>
   <style>
-    /* General Styles */
-/* General Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+    /* Reset and Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-body {
-  font-family: 'Arial', sans-serif;
-  line-height: 1.6;
-  color: #333;
-}
+    body {
+      font-family: 'Arial', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      overflow-x: hidden;
+    }
 
-.container {
-  width: 90%;
-  max-width: 1200px;
-  margin: 0 auto;
-}
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
 
-h1, h2, h3 {
-  color: #2c5f2d;
-}
+    h1, h2, h3 {
+      color: #2c5f2d;
+    }
 
-a {
-  text-decoration: none;
-  color: #fff;
-}
+    a {
+      text-decoration: none;
+      color: #fff;
+    }
 
-.cta-btn {
-  display: inline-block;
-  background-color: #4caf50;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 5px;
-  font-weight: bold;
-  transition: background 0.3s;
-}
+    /* Button Styles */
+    .cta-btn {
+      display: inline-block;
+      background-color: #4caf50;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
 
-.cta-btn:hover {
-  background-color: #45a049;
-}
+    .cta-btn:hover {
+      background-color: #45a049;
+    }
 
-/* Navbar Section */
-.navbar {
-  position: sticky;
-  top: 0;
-  background-color: #2c5f58; /* Dark green background */
-  z-index: 1000;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  color: #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+    /* Navbar Styles */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #2c5f58;
+      z-index: 1000;
+      padding: 15px 20px;
+    }
 
-.navbar .logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
 
-.nav-links {
-  display: flex; /* Aligns links horizontally */
-  list-style: none;
-  gap: 20px; /* Adds space between links */
-}
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #fff;
+    }
 
-.nav-links li {
-  display: inline-block;
-}
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 30px;
+      height: 21px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 1001;
+    }
 
-.nav-links a {
-  color: #fff;
-  font-weight: bold;
-  text-decoration: none;
-  transition: color 0.3s;
-  padding: 8px 10px;
-}
+    .menu-toggle span {
+      width: 100%;
+      height: 3px;
+      background-color: #fff;
+      transition: all 0.3s linear;
+    }
 
-.nav-links a:hover {
-  color: #45a049; /* Lighter green on hover */
-}
+    .nav-links {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
 
-/* Hero Section */
-.hero {
-  position: relative;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  text-align: center;
-  overflow: hidden; /* Ensure content doesn't overflow */
-}
+    .nav-links li {
+      margin-left: 30px;
+    }
 
+    .nav-links a {
+      color: #fff;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: #4caf50;
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 60px;
+    }
+
+/* Update the hero-content styles to remove white background */
 .hero-content {
   position: relative;
   z-index: 1;
-  margin-top: -50px; /* Move the content upward */
   text-align: center;
-  color: #061303;
+  color: #ffffff; /* Changed to white text */
+  padding: 30px;
+  margin: 0 15px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add text shadow for better readability */
 }
+    .hero-content h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
 
-.hero-content h1 {
-  font-size: 3rem;
-  margin-bottom: 20px;
-}
+    .hero-content p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+    }
 
-.hero-content p {
-  font-size: 1.2rem;
-  margin-bottom: 30px;
-}
+    .hero-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
 
-.hero-video {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: -1;
-}
+    /* Features Section */
+    .features {
+      padding: 80px 0;
+      background: #f9f9f9;
+    }
 
-/* Features Section */
-.features {
-  padding: 50px 0;
-  background: #f9f9f9;
-}
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      padding: 40px 0;
+    }
 
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-}
+    .feature-card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+    }
 
-.feature-card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
 
-.feature-card img {
-  max-width: 80px;
-  margin-bottom: 20px;
-}
+    .feature-card img {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+    }
 
-/* About Section */
-.about {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 50px 0;
-}
+    /* Objectives Section */
+    .objectives {
+      padding: 80px 0;
+    }
 
-.about-content {
-  flex: 1;
-  padding-right: 20px;
-}
+    .objective-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 60px;
+      gap: 40px;
+    }
 
-.about img {
-  max-width: 100%;
-  border-radius: 10px;
-}
+    .objective-row:nth-child(even) {
+      flex-direction: row-reverse;
+    }
 
-/* Contact Section */
-.contact {
-  padding: 50px 0;
-  text-align: center;
-}
+    .objective-image {
+      flex: 1;
+    }
 
-.contact-form {
-  max-width: 600px;
-  margin: 20px auto;
-  display: flex;
-  flex-direction: column;
-}
+    .objective-image img {
+      width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
 
-.contact-form input, .contact-form textarea {
-  margin-bottom: 15px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
+    .objective-description {
+      flex: 1;
+    }
 
-.contact-form button {
-  background: #4caf50;
-  color: #fff;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  cursor: pointer;
-}
+    .objective-description h3 {
+      margin-bottom: 20px;
+    }
 
-.contact-form button:hover {
-  background: #45a049;
-}
+    /* Contact Section */
+    .contact {
+      padding: 80px 0;
+      background: #f9f9f9;
+    }
 
-/* Footer */
-.footer {
-  text-align: center;
-  padding: 20px 0;
-  background: #2c5f2d;
-  color: #fff;
-}
+    .contact-form {
+      max-width: 600px;
+      margin: 40px auto 0;
+    }
 
-/* Objectives Section */
+    .contact-form input,
+    .contact-form textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .contact-form textarea {
+      height: 150px;
+      resize: vertical;
+    }
+
+    .contact-form button {
+      width: 100%;
+      padding: 12px;
+      background: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .contact-form button:hover {
+      background: #45a049;
+    }
+
+    /* Footer */
+    .footer {
+      background: #2c5f2d;
+      color: #fff;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    /* Mobile Responsive Styles */
+    @media screen and (max-width: 768px) {
+      .menu-toggle {
+        display: flex;
+      }
+
+      .nav-links {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #2c5f58;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .nav-links.active {
+        display: flex;
+      }
+
+      .nav-links li {
+        margin: 15px 0;
+      }
+
+      .hero-content h1 {
+        font-size: 2rem;
+      }
+
+      .hero-content p {
+        font-size: 1rem;
+      }
+
+      .objective-row,
+      .objective-row:nth-child(even) {
+        flex-direction: column;
+        margin-bottom: 40px;
+      }
+
+      .objective-image,
+      .objective-description {
+        width: 100%;
+      }
+
+      .cta-btn {
+        display: none;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      .container {
+        width: 95%;
+      }
+
+      .hero-content {
+        padding: 20px;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .feature-card {
+        padding: 20px;
+      }
+    }
+    /* Update Objectives Section */
 .objectives {
-  padding: 50px 0;
+  padding: 80px 0;
 }
 
 .objective-row {
   display: flex;
   align-items: center;
-  margin-bottom: 40px;
-  position: relative;
+  margin-bottom: 60px;
+  gap: 40px;
+  position: relative; /* For separator positioning */
 }
 
-.objective-row:nth-child(even) {
-  flex-direction: row-reverse;
-}
-
-.objective-image img {
-  max-width: 100%;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.objective-description {
-  flex: 1;
-  padding: 20px;
-}
-
-.objective-description h3 {
-  color: #2c5f2d;
-  margin-bottom: 10px;
-}
-
-.objective-description p {
-  font-size: 1rem;
-  line-height: 1.6;
-}
-
-.objective-image {
-  flex: 1;
-  padding: 20px;
-}
-
-.objective-row::after {
-  content: "";
-  position: absolute;
-  width: 2px;
-  background-color: #2c5f2d;
-  height: 80%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .about {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .about-content {
-    padding-right: 0;
-    margin-bottom: 20px;
-  }
-
-  .nav-links {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .hero-content h1 {
-    font-size: 2rem;
-  }
-
-  .hero-content p {
-    font-size: 1rem;
-  }
-
+/* Horizontal Separator for Mobile */
+@media screen and (max-width: 768px) {
   .objective-row {
     flex-direction: column;
-    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 40px; /* Space for separator */
   }
 
-  .objective-image, .objective-description {
-    padding: 10px;
+  .objective-row:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%; /* Width of separator */
+    height: 2px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      #2c5f2d,
+      transparent
+    );
+    margin: 20px 0;
   }
 
-  .objective-row::after {
-    display: none; /* Remove the line between objectives on mobile */
+  .objective-row,
+  .objective-row:nth-child(even) {
+    flex-direction: column;
+  }
+
+  .objective-image,
+  .objective-description {
+    width: 100%;
+  }
+  
+  /* Adjust hero text for better visibility on mobile */
+  .hero-content h1 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+  }
+  
+  .hero-content p {
+    font-size: 1rem;
+    margin-bottom: 25px;
+  }
+}
+
+/* Add overlay to hero video for better text readability */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4); /* Dark overlay */
+  z-index: 1;
+}
+
+.hero-content {
+  z-index: 2; /* Ensure content stays above overlay */
+}
+
+/* Adjust separator for smaller screens */
+@media screen and (max-width: 480px) {
+  .objective-row:not(:last-child)::after {
+    width: 90%; /* Wider separator on very small screens */
   }
 }
   </style>
 </head>
 <body>
-  <!-- Header Section -->
-  <header class="navbar">
-    <div class="logo">Kissan 4.0</div>
-    <ul class="nav-links">
-      <li><a href="#features">Features</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-    <a href="/agrocare" class="cta-btn">Get Start with AI</a>
-  </header>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">Kissan 4.0</div>
+      <button class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#objectives">Objectives</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <a href="/agrocare" class="cta-btn">Get Started with AI</a>
+    </div>
+  </nav>
 
   <!-- Hero Section -->
   <section class="hero">
@@ -326,157 +452,182 @@ a {
       <p>Your one-stop solution for sustainable farming, AI tools, and live updates.</p>
       <a href="#features" class="cta-btn">Explore Features</a>
     </div>
-    <!-- Video Background -->
-    <video autoplay loop muted class="hero-video">
-      <source src="static\vid1.mp4" type="video/mp4">
+    <video autoplay loop muted playsinline class="hero-video">
+      <source src="static/vid1.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
   </section>
 
-<!-- Divider Line -->
-<hr style="border: 1px solid #ccc; margin: 40px auto; width: 80%;">
+  <hr style="border: 1px solid #ccc; margin: 40px auto; width: 80%;">
 
-<!-- Objectives Section -->
-<section id="objectives" class="objectives">
-  <div class="container">
-    <h2 style="text-align: center; margin-bottom: 40px; color: #2c5f2d;">Objectives</h2>
-
-    <!-- Objective 1 -->
-    <div class="objective">
-      <div class="objective-row">
-        <div class="objective-image">
-          <img src="static\emp2.jpg" alt="Empower Farmers">
-        </div>
-        <div class="objective-description">
-          <h3>Empower Farmers with Technology</h3>
-          <p>Equip farmers with cutting-edge tools and technologies that simplify their daily operations. By integrating AI, IoT, and data-driven solutions, we aim to bridge the gap between traditional farming methods and modern advancements, ensuring a seamless transition to smart agriculture.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Objective 2 -->
-    <div class="objective">
-      <div class="objective-row reverse">
-        <div class="objective-description">
-          <h3>Sustainable Farming Practices</h3>
-          <p>Foster environmentally friendly farming methods that conserve resources and reduce waste. Our platform provides insights into sustainable practices, helping farmers maintain soil health, optimize water usage, and reduce the carbon footprint of their activities.</p>
-        </div>
-        <div class="objective-image">
-          <img src="static\sus1.webp" alt="Sustainable Farming">
-        </div>
-      </div>
-    </div>
-
-    <!-- Objective 3 -->
-    <div class="objective">
-      <div class="objective-row">
-        <div class="objective-image">
-          <img src="static\productuvity.avif" alt="Enhance Productivity">
-        </div>
-        <div class="objective-description">
-          <h3>Enhance Productivity and Efficiency</h3>
-          <p>Boost agricultural productivity by leveraging AI-powered tools for precision farming. From real-time data analysis to crop health monitoring, our solutions empower farmers to make informed decisions that maximize yield and minimize effort.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Objective 4 -->
-    <div class="objective">
-      <div class="objective-row reverse">
-        <div class="objective-description">
-          <h3>Real-Time Monitoring</h3>
-          <p>Enable farmers to monitor their fields in real-time with AI-driven surveillance systems. Our solutions integrate advanced sensors, drones, and cameras to detect potential threats, ensure crop safety, and provide actionable insights instantly.</p>
-        </div>
-        <div class="objective-image">
-          <img src="static\real-time.jpg" alt="Real-Time Monitoring">
-        </div>
-      </div>
-    </div>
-
-    <!-- Objective 5 -->
-    <div class="objective">
-      <div class="objective-row">
-        <div class="objective-image">
-          <img src="static\Market.jpg" alt="Market Info">
-        </div>
-        <div class="objective-description">
-          <h3>Real-Time Market Information</h3>
-          <p>Provide farmers with up-to-date market trends, crop prices, and demand forecasts. Our platform ensures transparency in market dynamics, helping farmers make profitable decisions and connect directly with buyers to maximize their earnings.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-  <!-- Features Section -->
-  <section id="features" class="features">
+  <!-- Objectives Section -->
+  <section id="objectives" class="objectives">
     <div class="container">
-      <h2>Key Features</h2>
-      <div class="features-grid">
-        <div class="feature-card">
-          <img src="images/chatbot.png" alt="Chatbot">
-          <h3>Multilingual Chatbot</h3>
-          <p>Get farming advice in your preferred language using our AI-powered chatbot.</p>
+      <h2 style="text-align: center; margin-bottom: 40px; color: #2c5f2d;">Objectives</h2>
+  
+      <!-- Objective 1 -->
+      <div class="objective">
+        <div class="objective-row">
+          <div class="objective-image">
+            <img src="static\emp2.jpg" alt="Empower Farmers">
+          </div>
+          <div class="objective-description">
+            <h3>Empower Farmers with Technology</h3>
+            <p>Equip farmers with cutting-edge tools and technologies that simplify their daily operations. By integrating AI, IoT, and data-driven solutions, we aim to bridge the gap between traditional farming methods and modern advancements, ensuring a seamless transition to smart agriculture.</p>
+          </div>
         </div>
-        <div class="feature-card">
-          <img src="images/disease.png" alt="Disease Prediction">
-          <h3>Disease Prediction</h3>
-          <p>Upload crop images and get instant disease diagnosis with AI recommendations.</p>
+      </div>
+  
+      <!-- Objective 2 -->
+      <div class="objective">
+        <div class="objective-row reverse">
+          <div class="objective-description">
+            <h3>Sustainable Farming Practices</h3>
+            <p>Foster environmentally friendly farming methods that conserve resources and reduce waste. Our platform provides insights into sustainable practices, helping farmers maintain soil health, optimize water usage, and reduce the carbon footprint of their activities.</p>
+          </div>
+          <div class="objective-image">
+            <img src="static\sus1.webp" alt="Sustainable Farming">
+          </div>
         </div>
-        <div class="feature-card">
-          <img src="images/weather.png" alt="Weather Updates">
-          <h3>Live Weather & Air Quality</h3>
-          <p>Access real-time weather forecasts and air quality data tailored to your location.</p>
+      </div>
+  
+      <!-- Objective 3 -->
+      <div class="objective">
+        <div class="objective-row">
+          <div class="objective-image">
+            <img src="static\productuvity.avif" alt="Enhance Productivity">
+          </div>
+          <div class="objective-description">
+            <h3>Enhance Productivity and Efficiency</h3>
+            <p>Boost agricultural productivity by leveraging AI-powered tools for precision farming. From real-time data analysis to crop health monitoring, our solutions empower farmers to make informed decisions that maximize yield and minimize effort.</p>
+          </div>
         </div>
-        <div class="feature-card">
-          <img src="images/sensors.png" alt="Sensor Data">
-          <h3>Sensor Data</h3>
-          <p>Monitor soil moisture, temperature, and more using IoT sensor integration.</p>
+      </div>
+  
+      <!-- Objective 4 -->
+      <div class="objective">
+        <div class="objective-row reverse">
+          <div class="objective-description">
+            <h3>Real-Time Monitoring</h3>
+            <p>Enable farmers to monitor their fields in real-time with AI-driven surveillance systems. Our solutions integrate advanced sensors, drones, and cameras to detect potential threats, ensure crop safety, and provide actionable insights instantly.</p>
+          </div>
+          <div class="objective-image">
+            <img src="static\real-time.jpg" alt="Real-Time Monitoring">
+          </div>
         </div>
-        <div class="feature-card">
-          <img src="images/surveillance.png" alt="Surveillance">
-          <h3>24/7 AI Surveillance</h3>
-          <p>Track farm activities and detect threats with AI-powered cameras and drones.</p>
-        </div>
-        <div class="feature-card">
-          <img src="images/market.png" alt="Market Prices">
-          <h3>Live Market Prices</h3>
-          <p>Stay updated with real-time market prices for crops across major regions.</p>
+      </div>
+  
+      <!-- Objective 5 -->
+      <div class="objective">
+        <div class="objective-row">
+          <div class="objective-image">
+            <img src="static\Market.jpg" alt="Market Info">
+          </div>
+          <div class="objective-description">
+            <h3>Real-Time Market Information</h3>
+            <p>Provide farmers with up-to-date market trends, crop prices, and demand forecasts. Our platform ensures transparency in market dynamics, helping farmers make profitable decisions and connect directly with buyers to maximize their earnings.</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
-
-  <!-- About Section -->
-  <section id="about" class="about">
-    <div class="container">
-      <div class="about-content">
-        <h2>About Kissan 4.0</h2>
-        <p>Kissan 4.0 is a revolutionary platform designed to bring technology to agriculture. Our mission is to empower farmers with tools that promote sustainability, boost productivity, and simplify decision-making.</p>
-        <a href="#" class="cta-btn">Learn More</a>
+  
+  
+    <!-- Features Section -->
+    <section id="features" class="features">
+      <div class="container">
+        <h2>Key Features</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <img src="images/chatbot.png" alt="Chatbot">
+            <h3>Multilingual Chatbot</h3>
+            <p>Get farming advice in your preferred language using our AI-powered chatbot.</p>
+          </div>
+          <div class="feature-card">
+            <img src="images/disease.png" alt="Disease Prediction">
+            <h3>Disease Prediction</h3>
+            <p>Upload crop images and get instant disease diagnosis with AI recommendations.</p>
+          </div>
+          <div class="feature-card">
+            <img src="images/weather.png" alt="Weather Updates">
+            <h3>Live Weather & Air Quality</h3>
+            <p>Access real-time weather forecasts and air quality data tailored to your location.</p>
+          </div>
+          <div class="feature-card">
+            <img src="images/sensors.png" alt="Sensor Data">
+            <h3>Sensor Data</h3>
+            <p>Monitor soil moisture, temperature, and more using IoT sensor integration.</p>
+          </div>
+          <div class="feature-card">
+            <img src="images/surveillance.png" alt="Surveillance">
+            <h3>24/7 AI Surveillance</h3>
+            <p>Track farm activities and detect threats with AI-powered cameras and drones.</p>
+          </div>
+          <div class="feature-card">
+            <img src="images/market.png" alt="Market Prices">
+            <h3>Live Market Prices</h3>
+            <p>Stay updated with real-time market prices for crops across major regions.</p>
+          </div>
+        </div>
       </div>
-      <img src="images/farming.png" alt="About Kissan 4.0">
-    </div>
-  </section>
+    </section>
+  
+    <!-- About Section -->
+    <section id="about" class="about">
+      <div class="container">
+        <div class="about-content">
+          <h2>About Kissan 4.0</h2>
+          <p>Kissan 4.0 is a revolutionary platform designed to bring technology to agriculture. Our mission is to empower farmers with tools that promote sustainability, boost productivity, and simplify decision-making.</p>
+          <a href="#" class="cta-btn">Learn More</a>
+        </div>
+        <img src="images/farming.png" alt="About Kissan 4.0">
+      </div>
+    </section>
+  
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+      <div class="container">
+        <h2>Contact Us</h2>
+        <p>Have questions? We're here to help. Reach out to us anytime!</p>
+        <form class="contact-form">
+          <input type="text" placeholder="Your Name" required>
+          <input type="email" placeholder="Your Email" required>
+          <textarea placeholder="Your Message" required></textarea>
+          <button type="submit">Send Message</button>
+        </form>
+      </div>
+    </section>
+  
+    <!-- Footer -->
+    <footer class="footer">
+      <p>&copy; 2025 Kissan 4.0. All Rights Reserved.</p>
+    </footer>
 
-  <!-- Contact Section -->
-  <section id="contact" class="contact">
-    <div class="container">
-      <h2>Contact Us</h2>
-      <p>Have questions? We're here to help. Reach out to us anytime!</p>
-      <form class="contact-form">
-        <input type="text" placeholder="Your Name" required>
-        <input type="email" placeholder="Your Email" required>
-        <textarea placeholder="Your Message" required></textarea>
-        <button type="submit">Send Message</button>
-      </form>
-    </div>
-  </section>
+  <!-- JavaScript for Mobile Menu -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const menuToggle = document.querySelector('.menu-toggle');
+      const navLinks = document.querySelector('.nav-links');
+      
+      menuToggle.addEventListener('click', function() {
+        navLinks.classList.toggle('active');
+      });
 
-  <!-- Footer -->
-  <footer class="footer">
-    <p>&copy; 2025 Kissan 4.0. All Rights Reserved.</p>
-  </footer>
+      // Close menu when clicking links
+      const links = document.querySelectorAll('.nav-links a');
+      links.forEach(link => {
+        link.addEventListener('click', () => {
+          navLinks.classList.remove('active');
+        });
+      });
+
+      // Close menu when clicking outside
+      document.addEventListener('click', function(event) {
+        if (!event.target.closest('.navbar')) {
+          navLinks.classList.remove('active');
+        }
+      });
+    });
+  </script>
 </body>
 </html>
