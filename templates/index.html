@@ -5,343 +5,219 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kissan 4.0 - The Future of Agriculture</title>
   <style>
-    /* Reset and Base Styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    body {
-      font-family: 'Arial', sans-serif;
-      line-height: 1.6;
-      color: #333;
-      overflow-x: hidden;
-    }
+body {
+  font-family: 'Arial', sans-serif;
+  line-height: 1.6;
+  color: #333;
+  overflow-x: hidden;
+}
 
-    .container {
-      width: 90%;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 15px;
-    }
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
 
-    h1, h2, h3 {
-      color: #2c5f2d;
-    }
+h1, h2, h3 {
+  color: #004501;
+}
 
-    a {
-      text-decoration: none;
-      color: #fff;
-    }
+a {
+  text-decoration: none;
+  color: #fff;
+}
 
-    /* Button Styles */
-    .cta-btn {
-      display: inline-block;
-      background-color: #4caf50;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 5px;
-      font-weight: bold;
-      transition: background 0.3s;
-    }
+/* Button Styles */
+.cta-btn {
+  display: inline-block;
+  background-color: #4caf50;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background 0.3s;
+}
 
-    .cta-btn:hover {
-      background-color: #45a049;
-    }
+.cta-btn:hover {
+  background-color: #45a049;
+}
 
-    /* Navbar Styles */
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background-color: #2c5f58;
-      z-index: 1000;
-      padding: 15px 20px;
-    }
+.nav-cta-btn {
+  display: inline-block;
+}
 
-    .nav-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+/* Hero Content Button Container */
+.hero-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+}
 
-    .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #fff;
-    }
+.hero-buttons .get-started {
+  display: none;
+}
 
-    .menu-toggle {
-      display: none;
-      flex-direction: column;
-      justify-content: space-between;
-      width: 30px;
-      height: 21px;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-      z-index: 1001;
-    }
+/* Navbar Styles */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #2c5f58;
+  z-index: 1000;
+  padding: 15px 20px;
+}
 
-    .menu-toggle span {
-      width: 100%;
-      height: 3px;
-      background-color: #fff;
-      transition: all 0.3s linear;
-    }
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-    .nav-links {
-      display: flex;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+}
 
-    .nav-links li {
-      margin-left: 30px;
-    }
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+}
 
-    .nav-links a {
-      color: #fff;
-      font-weight: 500;
-      transition: color 0.3s;
-    }
+.menu-toggle span {
+  width: 100%;
+  height: 3px;
+  background-color: #fff;
+  transition: all 0.3s linear;
+}
 
-    .nav-links a:hover {
-      color: #4caf50;
-    }
+.nav-links {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 
-    /* Hero Section */
-    .hero {
-      position: relative;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-top: 60px;
-    }
+.nav-links li {
+  margin-left: 30px;
+}
 
-/* Update the hero-content styles to remove white background */
+.nav-links a {
+  color: #fff;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: #4caf50;
+}
+
+/* Hero Section */
+.hero {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 60px;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
 .hero-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   text-align: center;
-  color: #ffffff; /* Changed to white text */
+  color: #ffffff;
   padding: 30px;
   margin: 0 15px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add text shadow for better readability */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
-    .hero-content h1 {
-      font-size: 3rem;
-      margin-bottom: 20px;
-    }
 
-    .hero-content p {
-      font-size: 1.2rem;
-      margin-bottom: 30px;
-    }
+.hero-content h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
 
-    .hero-video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 0;
-    }
+.hero-content p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+}
 
-    /* Features Section */
-    .features {
-      padding: 80px 0;
-      background: #f9f9f9;
-    }
+.hero-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the video covers the entire area */
+  z-index: 0;
+  aspect-ratio: 16/9; /* Ensures consistent aspect ratio */
+}
 
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 30px;
-      padding: 40px 0;
-    }
+/* Features Section */
+.features {
+  padding: 50px 0;
+  background: #f9f9f9;
+}
 
-    .feature-card {
-      background: #fff;
-      padding: 30px;
-      border-radius: 10px;
-      text-align: center;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s;
-    }
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  padding: 40px 0;
+}
 
-    .feature-card:hover {
-      transform: translateY(-5px);
-    }
+.feature-card {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
 
-    .feature-card img {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 20px;
-    }
+.feature-card:hover {
+  transform: translateY(-5px);
+}
 
-    /* Objectives Section */
-    .objectives {
-      padding: 80px 0;
-    }
+.feature-card img {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+}
 
-    .objective-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 60px;
-      gap: 40px;
-    }
-
-    .objective-row:nth-child(even) {
-      flex-direction: row-reverse;
-    }
-
-    .objective-image {
-      flex: 1;
-    }
-
-    .objective-image img {
-      width: 100%;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .objective-description {
-      flex: 1;
-    }
-
-    .objective-description h3 {
-      margin-bottom: 20px;
-    }
-
-    /* Contact Section */
-    .contact {
-      padding: 80px 0;
-      background: #f9f9f9;
-    }
-
-    .contact-form {
-      max-width: 600px;
-      margin: 40px auto 0;
-    }
-
-    .contact-form input,
-    .contact-form textarea {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 20px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 16px;
-    }
-
-    .contact-form textarea {
-      height: 150px;
-      resize: vertical;
-    }
-
-    .contact-form button {
-      width: 100%;
-      padding: 12px;
-      background: #4caf50;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .contact-form button:hover {
-      background: #45a049;
-    }
-
-    /* Footer */
-    .footer {
-      background: #2c5f2d;
-      color: #fff;
-      text-align: center;
-      padding: 20px 0;
-    }
-
-    /* Mobile Responsive Styles */
-    @media screen and (max-width: 768px) {
-      .menu-toggle {
-        display: flex;
-      }
-
-      .nav-links {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: #2c5f58;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-      }
-
-      .nav-links.active {
-        display: flex;
-      }
-
-      .nav-links li {
-        margin: 15px 0;
-      }
-
-      .hero-content h1 {
-        font-size: 2rem;
-      }
-
-      .hero-content p {
-        font-size: 1rem;
-      }
-
-      .objective-row,
-      .objective-row:nth-child(even) {
-        flex-direction: column;
-        margin-bottom: 40px;
-      }
-
-      .objective-image,
-      .objective-description {
-        width: 100%;
-      }
-
-      .cta-btn {
-        display: none;
-      }
-    }
-
-    @media screen and (max-width: 480px) {
-      .container {
-        width: 95%;
-      }
-
-      .hero-content {
-        padding: 20px;
-      }
-
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .feature-card {
-        padding: 20px;
-      }
-    }
-    /* Update Objectives Section */
+/* Objectives Section */
 .objectives {
   padding: 80px 0;
 }
@@ -351,76 +227,215 @@
   align-items: center;
   margin-bottom: 60px;
   gap: 40px;
-  position: relative; /* For separator positioning */
+  position: relative;
 }
 
-/* Horizontal Separator for Mobile */
+.objective-row:nth-child(even) {
+  flex-direction: row-reverse;
+}
+
+.objective-image {
+  flex: 1;
+  max-width: 50%;
+  position: relative;
+}
+
+.objective-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+  aspect-ratio: 16/9;
+}
+
+.objective-description {
+  flex: 1;
+  max-width: 50%;
+  position: relative;
+}
+
+.objective-description h3 {
+  margin-bottom: 20px;
+  color: #2c5f2d;
+}
+
+.objective-description p {
+  line-height: 1.6;
+}
+
+.objective-row::after {
+  content: '';
+  position: absolute;
+  width: 2px; /* Thickness of the line */
+  background-color: #134f77; /* Color of the line */
+  top: 0;
+  bottom: 0;
+  left: 50%; /* Center the line between the two sections */
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+/* Contact Section */
+.contact {
+  padding: 80px 0;
+  background: #f9f9f9;
+}
+
+.contact-form {
+  max-width: 600px;
+  margin: 40px auto 0;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.contact-form textarea {
+  height: 150px;
+  resize: vertical;
+}
+
+.contact-form button {
+  width: 100%;
+  padding: 12px;
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.contact-form button:hover {
+  background: #45a049;
+}
+
+/* Footer */
+.footer {
+  background: #2c5f2d;
+  color: #fff;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* Mobile Responsive Styles */
 @media screen and (max-width: 768px) {
-  .objective-row {
-    flex-direction: column;
-    margin-bottom: 40px;
-    padding-bottom: 40px; /* Space for separator */
+  /* Navigation */
+  .menu-toggle {
+    display: flex;
   }
 
-  .objective-row:not(:last-child)::after {
-    content: '';
-    position: absolute;
+  .nav-links {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80%; /* Width of separator */
-    height: 2px;
-    background: linear-gradient(
-      to right,
-      transparent,
-      #2c5f2d,
-      transparent
-    );
-    margin: 20px 0;
-  }
-
-  .objective-row,
-  .objective-row:nth-child(even) {
+    background: #2c5f58;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
   }
 
-  .objective-image,
-  .objective-description {
-    width: 100%;
+  .nav-links.active {
+    display: flex;
   }
-  
-  /* Adjust hero text for better visibility on mobile */
+
+  .nav-links li {
+    margin: 15px 0;
+  }
+
+  /* Hero Section */
   .hero-content h1 {
     font-size: 2rem;
     margin-bottom: 15px;
   }
-  
+
   .hero-content p {
     font-size: 1rem;
     margin-bottom: 25px;
   }
+
+  /* Buttons */
+  .nav-container .cta-btn {
+    display: none;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .hero-buttons .cta-btn {
+    display: inline-block;
+    width: 200px;
+    text-align: center;
+  }
+
+  .hero-buttons .get-started {
+    display: inline-block;
+  }
+
+  /* Objectives */
+  .objectives {
+    padding: 40px 0;
+  }
+
+  .objective-row {
+    gap: 20px;
+  }
+
+  .objective-description {
+    font-size: 14px;
+  }
+
+  .objective-description h3 {
+    font-size: 18px;
+  }
 }
 
-/* Add overlay to hero video for better text readability */
-.hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4); /* Dark overlay */
-  z-index: 1;
-}
-
-.hero-content {
-  z-index: 2; /* Ensure content stays above overlay */
-}
-
-/* Adjust separator for smaller screens */
 @media screen and (max-width: 480px) {
-  .objective-row:not(:last-child)::after {
-    width: 90%; /* Wider separator on very small screens */
+  .container {
+    width: 95%;
+  }
+
+  .hero-content {
+    padding: 20px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-card {
+    padding: 20px;
+  }
+
+  .objective-row {
+    gap: 15px;
+  }
+}
+
+/* Desktop-specific styles */
+@media screen and (min-width: 769px) {
+  .hero-buttons .nav-cta-btn {
+    display: none;
+  }
+}
+@media screen and (max-width: 768px) {
+  .hero-video {
+    object-fit: cover; /* Maintain cover property for consistent view */
+    aspect-ratio: auto; /* Override aspect ratio for mobile devices */
   }
 }
   </style>
@@ -445,18 +460,20 @@
     </div>
   </nav>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1>Empowering Farmers with Technology</h1>
-      <p>Your one-stop solution for sustainable farming, AI tools, and live updates.</p>
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Empowering Farmers with Technology</h1>
+    <p>Your one-stop solution for sustainable farming, AI tools, and live updates.</p>
+    <div class="hero-buttons">
       <a href="#features" class="cta-btn">Explore Features</a>
+      <a href="/agrocare" class="cta-btn get-started">Get Started with AI</a>
     </div>
-    <video autoplay loop muted playsinline class="hero-video">
-      <source src="static/vid1.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
-  </section>
+  </div>
+  <video autoplay loop muted playsinline class="hero-video">
+    <source src="static/vid1.mp4" type="video/mp4">
+  </video>
+</section>
 
   <hr style="border: 1px solid #ccc; margin: 40px auto; width: 80%;">
 
@@ -531,10 +548,10 @@
       </div>
     </div>
   </section>
-  
-  
+
     <!-- Features Section -->
     <section id="features" class="features">
+      <hr style="border: 1px solid #ccc; margin: 40px auto; width: 80%;">
       <div class="container">
         <h2>Key Features</h2>
         <div class="features-grid">
@@ -570,6 +587,7 @@
           </div>
         </div>
       </div>
+      <hr style="border: 1px solid #ccc; margin: 40px auto; width: 80%;">
     </section>
   
     <!-- About Section -->
