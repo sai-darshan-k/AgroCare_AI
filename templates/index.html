@@ -6,6 +6,7 @@
   <title>Kissan 4.0 - The Future of Agriculture</title>
   <style>
 /* Reset and Base Styles */
+/* Reset and Base Styles */
 * {
   margin: 0;
   padding: 0;
@@ -27,7 +28,7 @@ body {
 }
 
 h1, h2, h3 {
-  color: #004501;
+  color: #62c863;
 }
 
 a {
@@ -48,23 +49,6 @@ a {
 
 .cta-btn:hover {
   background-color: #45a049;
-}
-
-.nav-cta-btn {
-  display: inline-block;
-}
-
-/* Hero Content Button Container */
-.hero-buttons {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  align-items: center;
-  margin-top: 30px;
-}
-
-.hero-buttons .get-started {
-  display: none;
 }
 
 /* Navbar Styles */
@@ -101,7 +85,6 @@ a {
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 0;
   z-index: 1001;
 }
 
@@ -167,6 +150,7 @@ a {
 .hero-content h1 {
   font-size: 3rem;
   margin-bottom: 20px;
+  color: #fff;
 }
 
 .hero-content p {
@@ -180,9 +164,15 @@ a {
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures the video covers the entire area */
+  object-fit: cover;
   z-index: 0;
-  aspect-ratio: 16/9; /* Ensures consistent aspect ratio */
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Features Section */
@@ -193,28 +183,45 @@ a {
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 30px;
-  padding: 40px 0;
+  padding: 0 20px;
 }
 
 .feature-card {
-  background: #fff;
-  padding: 30px;
-  border-radius: 10px;
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  height: 300px;
+  transition: transform 0.3s ease;
+}
+
+.feature-image, .feature-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.feature-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  padding: 20px;
 }
 
-.feature-card:hover {
-  transform: translateY(-5px);
-}
-
-.feature-card img {
-  width: 80px;
-  height: 80px;
-  margin-bottom: 20px;
+.feature-card:hover .feature-overlay {
+  opacity: 1;
 }
 
 /* Objectives Section */
@@ -237,43 +244,23 @@ a {
 .objective-image {
   flex: 1;
   max-width: 50%;
-  position: relative;
 }
 
 .objective-image img {
   width: 100%;
   height: auto;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   object-fit: cover;
-  aspect-ratio: 16/9;
 }
 
 .objective-description {
   flex: 1;
   max-width: 50%;
-  position: relative;
 }
 
 .objective-description h3 {
   margin-bottom: 20px;
   color: #2c5f2d;
-}
-
-.objective-description p {
-  line-height: 1.6;
-}
-
-.objective-row::after {
-  content: '';
-  position: absolute;
-  width: 2px; /* Thickness of the line */
-  background-color: #134f77; /* Color of the line */
-  top: 0;
-  bottom: 0;
-  left: 50%; /* Center the line between the two sections */
-  transform: translateX(-50%);
-  z-index: 1;
 }
 
 /* Contact Section */
@@ -294,7 +281,6 @@ a {
   margin-bottom: 20px;
   border: 1px solid #ddd;
   border-radius: 5px;
-  font-size: 16px;
 }
 
 .contact-form textarea {
@@ -309,13 +295,7 @@ a {
   color: #fff;
   border: none;
   border-radius: 5px;
-  font-size: 16px;
   cursor: pointer;
-  transition: background 0.3s;
-}
-
-.contact-form button:hover {
-  background: #45a049;
 }
 
 /* Footer */
@@ -328,19 +308,18 @@ a {
 
 /* Mobile Responsive Styles */
 @media screen and (max-width: 768px) {
-  /* Navigation */
   .menu-toggle {
     display: flex;
   }
 
   .nav-links {
-    display: none;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: #2c5f58;
+    background: rgba(44, 95, 88, 0.95);
+    display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -355,20 +334,12 @@ a {
     margin: 15px 0;
   }
 
-  /* Hero Section */
   .hero-content h1 {
     font-size: 2rem;
-    margin-bottom: 15px;
   }
 
   .hero-content p {
     font-size: 1rem;
-    margin-bottom: 25px;
-  }
-
-  /* Buttons */
-  .nav-container .cta-btn {
-    display: none;
   }
 
   .hero-buttons {
@@ -376,34 +347,31 @@ a {
     gap: 15px;
   }
 
-  .hero-buttons .cta-btn {
-    display: inline-block;
-    width: 200px;
-    text-align: center;
-  }
-
-  .hero-buttons .get-started {
-    display: inline-block;
-  }
-
-  /* Objectives */
   .objectives {
     padding: 40px 0;
   }
 
   .objective-row {
+    flex-direction: column;
     gap: 20px;
   }
 
-  .objective-description {
-    font-size: 14px;
+  .objective-row:nth-child(even) {
+    flex-direction: column;
   }
 
-  .objective-description h3 {
-    font-size: 18px;
+  .objective-image, 
+  .objective-description {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
   }
 }
 
+/* Small Mobile Devices */
 @media screen and (max-width: 480px) {
   .container {
     width: 95%;
@@ -411,31 +379,6 @@ a {
 
   .hero-content {
     padding: 20px;
-  }
-
-  .features-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .feature-card {
-    padding: 20px;
-  }
-
-  .objective-row {
-    gap: 15px;
-  }
-}
-
-/* Desktop-specific styles */
-@media screen and (min-width: 769px) {
-  .hero-buttons .nav-cta-btn {
-    display: none;
-  }
-}
-@media screen and (max-width: 768px) {
-  .hero-video {
-    object-fit: cover; /* Maintain cover property for consistent view */
-    aspect-ratio: auto; /* Override aspect ratio for mobile devices */
   }
 }
   </style>
@@ -471,7 +414,7 @@ a {
     </div>
   </div>
   <video autoplay loop muted playsinline class="hero-video">
-    <source src="static/vid1.mp4" type="video/mp4">
+    <source src="static/vid2.mp4" type="video/mp4">
   </video>
 </section>
 
@@ -549,46 +492,66 @@ a {
     </div>
   </section>
 
-    <!-- Features Section -->
-    <section id="features" class="features">
-      <hr style="border: 1px solid #ccc; margin: 40px auto; width: 80%;">
-      <div class="container">
-        <h2>Key Features</h2>
-        <div class="features-grid">
-          <div class="feature-card">
-            <img src="images/chatbot.png" alt="Chatbot">
+  <section id="features" class="features">
+    <div class="container">
+      <h2 class="section-title">Key Features</h2>
+      <div class="features-grid">
+        <!-- Feature Card 1: Multilingual Chatbot -->
+        <div class="feature-card">
+          <video class="feature-video" autoplay loop muted>
+            <source src="static/chat3.webm" type="video/webm">
+          </video>
+          <div class="feature-overlay">
             <h3>Multilingual Chatbot</h3>
-            <p>Get farming advice in your preferred language using our AI-powered chatbot.</p>
-          </div>
-          <div class="feature-card">
-            <img src="images/disease.png" alt="Disease Prediction">
-            <h3>Disease Prediction</h3>
-            <p>Upload crop images and get instant disease diagnosis with AI recommendations.</p>
-          </div>
-          <div class="feature-card">
-            <img src="images/weather.png" alt="Weather Updates">
-            <h3>Live Weather & Air Quality</h3>
-            <p>Access real-time weather forecasts and air quality data tailored to your location.</p>
-          </div>
-          <div class="feature-card">
-            <img src="images/sensors.png" alt="Sensor Data">
-            <h3>Sensor Data</h3>
-            <p>Monitor soil moisture, temperature, and more using IoT sensor integration.</p>
-          </div>
-          <div class="feature-card">
-            <img src="images/surveillance.png" alt="Surveillance">
-            <h3>24/7 AI Surveillance</h3>
-            <p>Track farm activities and detect threats with AI-powered cameras and drones.</p>
-          </div>
-          <div class="feature-card">
-            <img src="images/market.png" alt="Market Prices">
-            <h3>Live Market Prices</h3>
-            <p>Stay updated with real-time market prices for crops across major regions.</p>
+            <p>Get personalized farming advice in your preferred language using our advanced AI-powered chatbot.</p>
           </div>
         </div>
+
+        <div class="feature-card">
+          <img src="static/disease2.jpg" alt="Crop Disease Detection" class="feature-image">
+          <div class="feature-overlay">
+            <h3>Crop Disease Detection</h3>
+            <p>Upload crop images for instant AI-powered disease diagnosis with precise treatment recommendations.</p>
+          </div>
+        </div>
+
+      <!-- Feature Card 3: Weather Updates -->
+      <div class="feature-card">
+        <img src="static/weather1.jpg" alt="Live Weather Insights" class="feature-image">
+        <div class="feature-overlay">
+          <h3>Live Weather Insights</h3>
+          <p>Access real-time weather forecasts and detailed air quality data tailored to your specific agricultural location.</p>
+        </div>
       </div>
-      <hr style="border: 1px solid #ccc; margin: 40px auto; width: 80%;">
-    </section>
+  
+            <!-- Feature Card 4: Sensor Data -->
+            <div class="feature-card">
+              <img src="static/iot.jpg" alt="IoT Sensor Monitoring" class="feature-image">
+              <div class="feature-overlay">
+                <h3>IoT Sensor Monitoring</h3>
+                <p>Comprehensive monitoring of soil moisture, temperature, humidity, and other critical environmental parameters.</p>
+              </div>
+            </div>
+  
+      <!-- Feature Card 5: AI Surveillance -->
+      <div class="feature-card">
+        <img src="static/security.jpg" alt="24/7 Farm Surveillance" class="feature-image">
+        <div class="feature-overlay">
+          <h3>24/7 Farm Surveillance</h3>
+          <p>Advanced AI-powered cameras and drone systems to monitor farm activities and detect potential threats in real-time.</p>
+        </div>
+      </div>
+  
+      <div class="feature-card">
+        <img src="static/market-data.avif" alt="Live Market Intelligence" class="feature-image">
+        <div class="feature-overlay">
+          <h3>Live Market Intelligence</h3>
+          <p>Stay ahead with real-time crop prices, market trends, and demand forecasts across major agricultural regions.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  </section>  
   
     <!-- About Section -->
     <section id="about" class="about">
