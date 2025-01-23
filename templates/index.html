@@ -6,7 +6,6 @@
   <title>Kissan 4.0 - The Future of Agriculture</title>
   <style>
 /* Reset and Base Styles */
-/* Reset and Base Styles */
 * {
   margin: 0;
   padding: 0;
@@ -51,6 +50,23 @@ a {
   background-color: #45a049;
 }
 
+.nav-cta-btn {
+  display: inline-block;
+}
+
+/* Hero Content Button Container */
+.hero-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.hero-buttons .get-started {
+  display: none;
+}
+
 /* Navbar Styles */
 .navbar {
   position: fixed;
@@ -85,6 +101,7 @@ a {
   background: transparent;
   border: none;
   cursor: pointer;
+  padding: 0;
   z-index: 1001;
 }
 
@@ -150,7 +167,6 @@ a {
 .hero-content h1 {
   font-size: 3rem;
   margin-bottom: 20px;
-  color: #fff;
 }
 
 .hero-content p {
@@ -164,15 +180,9 @@ a {
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; /* Ensures the video covers the entire area */
   z-index: 0;
-}
-
-.hero-buttons {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  align-items: center;
+  aspect-ratio: 16/9; /* Ensures consistent aspect ratio */
 }
 
 /* Features Section */
@@ -181,6 +191,247 @@ a {
   background: #f9f9f9;
 }
 
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  padding: 40px 0;
+}
+
+.feature-card {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Objectives Section */
+.objectives {
+  padding: 80px 0;
+}
+
+.objective-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 60px;
+  gap: 40px;
+  position: relative;
+}
+
+.objective-row:nth-child(even) {
+  flex-direction: row-reverse;
+}
+
+.objective-image {
+  flex: 1;
+  max-width: 50%;
+  position: relative;
+}
+
+.objective-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+  aspect-ratio: 16/9;
+}
+
+.objective-description {
+  flex: 1;
+  max-width: 50%;
+  position: relative;
+}
+
+.objective-description h3 {
+  margin-bottom: 20px;
+  color: #2c5f2d;
+}
+
+.objective-description p {
+  line-height: 1.6;
+}
+
+.objective-row::after {
+  content: '';
+  position: absolute;
+  width: 2px; /* Thickness of the line */
+  background-color: #134f77; /* Color of the line */
+  top: 0;
+  bottom: 0;
+  left: 50%; /* Center the line between the two sections */
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+/* Contact Section */
+.contact {
+  padding: 80px 0;
+  background: #f9f9f9;
+}
+
+.contact-form {
+  max-width: 600px;
+  margin: 40px auto 0;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.contact-form textarea {
+  height: 150px;
+  resize: vertical;
+}
+
+.contact-form button {
+  width: 100%;
+  padding: 12px;
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.contact-form button:hover {
+  background: #45a049;
+}
+
+/* Footer */
+.footer {
+  background: #2c5f2d;
+  color: #fff;
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* Mobile Responsive Styles */
+@media screen and (max-width: 768px) {
+  /* Navigation */
+  .menu-toggle {
+    display: flex;
+  }
+
+  .nav-links {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #2c5f58;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .nav-links.active {
+    display: flex;
+  }
+
+  .nav-links li {
+    margin: 15px 0;
+  }
+
+  /* Hero Section */
+  .hero-content h1 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+    margin-bottom: 25px;
+  }
+
+  /* Buttons */
+  .nav-container .cta-btn {
+    display: none;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .hero-buttons .cta-btn {
+    display: inline-block;
+    width: 200px;
+    text-align: center;
+  }
+
+  .hero-buttons .get-started {
+    display: inline-block;
+  }
+
+  /* Objectives */
+  .objectives {
+    padding: 40px 0;
+  }
+
+  .objective-row {
+    gap: 20px;
+  }
+
+  .objective-description {
+    font-size: 14px;
+  }
+
+  .objective-description h3 {
+    font-size: 18px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .container {
+    width: 95%;
+  }
+
+  .hero-content {
+    padding: 20px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-card {
+    padding: 20px;
+  }
+
+  .objective-row {
+    gap: 15px;
+  }
+}
+
+/* Desktop-specific styles */
+@media screen and (min-width: 769px) {
+  .hero-buttons .nav-cta-btn {
+    display: none;
+  }
+}
+@media screen and (max-width: 768px) {
+  .hero-video {
+    object-fit: cover; /* Maintain cover property for consistent view */
+    aspect-ratio: auto; /* Override aspect ratio for mobile devices */
+  }
+}
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -196,10 +447,26 @@ a {
   transition: transform 0.3s ease;
 }
 
-.feature-image, .feature-video {
+.feature-video {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.feature-card {
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  height: 300px;
+}
+
+.feature-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image stretches to fill the card completely */
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .feature-overlay {
@@ -224,163 +491,77 @@ a {
   opacity: 1;
 }
 
-/* Objectives Section */
-.objectives {
-  padding: 80px 0;
+.feature-overlay h3 {
+  margin-bottom: 15px;
+  font-size: 1.5rem;
 }
 
-.objective-row {
+.feature-overlay p {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+/* Hero Section */
+.hero {
+  position: relative;
+  height: 100vh;
   display: flex;
   align-items: center;
-  margin-bottom: 60px;
-  gap: 40px;
-  position: relative;
+  justify-content: center;
+  padding-top: 60px;
+  overflow: hidden; /* Ensures no overflow */
 }
 
-.objective-row:nth-child(even) {
-  flex-direction: row-reverse;
+.hero-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vw; /* Full width of the viewport */
+  height: auto; /* Maintain aspect ratio */
+  object-fit: cover; /* Ensures the video covers the entire area */
+  transform: translate(-50%, -50%); /* Center the video */
 }
 
-.objective-image {
-  flex: 1;
-  max-width: 50%;
-}
-
-.objective-image img {
-  width: 100%;
-  height: auto;
-  border-radius: 10px;
-  object-fit: cover;
-}
-
-.objective-description {
-  flex: 1;
-  max-width: 50%;
-}
-
-.objective-description h3 {
-  margin-bottom: 20px;
-  color: #2c5f2d;
-}
-
-/* Contact Section */
-.contact {
-  padding: 80px 0;
-  background: #f9f9f9;
-}
-
-.contact-form {
-  max-width: 600px;
-  margin: 40px auto 0;
-}
-
-.contact-form input,
-.contact-form textarea {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 20px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
-
-.contact-form textarea {
-  height: 150px;
-  resize: vertical;
-}
-
-.contact-form button {
-  width: 100%;
-  padding: 12px;
-  background: #4caf50;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-/* Footer */
-.footer {
-  background: #2c5f2d;
-  color: #fff;
-  text-align: center;
-  padding: 20px 0;
-}
-
-/* Mobile Responsive Styles */
 @media screen and (max-width: 768px) {
-  .menu-toggle {
-    display: flex;
+  .hero {
+    height: 70vh; /* Adjust height for mobile */
   }
 
-  .nav-links {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(44, 95, 88, 0.95);
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-
-  .nav-links.active {
-    display: flex;
-  }
-
-  .nav-links li {
-    margin: 15px 0;
-  }
-
-  .hero-content h1 {
-    font-size: 2rem;
-  }
-
-  .hero-content p {
-    font-size: 1rem;
-  }
-
-  .hero-buttons {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .objectives {
-    padding: 40px 0;
-  }
-
-  .objective-row {
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .objective-row:nth-child(even) {
-    flex-direction: column;
-  }
-
-  .objective-image, 
-  .objective-description {
-    max-width: 100%;
-    width: 100%;
-  }
-
-  .features-grid {
-    grid-template-columns: 1fr;
+  .hero-video {
+    width: 100%; /* Full width for mobile */
+    height: 100%; /* Full height for mobile */
+    object-fit: cover; /* Ensure it fits within the container */
   }
 }
 
-/* Small Mobile Devices */
-@media screen and (max-width: 480px) {
-  .container {
-    width: 95%;
-  }
-
-  .hero-content {
-    padding: 20px;
-  }
+.hero-content {
+  position: absolute; /* Place content inside the video */
+  z-index: 2; /* Ensure content is above the video */
+  text-align: center;
+  color: #ffffff;
+  padding: 20px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  max-width: 90%; /* Prevent content overflow */
 }
+
+.hero-content h1 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+.hero-content p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.hero-buttons {
+  display: flex;
+  flex-direction: column; /* Stack buttons for mobile */
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+}
+
+
   </style>
 </head>
 <body>
