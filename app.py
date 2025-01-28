@@ -70,9 +70,10 @@ os.makedirs(AUDIO_DIR, exist_ok=True)
 # Path to the Excel files
 EXCEL_FILE_INSECTICIDES = "all_crops_insecticides_sheets.xlsx"
 EXCEL_FILE_FUNGICIDES = "all_crops_fungicides_sheets.xlsx"
+EXCEL_FILE_HERBICIDES = "all_herb_sheets.xlsx"
 
 # Define the expected column order
-EXPECTED_COLUMNS = [
+COLUMNS = [
     "Crop",
     "Pest(Disease)",
     "Pesticide",
@@ -81,7 +82,15 @@ EXPECTED_COLUMNS = [
     "Dilution in Water (Liter)",
     "Waiting Period (in days)"
 ]
-
+HERBICIDE_COLUMNS = [
+    "Herbicide name & approved Crops",
+    "Weed species",
+    "Herbicide",
+    "a.i (gm/Kg)",
+    "Formulati on in (gm/ ml /Kg/ ltr)",
+    "Dilution in Water (Liter)",
+    "Waiting period/PHI between last application & harvest (days)"
+]
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -107,6 +116,16 @@ def fungicides():
         crops = []
         logging.error(f"Error loading fungicides Excel file: {e}")
     return render_template('fungicides.html', crops=crops)
+
+@app.route('/herbicides')
+def herbicides():
+    try:
+        excel_data = pd.ExcelFile(EXCEL_FILE_HERBICIDES)  # Ensure this file exists
+        crops = excel_data.sheet_names
+    except Exception as e:
+        crops = []
+        logging.error(f"Error loading herbicides Excel file: {e}")
+    return render_template('herbicides.html', crops=crops)
 
 @app.route('/agrocare')
 def agrocare():
@@ -249,13 +268,13 @@ def get_insecticides_data():
             crop_data = excel_data.parse(crop_name, header=None)
             
             # Ensure the dataframe has at least as many columns as headers
-            crop_data = crop_data.iloc[:, :len(EXPECTED_COLUMNS)]
+            crop_data = crop_data.iloc[:, :len(COLUMNS)]
             
             # Assign the expected headers explicitly
-            crop_data.columns = EXPECTED_COLUMNS
+            crop_data.columns = COLUMNS
             
             # Reorder the columns to match the expected order
-            crop_data = crop_data[EXPECTED_COLUMNS]
+            crop_data = crop_data[COLUMNS]
             
             # Fill missing values with empty strings
             crop_data = crop_data.fillna("")
@@ -292,13 +311,13 @@ def get_fungicides_data():
             crop_data = excel_data.parse(crop_name, header=None)
             
             # Ensure the dataframe has at least as many columns as headers
-            crop_data = crop_data.iloc[:, :len(EXPECTED_COLUMNS)]
+            crop_data = crop_data.iloc[:, :len(COLUMNS)]
             
             # Assign the expected headers explicitly
-            crop_data.columns = EXPECTED_COLUMNS
+            crop_data.columns = COLUMNS
             
             # Reorder the columns to match the expected order
-            crop_data = crop_data[EXPECTED_COLUMNS]
+            crop_data = crop_data[COLUMNS]
             
             # Fill missing values with empty strings
             crop_data = crop_data.fillna("")
@@ -323,6 +342,50 @@ def get_fungicides_data():
     except Exception as e:
         return jsonify({"error": f"Error reading data: {e}"})
 
+@app.route('/get_herbicides_data', methods=['POST'])
+def get_herbicides_data():
+    crop_name = request.form['crop_name']
+    try:
+        # Load herbicides Excel file
+        excel_data = pd.ExcelFile(EXCEL_FILE_HERBICIDES)
+        
+        if crop_name in excel_data.sheet_names:
+            # Parse the sheet without assuming any header row
+            crop_data = excel_data.parse(crop_name, header=None)
+            
+            # Ensure the dataframe has at least as many columns as headers
+            crop_data = crop_data.iloc[:, :len(HERBICIDE_COLUMNS)]
+            
+            # Assign the expected headers explicitly
+            crop_data.columns = HERBICIDE_COLUMNS
+            
+            # Reorder the columns to match the expected order
+            crop_data = crop_data[HERBICIDE_COLUMNS]
+            
+            # Fill missing values with empty strings
+            crop_data = crop_data.fillna("")
+
+            # Add Sl. No. column
+            crop_data.insert(0, "Sl. No.", range(1, len(crop_data) + 1))
+
+            # Convert to list of OrderedDicts to preserve column order
+            crop_data_json = []
+            for _, row in crop_data.iterrows():
+                ordered_row = OrderedDict()
+                for col in crop_data.columns:
+                    ordered_row[col] = row[col]
+                crop_data_json.append(ordered_row)
+                
+            return jsonify({
+                "columns": crop_data.columns.tolist(),
+                "data": crop_data_json
+            })
+        else:
+            return jsonify({"error": "Crop sheet not found."})
+    except Exception as e:
+        logging.error(f"Error reading herbicide data: {e}")
+        return jsonify({"error": f"Error reading data: {e}"})
+    
 @app.route('/weather')
 def weather():
     return render_template('weather.html')
