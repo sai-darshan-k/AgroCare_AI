@@ -1,0 +1,186 @@
+@media screen and (max-width: 768px) {
+    /* Hero Section Mobile Optimization */
+    .hero {
+      position: relative;
+      width: 100%;
+      height: 65vw; /* Increase height to make video slightly bigger */
+      max-height: 500px; /* Max height for better control */
+      overflow: hidden;
+    }
+  
+    .hero-video {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+  
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      width: 80%;
+      height: 100%; /* Reduce width to make content smaller */
+      max-width: 400px; /* Set max-width for better control */
+      background: rgba(44, 95, 88, 0.7);
+      border-radius: 15px;
+      padding: 15px; /* Reduced padding */
+      text-align: center;
+      color: #000000;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+  
+    /* Hero Text Styles */
+    .hero-content h1 {
+      font-size: 1.2rem; /* Smaller font size for heading */
+      margin-bottom: 15px;
+    }
+  
+    .hero-content p {
+      font-size: 0.8rem; /* Smaller font size for paragraph */
+      margin-bottom: 20px;
+    }
+  
+    /* Objectives Section Mobile Layout */
+    .objectives {
+      padding: 40px 15px;
+    }
+  
+    .objective-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+  
+    .objective-image {
+      order: -1;
+      width: 100%;
+      max-width: 100%;
+      margin-bottom: 20px;
+    }
+  
+    .objective-description {
+      width: 100%;
+      max-width: 100%;
+      text-align: center;
+    }
+  
+    .objective-row:nth-child(even) {
+      flex-direction: column;
+    }
+  
+    .objective-row::after {
+      display: none;
+    }
+  
+    .objective-image img {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      aspect-ratio: 16/9;
+    }
+  
+    /* Features Section Mobile Layout */
+    .features {
+      position: static;
+      top: 0;
+      margin-bottom: 0;
+      padding: 40px 15px;
+    }
+  
+    .features-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+      padding: 0;
+    }
+  
+    /* Navigation Mobile Optimization */
+    .navbar {
+      padding: 10px 15px;
+    }
+  
+    .nav-container {
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+  
+    .menu-toggle {
+      display: flex;
+      order: 2;
+    }
+  
+    .logo {
+      order: 1;
+    }
+  
+    .nav-links {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(44, 95, 88, 0.95);
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+  
+    .nav-links.active {
+      display: flex;
+    }
+  
+    .nav-links li {
+      margin: 15px 0;
+      text-align: center;
+    }
+  }
+  
+  /* Landscape Mode Adjustments */
+  @media screen and (max-width: 768px) and (orientation: landscape) {
+    .hero {
+      height: 65vw;
+      max-height: 500px;
+      position: relative;
+      overflow: hidden;
+    }
+  
+    .hero-video {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+  
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      width: 80%; /* Smaller width */
+      max-width: 500px; /* Max-width adjustment */
+      background: rgba(44, 95, 88, 0.7);
+      border-radius: 15px;
+      padding: 15px; /* Reduced padding */
+      text-align: center;
+      color: #ffffff;
+    }
+  
+    /* Hero Text Adjustments */
+    .hero-content h1 {
+      font-size: 1.5rem;
+    }
+  
+    .hero-content p {
+      font-size: 0.9rem;
+    }
+  }
+  
