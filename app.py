@@ -808,5 +808,8 @@ def data():
     states = fetch_all_states()
     return render_template('mandi.html', states=states, selected_state=state, data=data)
 
+import os
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.getenv("PORT", 10000))  # Use Render's assigned port or default to 10000
+    app.run(host="0.0.0.0", port=port, debug=True)
