@@ -26,7 +26,6 @@ from langdetect import detect, DetectorFactory
 from langdetect.lang_detect_exception import LangDetectException
 from gtts import gTTS
 import time
-from flask_babel import Babel, gettext
 import json
 
 # Ensure consistent language detection
