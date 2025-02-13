@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soil Labs Viewer</title>
+    <style>
+        :root {
+            --primary-color: #2c5282;
+            --secondary-color: #4299e1;
+            --background-color: #f7fafc;
+            --text-color: #2d3748;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .dropdowns {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        select {
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 5px rgba(66, 153, 225, 0.5);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f0f4f8;
+        }
+
+        .loading {
+            display: none;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button onclick="window.location.href='{{ url_for('index') }}'" 
+        style="margin-bottom: 1rem; padding: 0.75rem 1.5rem; background-color: var(--primary-color); 
+        color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; 
+        transition: background-color 0.2s, transform 0.2s;">
+        Home
+    </button>
+        <h1>Soil Testing Labs</h1>
+        
+        <div class="dropdowns">
+            <select id="stateSelect">
+                <option value="">Select State</option>
+                {% for state in states %}
+                    <option value="{{ state }}">{{ state }}</option>
+                {% endfor %}
+            </select>
+
+            <select id="districtSelect">
+                <option value="">Select District</option>
+            </select>
+        </div>
+
+        <div class="loading">Loading data...</div>
+
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>State</th>
+                    <th>District</th>
+                    <th>Lab Name</th>
+                    <th>Address</th>
+                    <th>Phone Number</th>
+                    <th>Email Address</th>
+                    <th>Location</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="7">Select a state and district to view data</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const stateSelect = document.getElementById("stateSelect");
+            const districtSelect = document.getElementById("districtSelect");
+            const dataTable = document.getElementById("dataTable").getElementsByTagName('tbody')[0];
+            const loading = document.querySelector(".loading");
+    
+            // Fetch districts when state changes
+            stateSelect.addEventListener("change", function() {
+                const state = encodeURIComponent(this.value); // Encode special characters
+                districtSelect.innerHTML = '<option value="">Select District</option>';
+                dataTable.innerHTML = '<tr><td colspan="7">Select a state and district to view data</td></tr>';
+    
+                if (state) {
+                    fetch(`/get_districts?state=${state}`)
+                        .then(response => response.json())
+                        .then(districts => {
+                            // Sort districts alphabetically
+                            districts.sort((a, b) => a.localeCompare(b));
+    
+                            districts.forEach(district => {
+                                const option = document.createElement("option");
+                                option.value = district;
+                                option.textContent = district;
+                                districtSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => {
+                            console.error("Error fetching districts:", error);
+                            districtSelect.innerHTML = '<option value="">Error loading districts</option>';
+                        });
+                }
+            });
+    
+            // Fetch data when district changes
+            districtSelect.addEventListener("change", function() {
+                const state = encodeURIComponent(stateSelect.value);
+                const district = encodeURIComponent(this.value);
+                dataTable.innerHTML = '<tr><td colspan="7">Loading data...</td></tr>';
+                loading.style.display = "block";
+    
+                if (state && district) {
+                    fetch(`/get_data?state=${state}&district=${district}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            loading.style.display = "none";
+                            dataTable.innerHTML = "";
+    
+                            if (data.length === 0) {
+                                dataTable.innerHTML = '<tr><td colspan="7">No data available</td></tr>';
+                                return;
+                            }
+    
+                            data.forEach(row => {
+                                const tr = document.createElement("tr");
+    
+                                tr.innerHTML = `
+                                    <td>${row["State"]}</td>
+                                    <td>${row["District"]}</td>
+                                    <td>${row["Lab Name"]}</td>
+                                    <td>${row["Address"]}</td>
+                                    <td>${row["Phone Number"] || "N/A"}</td>
+                                    <td>${row["Email Address"] || "N/A"}</td>
+                                    <td><a href="${row["Location"]}" target="_blank">Maps</a></td>
+                                `;
+    
+                                dataTable.appendChild(tr);
+                            });
+                        })
+                        .catch(error => {
+                            loading.style.display = "none";
+                            console.error("Error fetching data:", error);
+                            dataTable.innerHTML = '<tr><td colspan="7">Error loading data</td></tr>';
+                        });
+                } else {
+                    loading.style.display = "none";
+                    dataTable.innerHTML = '<tr><td colspan="7">Please select both a state and district</td></tr>';
+                }
+            });
+        });
+    </script>    
+</body>
+</html>

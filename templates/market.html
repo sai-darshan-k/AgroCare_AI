@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karnataka Market Rates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .category-selection {
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .category-label {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .category-label:hover {
+            background-color: #e0e0e0;
+        }
+
+        input[type="radio"] {
+            margin-right: 8px;
+        }
+
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        td {
+    position: relative;
+}
+
+td i {
+    margin-left: 5px;
+    font-style: normal;
+    color: green; /* Use red for "down" */
+}
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .error-message {
+            color: #ff0000;
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #ffe6e6;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            th, td {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            .category-label {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+            <button onclick="window.location.href='{{ url_for('index') }}'" 
+                    style="margin-bottom: 1rem; padding: 0.75rem 1.5rem; background-color: #0056b3; 
+                    color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; 
+                    cursor: pointer; transition: background-color 0.2s, transform 0.2s;">
+                Home
+            </button>
+        <h1>Karnataka Market Rates</h1>
+        
+        <form method="POST">
+            <div class="category-selection">
+                {% for category in categories %}
+                <label class="category-label">
+                    <input type="radio" name="category" value="{{ category }}" 
+                           {% if category == selected_category %}checked{% endif %}>
+                    {{ category }}
+                </label>
+                {% endfor %}
+            </div>
+            <button type="submit">Fetch Data</button>
+        </form>
+
+        {% if error_message %}
+        <div class="error-message">
+            {{ error_message }}
+        </div>
+        {% endif %}
+
+        {% if selected_category and table_headers %}
+        <h2>{{ selected_category }}</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        {% for header in table_headers %}
+                        <th>{{ header }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in table_rows %}
+                    <tr>
+                        {% for cell in row %}
+                        <td>{{ cell }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+    <div id="google_translate_element"></div>
+
+    <!-- Google Translate Initialization Script -->
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+          pageLanguage: 'en',  // Default page language
+          includedLanguages: 'en,hi,mr,ta,te,kn,ml,gu,pa,bn,or,as,ur,sa', // Available languages
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE, // Drop-down style
+          autoDisplay: false,  // Don't auto-show
+          gaTrack: false  // Disable tracking
+        }, 'google_translate_element');
+      }
+    </script>
+    
+    <!-- Load Google Translate API -->
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    
+    <style>
+      /* Positioning the Google Translate Widget */
+      #google_translate_element {
+        position: fixed;
+        top: 10px;  /* Adjust for better positioning */
+        right: 20px;
+        z-index: 1000;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 5px;
+        border-radius: 6px;
+        box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
+      }
+    
+      /* Styling the Google Translate dropdown */
+      .goog-te-gadget-simple {
+        border: none !important;
+        border-radius: 4px !important;
+        padding: 8px 12px !important;
+        font-family: Arial, sans-serif !important;
+        font-size: 14px !important;
+        background-color: #9ffff5 !important; /* Green theme */
+        color: white !important;
+        cursor: pointer !important;
+        transition: 0.3s ease-in-out;
+      }
+    
+      .goog-te-gadget-simple:hover {
+        background-color: #3a5b0c !important; /* Darker on hover */
+      }
+    
+      .goog-te-menu-value {
+        color: white !important;
+        text-decoration: none !important;
+        margin: 0 !important;
+      }
+    
+      /* Hide the Google Translate logo and branding */
+      .goog-te-gadget img,
+      .goog-te-banner-frame,
+      .skiptranslate > iframe.skiptranslate {
+        display: none !important;
+      }
+    
+      /* Prevent body from shifting when Google Translate loads */
+      body {
+        top: 0 !important;
+        position: static !important;
+      }
+    
+      /* Ensure background extends fully */
+      html, body {
+        height: 100%;
+        min-height: 100vh;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+      }
+    
+      /* Responsive Design for Mobile */
+      @media (max-width: 768px) {
+        #google_translate_element {
+          top: 50px;
+          right: 10px;
+        }
+    
+        .goog-te-gadget-simple {
+          padding: 6px 10px !important;
+          font-size: 13px !important;
+        }
+      }
+    </style>
+    
+    </body>
+    </html>

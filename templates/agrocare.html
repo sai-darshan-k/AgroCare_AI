@@ -5,148 +5,340 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AgroCare</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <style>
+   <style>
+        :root {
+            --primary: #00ff9d;
+            --secondary: #0a192f;
+            --accent: #64ffda;
+            --text: #e6f1ff;
+            --dark: #112240;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background-image: url('{{ url_for("static", filename="bg15.avif") }}');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            font-family: Arial, sans-serif;
-            color: #131111;
-            background-color: transparent;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--dark) 100%);
+            color: var(--text);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        .bot-response {
-            background-color: transparent;
-            color: #131111;
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 157, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(100, 255, 218, 0.1) 0%, transparent 50%);
+            z-index: -1;
+            animation: pulse 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        header {
+            padding: 2rem;
+            background: rgba(10, 25, 47, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(100, 255, 218, 0.1);
         }
 
         .logo {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
 
         .logo img {
-            height: 50px;
-            margin-right: 10px;
+            height: 60px;
+            filter: drop-shadow(0 0 10px var(--primary));
         }
 
         .logo h1 {
-            font-size: 35px;
-            margin: 0;
+            font-size: 2.5rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
         }
 
         .title h2 {
             text-align: center;
-            margin: 20px 0;
-        }
-
-        .language-switcher {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+            font-size: 1.5rem;
+            color: var(--accent);
+            letter-spacing: 2px;
         }
 
         .button-container {
             display: flex;
             justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
-            gap: 10px;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
         }
 
-        .question-input {
+        .button-container button {
+            background: rgba(100, 255, 218, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .button-container button:hover {
+            background: rgba(100, 255, 218, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.2);
+        }
+
+        .search-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .question-input input[type="text"] {
-            width: 60%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        .upload-btn, .submit-btn {
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-        }
-
-        .examples {
-    text-align: center;
-    margin-bottom: 20px;
-    transition: opacity 0.3s ease;
-    height: auto;
-    max-width: 80%; /* Restricts the width to 80% of the container */
-    margin-left: auto;
-    margin-right: auto;
-}
-        .examples.hidden {
-            opacity: 0;
-            visibility: hidden;
-            height: 0;
-            margin: 0;
-            padding: 0;
-        }
-
-        .examples ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .examples li {
-            cursor: pointer;
-            margin-bottom: 10px;
-            color: #007BFF;
-        }
-
-        .examples li:hover {
-            text-decoration: underline;
-        }
-
-        .uploaded-image img {
-            max-width: 100%;
-            margin: 20px 0;
-            display: block;
+            gap: 0.5rem;
+            padding: 0 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            max-width: 800px;
             margin-left: auto;
             margin-right: auto;
         }
 
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            background: rgba(10, 25, 47, 0.8);
+            border-radius: 12px;
+            border: 1px solid var(--accent);
+            padding: 0.5rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .search-wrapper input[type="text"] {
+            flex: 1;
+            padding: 0.8rem;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .search-wrapper input[type="text"]:focus {
+            outline: none;
+        }
+
+        .search-wrapper .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .upload-btn, .submit-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            padding: 0.5rem;
+        }
+
+        .upload-btn:hover, .submit-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .upload-btn img, .submit-btn img {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: relative;
+            background: var(--dark);
+            margin: 10% auto;
+            padding: 2rem;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 12px;
+            border: 1px solid var(--accent);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-body {
+            margin-bottom: 2rem;
+        }
+
+        .modal-body p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .modal-footer {
+            text-align: right;
+        }
+
+        .close-modal {
+            background: var(--accent);
+            color: var(--dark);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .examples {
+            background: rgba(10, 25, 47, 0.8);
+            backdrop-filter: blur(5px);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid rgba(100, 255, 218, 0.1);
+        }
+
+        .examples.hidden {
+            display: none;
+        }
+
+        .examples p {
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .examples ul {
+            list-style: none;
+        }
+
+        .examples li {
+            color: var(--text);
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .examples li:hover {
+            background: rgba(100, 255, 218, 0.1);
+            padding-left: 1.5rem;
+        }
+
         .bot-response {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 18px;
-            flex-grow: 1;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
+
+            backdrop-filter: blur(5px);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 800px;
+
         }
 
-        main {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
+        @media (max-width: 768px) {
+            .logo h1 {
+                font-size: 2rem;
+            }
+            
+            .search-container {
+                padding: 0 1rem;
+            }
 
-        .content-wrapper {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
+            .modal-content {
+                width: 90%;
+                margin: 20% auto;
+            }
         }
     </style>
 </head>
 <body>
+    <div id="welcomeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Welcome to Kissan 4.0 AI Assistant</h2>
+            </div>
+            <div class="modal-body">
+                <p>👋 Welcome to your smart farming companion! Here's how to use our AI-powered tools:</p>
+                
+                <p>🌿 <strong>Plant Disease Detection:</strong>
+                   Click the camera icon to upload a photo of your plant. Our AI will analyze it and identify any potential diseases.</p>
+                
+                <p>❓ <strong>Ask Questions:</strong>
+                   Type any farming-related question in the search bar and click the send button. Our AI will provide detailed answers.</p>
+                
+                <p>🌍 <strong>Language Options:</strong>
+                   Use the language selector in the top-right corner to view content in your preferred language.</p>
+                
+                <p>🔄 <strong>Navigation:</strong>
+                   Use the buttons at the top to access different features like weather information and voice interaction.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="close-modal" onclick="closeModal()">Get Started</button>
+            </div>
+        </div>
+    </div>
     <header>
         <div class="logo">
-            <img src="{{ url_for('static', filename='mainlogo.png') }}" alt="AgroCare">
+            <img src="{{ url_for('static', filename='mainlogo.png') }}" alt="Kissan 4.0">
             <h1>Kissan 4.0</h1>
         </div>
         <div class="title">
@@ -156,20 +348,26 @@
     <main>
         <div class="content-wrapper">
             <div class="button-container">
+                <button id="homeButton" onclick="window.location.href='{{ url_for('index') }}'">Home</button>
                 <button id="letsTalkButton" onclick="window.location.href='{{ url_for('speech') }}'">Let's Talk</button>
                 <button id="weatherButton" onclick="window.location.href='{{ url_for('weather') }}'">Weather</button>
                 <button id="refresh-button" onclick="location.reload();">Refresh</button>
-            </div>        
-            <div class="question-input">
-                <input type="text" id="questionInput" placeholder="Type your question..." onfocus="hideExamples()" oninput="hideExamples()">
-                <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="uploadImage();">
-                <button class="upload-btn" onclick="document.getElementById('imageInput').click();">
-                    <img src="{{ url_for('static', filename='cam2.png') }}" alt="Camera" style="width: 30px; height: 30px;">
-                </button>
-                <button class="submit-btn" onclick="submitQuestion()">
-                    <img src="{{ url_for('static', filename='send1.png') }}" alt="Send">
-                </button>
             </div>
+            <div class="search-container">
+                <div class="search-wrapper">
+                    <input type="text" id="questionInput" placeholder="Ask any farming related question..." onfocus="hideExamples()" oninput="hideExamples()">
+                    <div class="action-buttons">
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="uploadImage();">
+                        <button class="upload-btn" onclick="document.getElementById('imageInput').click();" title="Upload plant image for disease detection">
+                            <img src="{{ url_for('static', filename='cam2.png') }}" alt="Camera">
+                        </button>
+                        <button class="submit-btn" onclick="submitQuestion()" title="Send question">
+                            <img src="{{ url_for('static', filename='send1.png') }}" alt="Send">
+                        </button>
+                    </div>
+                </div>
+            </div>
+   
             <div class="examples" id="examples">
                 <p>Few examples to ask!</p>
                 <ul>
@@ -249,5 +447,124 @@
             });
         }
     </script>
+
+<script>
+    // Show modal on page load
+    window.onload = function() {
+        document.getElementById('welcomeModal').style.display = 'block';
+    }
+
+    // Close modal function
+    function closeModal() {
+        document.getElementById('welcomeModal').style.display = 'none';
+    }
+
+    // Close modal if clicking outside
+    window.onclick = function(event) {
+        var modal = document.getElementById('welcomeModal');
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // Your existing JavaScript functions remain the same
+</script>
+  <!-- Google Translate Widget -->
+<div id="google_translate_element"></div>
+
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,hi,mr,ta,te,kn,ml,gu,pa,bn,or,as,ur,sa',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+      }, 'google_translate_element');
+    }
+  
+    // Reinitialize when navigating back
+    window.addEventListener("pageshow", function () {
+      if (!document.querySelector(".goog-te-gadget")) {
+        googleTranslateElementInit();
+      }
+    });
+  </script>
+  
+
+<!-- Load Google Translate API -->
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<style>
+  /* Positioning the Google Translate Widget */
+  #google_translate_element {
+    position: fixed;
+    top: 10px;  /* Adjust for better positioning */
+    right: 20px;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 6px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Styling the Google Translate dropdown */
+  .goog-te-gadget-simple {
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 8px 12px !important;
+    font-family: Arial, sans-serif !important;
+    font-size: 14px !important;
+    background-color: #9ffff5 !important; /* Green theme */
+    color: white !important;
+    cursor: pointer !important;
+    transition: 0.3s ease-in-out;
+  }
+
+  .goog-te-gadget-simple:hover {
+    background-color: #3a5b0c !important; /* Darker on hover */
+  }
+
+  .goog-te-menu-value {
+    color: white !important;
+    text-decoration: none !important;
+    margin: 0 !important;
+  }
+
+  /* Hide the Google Translate logo and branding */
+  .goog-te-gadget img,
+  .goog-te-banner-frame,
+  .skiptranslate > iframe.skiptranslate {
+    display: none !important;
+  }
+
+  /* Prevent body from shifting when Google Translate loads */
+  body {
+    top: 0 !important;
+    position: static !important;
+  }
+
+  /* Ensure background extends fully */
+  html, body {
+    height: 100%;
+    min-height: 100vh;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  /* Responsive Design for Mobile */
+  @media (max-width: 768px) {
+    #google_translate_element {
+      top: 50px;
+      right: 10px;
+    }
+
+    .goog-te-gadget-simple {
+      padding: 6px 10px !important;
+      font-size: 13px !important;
+    }
+  }
+</style>
+
 </body>
 </html>

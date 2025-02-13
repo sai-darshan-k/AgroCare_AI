@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Information</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 15px;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #218838;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 20px -15px;
+            padding: 0 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px 8px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            white-space: nowrap;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .note {
+            margin-top: 20px;
+            padding: 12px;
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            font-size: 14px;
+            color: #333;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .note a {
+            color: #0056b3;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .note a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            display: none;
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #007bff;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                width: 100%;
+                padding: 12px;
+                margin: 10px auto;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+
+            select, button {
+                padding: 10px;
+                font-size: 15px;
+            }
+
+            th, td {
+                padding: 8px 6px;
+                font-size: 13px;
+            }
+
+            .note {
+                font-size: 13px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button onclick="window.location.href='{{ url_for('index') }}'" 
+                style="margin-bottom: 1rem; padding: 0.75rem 1.5rem; background-color: #0056b3; 
+                color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; 
+                cursor: pointer; transition: background-color 0.2s, transform 0.2s;">
+            Home
+        </button>
+        <h2>Real-Time Commodity Information</h2>
+        <form method="POST" action="/data">
+            <div>
+                <label for="state">Select State:</label>
+                <select name="state" id="state" required>
+                    <option value="">--Select State--</option>
+                    {% for state in states %}
+                        <option value="{{ state }}">{{ state }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="district">Select District:</label>
+                <select name="district" id="district" required disabled>
+                    <option value="">--Select District--</option>
+                </select>
+                <div class="loading"><span class="spinner"></span>Loading districts...</div>
+            </div>
+
+            <button type="submit" disabled>Get Data</button>
+        </form>
+
+        {% if data %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>District</th>
+                            <th>Market</th>
+                            <th>Commodity</th>
+                            <th>Variety</th>
+                            <th>Grade</th>
+                            <th>Arrival Date</th>
+                            <th>Min Price</th>
+                            <th>Max Price</th>
+                            <th>Modal Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in data %}
+                            <tr>
+                                <td>{{ record['state'] }}</td>
+                                <td>{{ record['district'] }}</td>
+                                <td>{{ record['market'] }}</td>
+                                <td>{{ record['commodity'] }}</td>
+                                <td>{{ record.get('variety', 'N/A') }}</td>
+                                <td>{{ record.get('grade', 'N/A') }}</td>
+                                <td>{{ record.get('arrival_date', 'N/A') }}</td>
+                                <td>{{ record.get('min_price', 'N/A') }}</td>
+                                <td>{{ record.get('max_price', 'N/A') }}</td>
+                                <td>{{ record.get('modal_price', 'N/A') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        <div class="note">
+            <strong>Note:</strong> Real-time information is only available for updated market commodities. Other information will be available until the evening.  
+            For more details, click <a href="https://agmarknet.gov.in/PriceAndArrivals/CommodityDailyStateWise.aspx" target="_blank">here</a>.
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            const $stateSelect = $('#state');
+            const $districtSelect = $('#district');
+            const $submitButton = $('button[type="submit"]');
+            const $loading = $('.loading');
+
+            // Enable/disable submit button based on selections
+            function updateSubmitButton() {
+                $submitButton.prop('disabled', 
+                    !$stateSelect.val() || !$districtSelect.val()
+                );
+            }
+
+            $stateSelect.change(function() {
+                const state = $(this).val();
+                $districtSelect.prop('disabled', true);
+                $districtSelect.html('<option value="">--Select District--</option>');
+                updateSubmitButton();
+
+                if (state) {
+                    $loading.show();
+                    
+                    $.ajax({
+                        type: "POST",
+                        url: "/districts",
+                        contentType: "application/json",
+                        data: JSON.stringify({ "state": state }),
+                        success: function(response) {
+                            $districtSelect.html('<option value="">--Select District--</option>');
+                            response.forEach(function(district) {
+                                $districtSelect.append(
+                                    $('<option></option>').val(district).text(district)
+                                );
+                            });
+                            $districtSelect.prop('disabled', false);
+                        },
+                        error: function() {
+                            alert("Error fetching districts. Please try again.");
+                        },
+                        complete: function() {
+                            $loading.hide();
+                        }
+                    });
+                }
+            });
+
+            $districtSelect.change(updateSubmitButton);
+        });
+    </script>
+<div id="google_translate_element"></div>
+
+<!-- Google Translate Initialization Script -->
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',  // Default page language
+      includedLanguages: 'en,hi,mr,ta,te,kn,ml,gu,pa,bn,or,as,ur,sa', // Available languages
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE, // Drop-down style
+      autoDisplay: false,  // Don't auto-show
+      gaTrack: false  // Disable tracking
+    }, 'google_translate_element');
+  }
+</script>
+
+<!-- Load Google Translate API -->
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<style>
+  /* Positioning the Google Translate Widget */
+  #google_translate_element {
+    position: fixed;
+    top: 10px;  /* Adjust for better positioning */
+    right: 20px;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 6px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Styling the Google Translate dropdown */
+  .goog-te-gadget-simple {
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 8px 12px !important;
+    font-family: Arial, sans-serif !important;
+    font-size: 14px !important;
+    background-color: #9ffff5 !important; /* Green theme */
+    color: white !important;
+    cursor: pointer !important;
+    transition: 0.3s ease-in-out;
+  }
+
+  .goog-te-gadget-simple:hover {
+    background-color: #3a5b0c !important; /* Darker on hover */
+  }
+
+  .goog-te-menu-value {
+    color: white !important;
+    text-decoration: none !important;
+    margin: 0 !important;
+  }
+
+  /* Hide the Google Translate logo and branding */
+  .goog-te-gadget img,
+  .goog-te-banner-frame,
+  .skiptranslate > iframe.skiptranslate {
+    display: none !important;
+  }
+
+  /* Prevent body from shifting when Google Translate loads */
+  body {
+    top: 0 !important;
+    position: static !important;
+  }
+
+  /* Ensure background extends fully */
+  html, body {
+    height: 100%;
+    min-height: 100vh;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  /* Responsive Design for Mobile */
+  @media (max-width: 768px) {
+    #google_translate_element {
+      top: 50px;
+      right: 10px;
+    }
+
+    .goog-te-gadget-simple {
+      padding: 6px 10px !important;
+      font-size: 13px !important;
+    }
+  }
+</style>
+
+</body>
+</html>

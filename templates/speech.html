@@ -56,7 +56,7 @@
             margin-top: 40px;
         }
         #startSpeechButton, .go-back-button {
-            background-color: #4CAF50;
+            background-color: green;
             color: white;
             padding: 15px;
             border: none;
@@ -64,6 +64,14 @@
             cursor: pointer;
             font-size: 16px;
             margin: 10px;
+            background-color: green; /* Green background */
+    color: white; /* White text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding */
+    cursor: pointer; /* Pointer cursor */
+    font-size: 16px; /* Font size */
+    transition: background-color 0.3s; 
         }
         #startSpeechButton:hover, .go-back-button:hover {
             background-color: #45a049;
@@ -96,7 +104,7 @@
             flex-wrap: wrap;
         }
         .play-button {
-            background-color: #4CAF50;
+            background-color: green;
             color: white;
             padding: 10px;
             border: none;
@@ -116,6 +124,16 @@
             width: 100%;
             margin-top: 20px;
         }
+        #homeButton {
+    background-color: green; /* Green background */
+    color: white; /* White text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding */
+    cursor: pointer; /* Pointer cursor */
+    font-size: 16px; /* Font size */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
     </style>
 </head>
 <body>
@@ -151,6 +169,7 @@
         <div class="speech-input">
             <button id="startSpeechButton" onclick="startSpeechRecognition()">Start Talking</button>
             <button class="go-back-button" onclick="window.history.back()">Go Back</button>
+            <button id="homeButton" onclick="window.location.href='{{ url_for('index') }}'">Home</button>
         </div>
         <div class="qa-container" id="botResponse">
             <!-- Response will be appended here -->

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Map</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Home button styling */
+        .home-button {
+            position: absolute;
+            top: 27.5px;
+            right: 24px;
+            padding-top: .625rem;
+            padding-bottom: .625rem;
+            padding-left: 3.5rem;  /* Increased width */
+            padding-right: 3.5rem; /* Increased width */
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .home-button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Home Button -->
+    <button class="home-button" onclick="window.location.href='{{ url_for('index') }}'">
+        Home
+    </button>
+
+    <!-- Climate Map Iframe -->
+    <iframe 
+        src="https://maps.getambee.com/?state=hideAll=true&hideUI=true&showTitle=false" 
+        allowfullscreen>
+    </iframe>
+
+</body>
+</html>

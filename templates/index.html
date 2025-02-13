@@ -8,146 +8,469 @@
   <link rel="stylesheet" href="static/index.css">
   <link rel="stylesheet" href="static/mobile.css">
 </head>
+<style>
+
+  .menu-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 10px;
+      z-index: 1000;
+  }
+  
+  .menu-toggle span {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background-color: #333;
+      margin: 5px 0;
+      transition: all 0.3s ease;
+  }
+  
+  /* Menu toggle animation */
+  .menu-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+  }
+  
+  .menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+  }
+  
+  .menu-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(7px, -6px);
+  }
+  
+  /* Services Dropdown Styles */
+  .main-services {
+      display: none;
+      position: absolute;
+      background: rgb(255, 255, 255);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      padding: 1rem;
+      min-width: 250px;
+      list-style: none;
+      z-index: 1000;
+  }
+  
+  .dropdown.active .main-services {
+      display: block;
+  }
+  
+  .service-item {
+      margin-bottom: 0.5rem;
+  }
+  
+  .service-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem;
+      cursor: pointer;
+      background: #f8f9fa;
+      border-radius: 4px;
+  }
+  
+  .arrow {
+      border: solid #333;
+      border-width: 0 2px 2px 0;
+      display: inline-block;
+      padding: 3px;
+      transform: rotate(45deg);
+      transition: 0.3s;
+  }
+  
+  .service-item.active .arrow {
+      transform: rotate(-135deg);
+  }
+  
+  .sub-services {
+      display: none;
+      list-style: none;
+      padding: 0.5rem 1rem;
+  }
+  
+  .service-item.active .sub-services {
+      display: block;
+  }
+  
+  .sub-services a {
+      color: #666;
+      text-decoration: none;
+      padding: 0.5rem;
+      display: block;
+  }
+  
+  .sub-services a:hover {
+      color: #007bff;
+  }
+  /* Services Dropdown Styles */
+.services-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    z-index: 1000;
+}
+
+.dropdown.active .services-dropdown {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.5rem;
+    min-width: 1000px;
+}
+
+.service-category {
+    padding: 0.5rem;
+}
+
+.service-category h3 {
+    color: #333;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.service-category ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.service-category ul li {
+    margin: 0.8rem 0;
+}
+
+.service-category ul li a {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.3s;
+    font-size: 0.95rem;
+}
+
+.service-category ul li a:hover {
+    color: #007bff;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .services-dropdown {
+        position: static;
+        box-shadow: none;
+        padding: 0 1rem;
+    }
+
+    .dropdown.active .services-dropdown {
+        display: block;
+        min-width: 100%;
+        grid-template-columns: 1fr;
+    }
+
+    .service-category {
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+        padding: 0.5rem 0;
+    }
+
+    .service-category:last-child {
+        border-bottom: none;
+    }
+
+    .service-category h3 {
+        cursor: pointer;
+        padding: 0.5rem;
+        margin: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .service-category h3::after {
+        content: '';
+        border: solid #333;
+        border-width: 0 2px 2px 0;
+        display: inline-block;
+        padding: 3px;
+        transform: rotate(45deg);
+        transition: 0.3s;
+    }
+
+    .service-category.active h3::after {
+        transform: rotate(-135deg);
+    }
+
+    .service-category ul {
+        display: none;
+        padding: 0.5rem 1rem;
+    }
+
+    .service-category.active ul {
+        display: block;
+    }
+  }
+  /* Mobile Styles */
+  @media (max-width: 768px) {
+      .menu-toggle {
+          display: block;
+      }
+  
+      .nav-links {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(28, 57, 50, 0.818);
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 60px 1rem 1rem 1rem;
+          z-index: 999;
+          overflow-y: auto;
+      }
+  
+      .nav-links.show {
+          display: flex;
+      }
+  
+      .nav-links > li {
+          width: 100%;
+      }
+  
+      .nav-links > li > a {
+          padding: 1rem;
+          width: 100%;
+          display: block;
+      }
+  
+      .main-services {
+          position: static;
+          box-shadow: none;
+          width: 100%;
+          padding: 0 1rem;
+      }
+  
+      .service-item {
+          margin: 0.5rem 0;
+      }
+  
+      .sub-services {
+          padding: 0.5rem;
+      }
+  
+      .dropdown .services-link {
+          width: 100%;
+          display: block;
+      }
+  }
+  </style>
+  
 <body>
-<!-- Navbar -->
+
   <nav class="navbar">
     <div class="nav-container">
-      <div class="logo">Kissan 4.0</div>
-      <button class="menu-toggle">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-      <ul class="nav-links">
-        <li class="dropdown">
-          <a href="#" class="services-link">Services</a>
-          <ul class="dropdown-menu">
-            <li><a href="/insecticides">Insecticides</a></li>
-            <li><a href="/fungicides">Fungicides</a></li>
-            <li><a href="/herbicides">Herbicides</a></li>
-          </ul>
-        </li>      <li><a href="#features">Features</a></li>
-      <li><a href="#objectives">Objectives</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-    <a href="/agrocare" class="cta-btn">Get Started with AI</a>
-  </div>
+        <div class="logo">Kissan 4.0</div>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <ul class="nav-links" id="navLinks">
+            <li class="dropdown">
+                <a href="#" class="services-link">Services</a>
+                <ul class="main-services">
+                    <li class="service-item">
+                        <div class="service-header">
+                            <span>Pesticide Information</span>
+                            <i class="arrow"></i>
+                        </div>
+                        <ul class="sub-services">
+                            <li><a href="/insecticides">Insecticides</a></li>
+                            <li><a href="/fungicides">Fungicides</a></li>
+                            <li><a href="/herbicides">Herbicides</a></li>
+                            <li><a href="/pgr">Plant Growth Regulation (PGR)</a></li>
+                        </ul>
+                    </li>
+                    <li class="service-item">
+                        <div class="service-header">
+                            <span>Soil Information</span>
+                            <i class="arrow"></i>
+                        </div>
+                        <ul class="sub-services">
+                            <li><a href="/soil_labs">Soil Test Labs</a></li>
+                            <li><a href="/shc">Soil Health Cards</a></li>
+                            <li><a href="https://www.soilhealth.dac.gov.in/piechart">Nutrient Management</a></li>
+                            <li><a href="https://www.soilhealth.dac.gov.in/fertiliser-dosage">Fertilizer recommendation</a></li>
+                        </ul>
+                    </li>
+                    <li class="service-item">
+                        <div class="service-header">
+                            <span>Market Information</span>
+                            <i class="arrow"></i>
+                        </div>
+                        <ul class="sub-services">
+                            <li><a href="/market">Karnataka Market Price</a></li>
+                            <li><a href="/mandi">Real-Time Mandi Information</a></li>
+                        </ul>
+                    </li>
+                    <li class="service-item">
+                        <div class="service-header">
+                            <span>Environmental Data</span>
+                            <i class="arrow"></i>
+                        </div>
+                        <ul class="sub-services">
+                            <li><a href="/maps">Air Quality and Pollen Maps</a></li>
+                        </ul>
+                    </li>
+                    <li class="service-item">
+                      <div class="service-header">
+                          <span>News</span>
+                          <i class="arrow"></i>
+                      </div>
+                      <ul class="sub-services">
+                          <li><a href="/news">Stay updated with latest news</a></li>
+                      </ul>
+                  </li>
+                </ul>
+            </li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#objectives">Objectives</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="nav-right">
+            <a href="/agrocare" class="ai-button">
+                <div class="logo-container">
+                    <img src="static/black.png" alt="Rotating Logo" class="rotating-logo">
+                    <img src="static/ai_Ci.png" alt="Static Logo" class="static-logo">
+                </div>
+            </a>
+            <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTN1dGM1NDdzamEwazI1bGowbm5nOGpmZWhrNnNyM2p6NWRlbjQ5MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/gd2jKQSg1UWN9HgBCV/giphy.gif" 
+                alt="Click Hand" class="click-hand">
+            <div id="google_translate_element"></div>
+        </div>
+    </div>
 </nav>
-
-
-<!-- Hero Section -->
 <section class="hero">
   <div class="hero-content">
-    <h1>Empowering Farmers with Technology</h1>
-    <p>Your one-stop solution for sustainable farming, AI tools, and live updates.</p>
+    <h1 id="hero-title"></h1> <!-- Empty initially for typing effect -->
+    <p id="hero-desc">Your one-stop solution for sustainable farming, AI tools, and live updates.</p>
     <div class="hero-buttons">
-      <a href="#features" class="cta-btn">Explore Features</a>
-      <a href="/agrocare" class="cta-btn get-started">Get Started with AI</a>
+      <a href="#features" class="cta-btn" id="explore-btn">Explore Features</a>
+      <a href="/agrocare" class="cta-btn get-started" id="start-btn">Get Started with AI</a>
     </div>
   </div>
-  <video autoplay loop muted playsinline class="hero-video">
+
+  <!-- Video Element -->
+  <video id="hero-video" autoplay muted playsinline class="hero-media">
     <source src="static/vid2.mp4" type="video/mp4">
   </video>
-</section>
 
-  <hr style="border: 1px solid #000000; margin: 40px auto; width: 80%;">
+  <!-- Image Slideshow (Initially Hidden) -->
+  <img id="hero-image-1" src="static/smart4.png" alt="Hero Image" class="hero-media" style="display: none;">
+  <img id="hero-image-2" src="static/organic.jpg" alt="Hero Image" class="hero-media" style="display: none;">
+  </section>
 
-  <!-- Objectives Section -->
-  <section id="objectives" class="objectives">
-    <div class="container">
-      <h2 style="text-align: center; margin-bottom: 40px; color: #2c5f2d;">CORE PILLARS OF KISSAN 4.0 </h2>
-  
-      <!-- Objective 1 -->
-      <div class="objective">
-        <div class="objective-row">
-          <div class="objective-image">
-            <img src="static\emp2.jpg" alt="Empower Farmers">
-          </div>
-          <div class="objective-description">
-            <h3>Empower Farmers with Technology</h3>
-            <p>Equip farmers with cutting-edge tools and technologies that simplify their daily operations. By integrating AI, IoT, and data-driven solutions, we aim to bridge the gap between traditional farming methods and modern advancements, ensuring a seamless transition to smart agriculture.</p>
-          </div>
+<hr style="border: 1px solid #000000; margin: 40px auto; width: 80%;">
+
+<!-- Objectives Section -->
+<section id="objectives" class="objectives">
+  <div class="container">
+    <h2 style="text-align: center; margin-bottom: 40px; color: #2c5f2d;">CORE PILLARS OF KISSAN 4.0 </h2>
+
+    <div class="objective">
+      <div class="objective-row">
+        <div class="objective-image">
+          <img src="static/emp2.jpg" alt="Empower Farmers">
         </div>
-      </div>
-      
-     
-      <!-- Objective 2 -->
-      <div class="objective">
-        <div class="objective-row reverse">
-          <div class="objective-description">
-            <h3>Sustainable Farming Practices</h3>
-            <p>Foster environmentally friendly farming methods that conserve resources and reduce waste. Our platform provides insights into sustainable practices, helping farmers maintain soil health, optimize water usage, and reduce the carbon footprint of their activities.</p>
-          </div>
-          <div class="objective-image">
-            <img src="static\sus1.webp" alt="Sustainable Farming">
-          </div>
-        </div>
-      </div>
-  
-      <!-- Objective 3 -->
-      <div class="objective">
-        <div class="objective-row">
-          <div class="objective-image">
-            <img src="static\productuvity.avif" alt="Enhance Productivity">
-          </div>
-          <div class="objective-description">
-            <h3>Enhance Productivity and Efficiency</h3>
-            <p>Boost agricultural productivity by leveraging AI-powered tools for precision farming. From real-time data analysis to crop health monitoring, our solutions empower farmers to make informed decisions that maximize yield and minimize effort.</p>
-          </div>
-        </div>
-      </div>
-  
-      <!-- Objective 4 -->
-      <div class="objective">
-        <div class="objective-row reverse">
-          <div class="objective-description">
-            <h3>Real-Time Monitoring</h3>
-            <p>Enable farmers to monitor their fields in real-time with AI-driven surveillance systems. Our solutions integrate advanced sensors, drones, and cameras to detect potential threats, ensure crop safety, and provide actionable insights instantly.</p>
-          </div>
-          <div class="objective-image">
-            <img src="static\real-time.jpg" alt="Real-Time Monitoring">
-          </div>
-        </div>
-      </div>
-  
-      <!-- Objective 5 -->
-      <div class="objective">
-        <div class="objective-row">
-          <div class="objective-image">
-            <img src="static\Market.jpg" alt="Market Info">
-          </div>
-          <div class="objective-description">
-            <h3>Real-Time Market Information</h3>
-            <p>Provide farmers with up-to-date market trends, crop prices, and demand forecasts. Our platform ensures transparency in market dynamics, helping farmers make profitable decisions and connect directly with buyers to maximize their earnings.</p>
-          </div>
+        <div class="objective-description">
+          <h3>Empower Farmers with Technology</h3>
+          <p>AI, IoT, and data-driven solutions help farmers move towards smart agriculture.</p>
         </div>
       </div>
     </div>
-  </section>
 
-  <section id="features" class="features">
-    <div class="container">
-      <h2 style="text-align: center; margin-bottom: 40px; color: #2c5f2d;">OUR SMART SOLUTIONS OF KISSAN 4.0 </h2>
-      <div class="features-grid">
-        <!-- Feature Card 1: Multilingual Chatbot -->
-        <div class="feature-card">
-          <video class="feature-video" autoplay loop muted>
-            <source src="static/chat3.webm" type="video/webm">
-          </video>
-          <div class="feature-overlay">
-            <h3>Multilingual Chatbot</h3>
-            <p>Get personalized farming advice in your preferred language using our advanced AI-powered chatbot.</p>
-          </div>
+    <!-- Objective 2 -->
+    <div class="objective">
+      <div class="objective-row reverse">
+        <div class="objective-description">
+          <h3>Sustainable Farming Practices</h3>
+          <p>Foster environmentally friendly farming methods that conserve resources and reduce waste. Our platform provides insights into sustainable practices, helping farmers maintain soil health, optimize water usage, and reduce the carbon footprint of their activities.</p>
         </div>
+        <div class="objective-image">
+          <img src="static\sus1.webp" alt="Sustainable Farming">
+        </div>
+      </div>
+    </div>
 
-        <div class="feature-card">
-          <img src="static/disease2.jpg" alt="Crop Disease Detection" class="feature-image">
-          <div class="feature-overlay">
-            <h3>Crop Disease Detection</h3>
-            <p>Upload crop images for instant AI-powered disease diagnosis with precise treatment recommendations.</p>
-          </div>
+    <!-- Objective 3 -->
+    <div class="objective">
+      <div class="objective-row">
+        <div class="objective-image">
+          <img src="static\productuvity.avif" alt="Enhance Productivity">
         </div>
+        <div class="objective-description">
+          <h3>Enhance Productivity and Efficiency</h3>
+          <p>Boost agricultural productivity by leveraging AI-powered tools for precision farming. From real-time data analysis to crop health monitoring, our solutions empower farmers to make informed decisions that maximize yield and minimize effort.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Objective 4 -->
+    <div class="objective">
+      <div class="objective-row reverse">
+        <div class="objective-description">
+          <h3>Real-Time Monitoring</h3>
+          <p>Enable farmers to monitor their fields in real-time with AI-driven surveillance systems. Our solutions integrate advanced sensors, drones, and cameras to detect potential threats, ensure crop safety, and provide actionable insights instantly.</p>
+        </div>
+        <div class="objective-image">
+          <img src="static\real-time.jpg" alt="Real-Time Monitoring">
+        </div>
+      </div>
+    </div>
+
+    <!-- Objective 5 -->
+    <div class="objective">
+      <div class="objective-row">
+        <div class="objective-image">
+          <img src="static\Market.jpg" alt="Market Info">
+        </div>
+        <div class="objective-description">
+          <h3>Real-Time Market Information</h3>
+          <p>Provide farmers with up-to-date market trends, crop prices, and demand forecasts. Our platform ensures transparency in market dynamics, helping farmers make profitable decisions and connect directly with buyers to maximize their earnings.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="features">
+  <div class="container">
+    <h2 style="text-align: center; margin-bottom: 40px; color: #2c5f2d;">OUR SMART SOLUTIONS OF KISSAN 4.0 </h2>
+    <div class="features-grid">
+      <!-- Feature Card 1: Multilingual Chatbot -->
+      <div class="feature-card">
+        <video class="feature-video" autoplay loop muted>
+          <source src="static/chat3.webm" type="video/webm">
+        </video>
+        <div class="feature-overlay">
+          <h3>Multilingual Chatbot</h3>
+          <p>Get personalized farming advice in your preferred language using our advanced AI-powered chatbot.</p>
+        </div>
+      </div>
+
+      <!-- Feature Card 2: Crop Disease Detection -->
+      <div class="feature-card">
+        <img src="static/disease2.jpg" alt="Crop Disease Detection" class="feature-image">
+        <div class="feature-overlay">
+          <h3>Crop Disease Detection</h3>
+          <p>Upload crop images for instant AI-powered disease diagnosis with precise treatment recommendations.</p>
+        </div>
+      </div>
 
       <!-- Feature Card 3: Weather Updates -->
       <div class="feature-card">
@@ -157,16 +480,16 @@
           <p>Access real-time weather forecasts and detailed air quality data tailored to your specific agricultural location.</p>
         </div>
       </div>
-  
-            <!-- Feature Card 4: Sensor Data -->
-            <div class="feature-card">
-              <img src="static/iot.jpg" alt="IoT Sensor Monitoring" class="feature-image">
-              <div class="feature-overlay">
-                <h3>IoT Sensor Monitoring</h3>
-                <p>Comprehensive monitoring of soil moisture, temperature, humidity, and other critical environmental parameters.</p>
-              </div>
-            </div>
-  
+
+      <!-- Feature Card 4: Sensor Data -->
+      <div class="feature-card">
+        <img src="static/iot.jpg" alt="IoT Sensor Monitoring" class="feature-image">
+        <div class="feature-overlay">
+          <h3>IoT Sensor Monitoring</h3>
+          <p>Comprehensive monitoring of soil moisture, temperature, humidity, and other critical environmental parameters.</p>
+        </div>
+      </div>
+
       <!-- Feature Card 5: AI Surveillance -->
       <div class="feature-card">
         <img src="static/security.jpg" alt="24/7 Farm Surveillance" class="feature-image">
@@ -175,7 +498,8 @@
           <p>Advanced AI-powered cameras and drone systems to monitor farm activities and detect potential threats in real-time.</p>
         </div>
       </div>
-  
+
+      <!-- Feature Card 6: Market Intelligence -->
       <div class="feature-card">
         <img src="static/market-data.avif" alt="Live Market Intelligence" class="feature-image">
         <div class="feature-overlay">
@@ -185,64 +509,489 @@
       </div>
     </div>
   </div>
-  </section>  
-  
-    <!-- About Section -->
-    <section id="about" class="about">
-      <div class="container">
-        <div class="about-content">
-          <h2>About Kissan 4.0</h2>
-          <p>Kissan 4.0 is a revolutionary platform designed to bring technology to agriculture. Our mission is to empower farmers with tools that promote sustainability, boost productivity, and simplify decision-making.</p>
-          <a href="#" class="cta-btn">Learn More</a>
-        </div>
-        <img src="images/farming.png" alt="About Kissan 4.0">
-      </div>
-    </section>
-  
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
-      <div class="container">
-        <h2>Contact Us</h2>
-        <p>Have questions? We're here to help. Reach out to us anytime!</p>
-        <form class="contact-form">
-          <input type="text" placeholder="Your Name" required>
-          <input type="email" placeholder="Your Email" required>
-          <textarea placeholder="Your Message" required></textarea>
-          <button type="submit">Send Message</button>
-        </form>
-      </div>
-    </section>
-  
-    <!-- Footer -->
-    <footer class="footer">
-      <p>&copy; 2025 Kissan 4.0. All Rights Reserved.</p>
-    </footer>
+</section>  
 
-  <!-- JavaScript for Mobile Menu -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const menuToggle = document.querySelector('.menu-toggle');
-      const navLinks = document.querySelector('.nav-links');
-      
-      menuToggle.addEventListener('click', function() {
+<!-- About Section -->
+<section id="about" class="about">
+  <div class="container">
+    <div class="about-content">
+      <h2>About Kissan 4.0</h2>
+      <p>Kissan 4.0 is a revolutionary platform designed to bring technology to agriculture. Our mission is to empower farmers with tools that promote sustainability, boost productivity, and simplify decision-making.</p>
+      <a href="#" class="cta-btn">Learn More</a>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="contact">
+  <div class="container">
+    <h2>Contact Us</h2>
+    <p>Have questions? We're here to help. Reach out to us anytime!</p>
+    <form class="contact-form">
+      <input type="text" placeholder="Your Name" required>
+      <input type="email" placeholder="Your Email" required>
+      <textarea placeholder="Your Message" required></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>&copy; 2025 Kissan 4.0. All Rights Reserved.</p>
+</footer>
+
+
+<!-- CSS to Ensure Full-Screen Fit -->
+<style>
+.nav-right {
+    position: relative; /* Ensures proper placement */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-container {
+    position: relative;
+    width: 80px; /* Adjust as needed */
+    height: auto;
+}
+
+.rotating-logo {
+    width: 100%; 
+    animation: rotate 4s linear infinite;
+}
+
+.static-logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px; /* Adjust AI icon size */
+}
+
+.click-hand {
+    position: absolute;
+    bottom: -10px; /* Slightly below AI icon */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 75px; /* Smaller GIF size */
+    opacity: 0;
+    animation: handClick 4s infinite ease-in-out;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes handClick {
+    0% { opacity: 0; transform: translate(-50%, 10px); }
+    20% { opacity: 1; transform: translate(-50%, 0); }
+    40% { opacity: 0; transform: translate(-50%, -5px); }
+    100% { opacity: 0; transform: translate(-50%, 10px); }
+}
+
+  .hero {
+    position: relative;
+    width: 100%;
+    height: 100vh; /* Full viewport height */
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-content {
+    position: absolute;
+    z-index: 2;
+    text-align: center;
+    color: white;
+  }
+
+  .hero-media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures full coverage */
+    z-index: 1;
+  }
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const video = document.getElementById("hero-video");
+  const images = document.querySelectorAll(".hero-media");
+  let currentIndex = 0;
+
+  function showImages() {
+    video.style.display = "none"; // Hide video
+    images[currentIndex].style.display = "block"; // Show first image
+
+    let imageInterval = setInterval(() => {
+      images[currentIndex].style.display = "none"; // Hide current image
+      currentIndex = (currentIndex + 1) % images.length; // Move to next image
+      images[currentIndex].style.display = "block"; // Show next image
+
+      // **Fix: Immediately restart video after last image**
+      if (currentIndex === images.length - 1) {
+        clearInterval(imageInterval); // Stop image loop
+        setTimeout(() => {
+          images[currentIndex].style.display = "none"; // Hide last image
+          video.style.display = "block"; // Show video again
+          video.play(); // Restart video immediately
+        }, 7000); // Only wait 7 seconds for last image
+      }
+    }, 7000); // Change image every 7 seconds
+  }
+
+  video.addEventListener("ended", showImages); // Start image loop when video ends
+});
+</script>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+    const servicesLink = document.querySelector('.services-link');
+    const dropdown = document.querySelector('.dropdown');
+    const servicesDropdown = document.querySelector('.services-dropdown');
+
+    // Mobile menu toggle
+    menuToggle.addEventListener('click', function() {
         navLinks.classList.toggle('active');
-      });
-
-      // Close menu when clicking links
-      const links = document.querySelectorAll('.nav-links a');
-      links.forEach(link => {
-        link.addEventListener('click', () => {
-          navLinks.classList.remove('active');
-        });
-      });
-
-      // Close menu when clicking outside
-      document.addEventListener('click', function(event) {
-        if (!event.target.closest('.navbar')) {
-          navLinks.classList.remove('active');
-        }
-      });
     });
+
+    // Toggle services dropdown on mobile
+    servicesLink.addEventListener('click', function(event) {
+        event.preventDefault();
+        
+        if (window.innerWidth <= 768) {
+            servicesDropdown.classList.toggle('show');
+            dropdown.classList.toggle('active');
+            console.log('Dropdown visibility toggled'); // Debugging log
+        }
+    });
+
+    // Close mobile menu when a link is clicked
+    navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                navLinks.classList.remove('active');
+                servicesDropdown.classList.remove('show');
+                dropdown.classList.remove('active');
+            }
+        });
+    });
+});
+</script>
+
+<style>
+  /* Google Translate Button at Top-Right Corner */
+  #google_translate_element {
+      position: fixed; /* Keeps it in place */
+      top: 20px; /* Distance from top */
+      right: 55px; /* Moves it to the right corner */
+      z-index: 9999;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 5px;
+  }
+  
+  /* Google Translate Button Styling */
+  .goog-te-gadget-simple {
+      border: none !important;
+      border-radius: 6px !important;
+      padding: 8px 12px !important;
+      font-family: 'Arial', sans-serif !important;
+      font-size: 14px !important;
+      line-height: 1.4 !important;
+      background-color: #9cffa1 !important; /* Matches theme */
+      color: black !important;
+      transition: all 0.3s ease !important;
+      margin: 0 !important;
+  }
+  
+  /* Hover Effect */
+  .goog-te-gadget-simple:hover {
+      background-color: #367937 !important;
+      box-shadow: 0 2px 8px rgba(44, 95, 45, 0.3) !important;
+  }
+  
+  /* Hide Google Branding */
+  .goog-te-gadget img,
+  .goog-te-banner-frame,
+  .skiptranslate > iframe.skiptranslate {
+      display: none !important;
+  }
+  
+  /* Prevent Body Shifting */
+  body {
+      top: 0 !important;
+      position: relative !important;
+  }
+  
+  /* Navbar Styling */
+  .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+  }
+  
+  .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+  }
+  
+  /* Mobile Responsiveness */
+  @media (max-width: 768px) {
+      #google_translate_element {
+          top: 15px;
+          right: 55px;
+      }
+  
+      .goog-te-gadget-simple {
+          padding: 6px 8px !important;
+          font-size: 13px !important;
+      }
+  
+      .nav-container {
+          padding: 0 10px;
+      }
+      
+      .nav-right {
+          gap: 10px;
+      }
+  }
+  </style>
+  
+
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+      // Ensure the function only runs once
+      if (window.googleTranslateInitialized) return;
+      
+      new google.translate.TranslateElement({
+          pageLanguage: 'en',
+          includedLanguages: 'en,hi,mr,ta,te,kn,ml,gu,pa,bn,or,as,ur,sa',
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+          autoDisplay: true,
+          gaTrack: false
+      }, 'google_translate_element');
+      
+      // Custom translation post-processing
+      const translateCombo = document.querySelector('.goog-te-combo');
+      if (translateCombo) {
+          translateCombo.addEventListener('change', function() {
+              // Preserve specific text after translation
+              setTimeout(() => {
+                  const elements = document.body.getElementsByTagName('*');
+                  for (let el of elements) {
+                      if (el.innerHTML.includes('Cat 4.0')) {
+                          el.innerHTML = el.innerHTML.replace('Cat 4.0', 'Kissan 4.0');
+                      }
+                  }
+              }, 500);
+          });
+      }
+      
+      window.googleTranslateInitialized = true;
+  }
+
+  function loadTranslateScript() {
+      if (document.getElementById('google-translate-script')) return;
+      
+      const script = document.createElement('script');
+      script.id = 'google-translate-script';
+      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+      script.async = true;
+      script.defer = true;
+      
+      script.onerror = () => {
+          console.error('Failed to load Google Translate script. Retrying in 3 seconds...');
+          setTimeout(loadTranslateScript, 3000);
+      };
+      
+      document.body.appendChild(script);
+  }
+
+  document.addEventListener('DOMContentLoaded', loadTranslateScript);
+
+  if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadTranslateScript);
+  } else {
+      loadTranslateScript();
+  }
+</script>
+
+<!--rotation-->
+<style>
+.logo-container {
+  position: relative;
+  width: 80px;  /* Adjust size */
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rotating-logo {
+  width: 80px;
+  height: 80px;
+  position: absolute; /* Overlaps static logo */
+  transition: transform 0.1s linear;
+}
+
+.static-logo {
+  width: 60px;  /* Adjust size */
+  height: 40px;
+  z-index: 1; /* Ensures it stays on top */
+}
+</style>
+
+<script>
+let lastScrollTop = 0;
+let rotation = 0;
+
+window.addEventListener('scroll', function () {
+    let logo = document.querySelector('.rotating-logo');
+    let currentScroll = window.scrollY;
+
+    if (currentScroll > lastScrollTop) {
+        // Scrolling Down (Anti-clockwise)
+        rotation -= 10;
+    } else if (currentScroll < lastScrollTop) {
+        // Scrolling Up (Clockwise)
+        rotation += 10;
+    }
+
+    logo.style.transform = `rotate(${rotation}deg)`;
+    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll; // Prevent negative values
+});
+</script>
+
+<style>
+  /* Hide elements initially */
+  #hero-desc, .hero-buttons a {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  }
+
+  /* Show p after h1 finishes typing */
+  .show-desc #hero-desc {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Show buttons one by one */
+  .show-buttons #explore-btn {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.5s;
+  }
+
+  .show-buttons #start-btn {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 1s;
+  }
+
+  /* Typing Effect */
+  @keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  #hero-title {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 2px solid transparent;
+    font-size: 2em;
+    width: 0;
+    animation: typing 2.4s steps(30, end) forwards;
+  }
+</style>
+
+<!-- JavaScript for Sequential Effects -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const heroTitle = document.getElementById("hero-title");
+    const heroDesc = document.getElementById("hero-desc");
+    const heroButtons = document.querySelector(".hero-buttons");
+
+    // Set the typing text dynamically
+    const text = "Empowering Farmers with Technology";
+    heroTitle.textContent = text;
+
+    setTimeout(() => {
+      document.body.classList.add("show-desc"); // Show <p>
+    }, 2200); // Slightly longer than typing effect
+
+    setTimeout(() => {
+      document.body.classList.add("show-buttons"); // Show buttons one by one
+    }, 2800);
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const menuToggle = document.getElementById('menuToggle');
+      const navLinks = document.getElementById('navLinks');
+      const servicesLink = document.querySelector('.services-link');
+      const dropdown = document.querySelector('.dropdown');
+      const serviceHeaders = document.querySelectorAll('.service-header');
+  
+      // Mobile menu toggle
+      menuToggle.addEventListener('click', function(e) {
+          e.stopPropagation();
+          menuToggle.classList.toggle('active');
+          navLinks.classList.toggle('show');
+          // Prevent body scrolling when menu is open
+          document.body.style.overflow = navLinks.classList.contains('show') ? 'hidden' : '';
+      });
+  
+      // Services dropdown toggle
+      servicesLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          dropdown.classList.toggle('active');
+      });
+  
+      // Service category toggles
+      serviceHeaders.forEach(header => {
+          header.addEventListener('click', function(e) {
+              e.stopPropagation();
+              const serviceItem = this.parentElement;
+              serviceItem.classList.toggle('active');
+          });
+      });
+  
+      // Close menu when clicking outside
+      document.addEventListener('click', function(e) {
+          if (!navLinks.contains(e.target) && !menuToggle.contains(e.target)) {
+              navLinks.classList.remove('show');
+              menuToggle.classList.remove('active');
+              document.body.style.overflow = '';
+          }
+      });
+  
+      // Close menu when clicking a link (except Services)
+      navLinks.querySelectorAll('a:not(.services-link)').forEach(link => {
+          link.addEventListener('click', function() {
+              navLinks.classList.remove('show');
+              menuToggle.classList.remove('active');
+              document.body.style.overflow = '';
+          });
+      });
+  });
   </script>
+
 </body>
 </html>
