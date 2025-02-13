@@ -37,8 +37,6 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "your_secret_key")
 
-babel = Babel(app)
-
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
@@ -180,75 +178,6 @@ def maps():
 @app.route('/shc')
 def shc():
     return render_template('shc.html')
-
-LANGUAGES = {
-    'en': 'English',
-    'hi': 'हिंदी',
-    'kn': 'ಕನ್ನಡ',
-    'te': 'తెలుగు',
-    'ta': 'தமிழ்',
-    'mr': 'मराठी',
-    'gu': 'ગુજરાતી',
-    'pa': 'ਪੰਜਾਬੀ'
-}
-# Set default language
-app.config['BABEL_DEFAULT_LOCALE'] = 'en'
-
-# Load translations from JSON files
-def load_translations(lang_code):
-    try:
-        translations_path = os.path.join(app.root_path, 'translations', f'{lang_code}.json')
-        with open(translations_path, 'r', encoding='utf-8') as file:
-            return json.load(file)
-    except FileNotFoundError:
-        return {}
-
-@app.route('/translate', methods=['POST'])
-def translate():
-    try:
-        data = request.get_json()
-        text = data.get('text')
-        target_lang = data.get('target_lang')
-        
-        # Store the selected language in session
-        session['language'] = target_lang
-        
-        translations = load_translations(target_lang)
-        translated_text = translations.get(text, text)  # Fallback to original text if no translation
-        
-        return jsonify({
-            'success': True,
-            'translated_text': translated_text
-        })
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-@app.route('/set_language', methods=['POST'])
-def set_language():
-    try:
-        data = request.get_json()
-        language = data.get('language')
-        
-        if language in LANGUAGES:
-            session['language'] = language
-            return jsonify({'success': True})
-        return jsonify({'success': False, 'error': 'Invalid language'}), 400
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-# Get current language
-def get_locale():
-    # First priority: language set in current session
-    if 'language' in session:
-        return session['language']
-    # Second priority: language from request header
-    return request.accept_languages.best_match(LANGUAGES.keys())
-
-# Register the locale selector with Babel
-babel.init_app(app, locale_selector=get_locale)
 
 # Add a new route specifically for speech responses
 @app.route('/ask_speech', methods=['POST'])
