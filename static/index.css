@@ -139,7 +139,6 @@ a {
 }
 
 .nav-links a {
-  color: #fff;
   font-weight: 500;
   transition: color 0.3s;
 }
@@ -666,7 +665,7 @@ h1 {
 }
 
 a {
-  color: #a5aaab; /* Green accent matching existing CTA buttons */
+  color: #ffffff; /* Green accent matching existing CTA buttons */
   transition: color 0.3s ease;
 }
 

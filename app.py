@@ -55,6 +55,8 @@ def download_model_from_drive(drive_link, destination):
             logging.error(f"Error downloading model: {str(e)}")
             raise e
 
+labels = {0: 'Healthy', 1: 'Powdery', 2: 'Rust'}
+
 # Download and load the TensorFlow Lite model
 download_model_from_drive(drive_link, model_path)
 
@@ -70,8 +72,6 @@ prompt = """(System: You are a crop assistant designed to give responses in the 
 
 (user: Question: {question})"""
 promptinstance = ChatPromptTemplate.from_template(prompt)
-
-labels = {0: 'Healthy', 1: 'Powdery', 2: 'Rust'}
 
 # Create a directory for storing the audio files if it doesn't exist
 AUDIO_DIR = os.path.join(os.getcwd(), 'static', 'audio')

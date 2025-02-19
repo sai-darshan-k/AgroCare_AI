@@ -1,1 +1,377 @@
-/* Navbar Links */
+/* Services Dropdown - Modern Design */
+.services-container {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(135deg, #1a1a1a, #333); /* Gradient Background */
+
+    padding: 20px;
+    z-index: 10;
+    border-radius: 10px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+
+/* Main Services Styling */
+.main-services {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.service-item {
+    flex: 1 1 220px; /* Responsive grid */
+    min-width: 220px;
+    background: rgba(241, 241, 241, 0.1); /* Transparent Glass Effect */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgb(255, 255, 255);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover Effect */
+.service-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
+}
+
+/* Service Header */
+.service-header {
+    font-weight: bold;
+    color: #ffcc00; /* Yellowish Text */
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+/* Sub-services */
+.sub-services {
+    list-style: none;
+    padding: 0;
+}
+
+.sub-services li {
+    padding: 5px 0;
+}
+
+.sub-services a {
+    text-decoration: none;
+    color: #000000; /* White Text */
+    font-size: 14px;
+    transition: color 0.3s ease, padding-left 0.3s ease;
+}
+
+/* Hover Effect */
+.sub-services a:hover {
+    color: #00ffcc; /* Aqua Glow Effect */
+    padding-left: 8px;
+}
+
+/* Mobile Styling */
+@media (max-width: 768px) {
+    .nav-links {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .services-container {
+        width: 100%;
+        left: 0;
+        padding: 15px;
+    }
+
+    .main-services {
+        flex-direction: column;
+    }
+
+    .service-item {
+        width: 100%;
+    }
+}
+/* Services Link Default */
+.services-link {
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    padding: 10px 15px;
+    transition: color 0.3s, background 0.3s, border-radius 0.3s;
+}
+
+/* Highlight When Selected */
+.services-link.active {
+    background: #007bff; /* Blue Highlight */
+    color: white;
+    border-radius: 6px;
+}
+
+/* Services Dropdown */
+.services-container {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(135deg, #1a1a1a, #333);
+    box-shadow: 0px 10px 20px rgba(255, 255, 255, 0.3);
+    padding: 20px;
+    z-index: 10;
+    border-radius: 10px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Show Dropdown When Active */
+.services-container.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+/* Services Link */
+.services-link {
+    text-decoration: none;
+    color: rgb(255, 255, 255); /* Black text */
+    font-weight: 600;
+    padding: 10px 15px;
+    transition: color 0.3s, background 0.3s, border-radius 0.3s;
+}
+
+/* Highlight When Selected */
+.services-link.active {
+    background: #007bff;
+    color: rgb(0, 0, 0);
+    border-radius: 6px;
+}
+
+/* Services Dropdown (Glass Effect) */
+.services-container {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 600px; /* Adjust width to fit content */
+    background: rgba(255, 255, 255, 0.2); /* Glass effect */
+    backdrop-filter: blur(12px); /* Blur effect */
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    z-index: 10;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Show dropdown when active */
+.services-container.active {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Main Services - Horizontal Layout */
+.main-services {
+    display: flex;
+    gap: 20px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Each Main Service Box */
+.service-item {
+    background: rgba(255, 255, 255, 0.3); /* Glass effect */
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    min-width: 140px; /* Equal width for all */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover Effect */
+.service-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Service Headers */
+.service-header {
+    font-weight: bold;
+    color: black; /* Black text */
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+/* Hover Effect */
+.service-header:hover {
+    color: #007bff;
+}
+
+/* Sub-services */
+.sub-services {
+    list-style: none;
+    padding: 0;
+    margin-top: 5px;
+    text-align: left;
+}
+
+/* Sub-service links */
+.sub-services a {
+    text-decoration: none;
+    color: black;
+    font-size: 14px;
+    display: block;
+    transition: color 0.3s ease, padding-left 0.3s ease;
+}
+
+/* Hover Effect */
+.sub-services a:hover {
+    color: #00bcd4;
+    padding-left: 8px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .services-container {
+        flex-direction: column;
+        min-width: 100%;
+        left: 0;
+        padding: 15px;
+    }
+
+    .main-services {
+        flex-direction: column;
+    }
+
+    .service-item {
+        width: 100%;
+    }
+}
+
+/* Services Link */
+.services-link {
+    text-decoration: none; /* Green text */
+    font-weight: 600;
+    padding: 10px 15px;
+    transition: color 0.3s, background 0.3s, border-radius 0.3s;
+}
+
+/* Highlight When Selected */
+.services-link.active {
+    background: #007bff;
+    color: white;
+    border-radius: 6px;
+}
+
+/* Services Dropdown (Glass Effect) */
+.services-container {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 600px;
+    background: rgba(255, 255, 255, 0.2); /* Glass effect */
+    backdrop-filter: blur(12px); /* Blur effect */
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    z-index: 10;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Show dropdown when active */
+.services-container.active {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Main Services - Horizontal Layout */
+.main-services {
+    display: flex;
+    gap: 20px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Each Main Service Box */
+.service-item {
+    background: rgba(255, 255, 255, 0.3);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    min-width: 140px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover Effect */
+.service-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Main Service Headers - Green */
+.service-header {
+    font-weight: bold;
+    color: rgb(0, 0, 0); /* Green main services */
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+/* Hover Effect */
+.service-header:hover {
+    color: #00ff00; /* Brighter green on hover */
+}
+
+/* Sub-services */
+.sub-services {
+    list-style: none;
+    padding: 0;
+    margin-top: 5px;
+    text-align: left;
+}
+
+/* Sub-service links - Black */
+.sub-services a {
+    text-decoration: none;
+    color: black; /* Black sub-services */
+    font-size: 14px;
+    display: block;
+    transition: color 0.3s ease, padding-left 0.3s ease;
+}
+
+/* Hover Effect */
+.sub-services a:hover {
+    color: #00bcd4;
+    padding-left: 8px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .services-container {
+        flex-direction: column;
+        min-width: 100%;
+        left: 0;
+        padding: 15px;
+    }
+
+    .main-services {
+        flex-direction: column;
+    }
+
+    .service-item {
+        width: 100%;
+    }
+}
+
+
