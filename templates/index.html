@@ -344,24 +344,25 @@
 
 .click-hand {
     position: absolute;
-    bottom: -10px; /* Slightly below AI icon */
+    bottom: -10px;
     left: 50%;
     transform: translateX(-50%);
-    width: 75px; /* Smaller GIF size */
+    width: 75px;
     opacity: 0;
     animation: handClick 6s infinite ease-in-out;
+}
+
+@keyframes handClick {
+    0% { opacity: 0; transform: translate(-50%, 10px); }
+    5% { opacity: 1; transform: translate(-50%, 0); }
+    45% { opacity: 1; transform: translate(-50%, 0); }
+    50% { opacity: 0; transform: translate(-50%, -5px); }
+    100% { opacity: 0; transform: translate(-50%, 10px); }
 }
 
 @keyframes rotate {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
-}
-
-@keyframes handClick {
-    0% { opacity: 0; transform: translate(-50%, 10px); }
-    20% { opacity: 1; transform: translate(-50%, 0); }
-    40% { opacity: 0; transform: translate(-50%, -5px); }
-    100% { opacity: 0; transform: translate(-50%, 10px); }
 }
 
   .hero {
