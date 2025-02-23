@@ -68,10 +68,11 @@
                         </li>
                         <li class="service-item">
                             <div class="service-header">
-                                <span>News</span>
+                                <span>Schemes and News</span>
                             </div>
                             <ul class="sub-services">
                                 <li><a href="/news">Stay updated with the latest news</a></li>
+                                <li><a href="/schemes">Major Schemes of Agriculture</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -116,7 +117,16 @@
   <img id="hero-image-2" src="static/organic.jpg" alt="Hero Image" class="hero-media" style="display: none;">
   </section>
 
+  <div class="weather-ticker">
+    <div class="ticker-container">
+      <div class="ticker-content">
+        <!-- Weather items will be inserted here by JavaScript -->
+      </div>
+    </div>
+  </div>
+
 <hr style="border: 1px solid #000000; margin: 40px auto; width: 80%;">
+
 
 <!-- Objectives Section -->
 <section id="objectives" class="objectives">
@@ -1020,6 +1030,181 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+  </script>
+
+<style>
+  .weather-ticker {
+    width: 100%;
+    background: linear-gradient(90deg, #2c5364, #203a43, #0f2027);
+    color: white;
+    padding: 12px 0;
+    overflow: hidden;
+  }
+  
+  .ticker-wrapper {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .ticker-content {
+    display: flex;
+    white-space: nowrap;
+    animation: tickerMove 30s linear infinite;
+    padding-left: 100%;
+  }
+  
+  @keyframes tickerMove {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-200%); /* Move two full lengths for seamless loop */
+    }
+  }
+  
+  .weather-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 25px;
+    font-size: 16px;
+    font-weight: 500;
+    border-right: 2px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .weather-item:last-child {
+    border-right: none;
+  }
+  
+  .weather-icon {
+    margin-right: 10px;
+    font-size: 20px;
+  }
+  
+  .loading-text {
+    text-align: center;
+    padding: 10px;
+    font-style: italic;
+  }
+  </style>
+  
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const API_KEY = 'e10f65c590d431935edaaf55555c6146';
+    const tickerContent = document.querySelector('.ticker-content');
+  
+    // AQI ranges and descriptions
+    const aqiLevels = {
+      1: { description: 'Good', icon: '✅' },
+      2: { description: 'Fair', icon: '✔️' },
+      3: { description: 'Moderate', icon: '⚠️' },
+      4: { description: 'Poor', icon: '⛔' },
+      5: { description: 'Very Poor', icon: '☣️' }
+    };
+  
+    function getWindDirection(degrees) {
+      const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+      return directions[Math.round(degrees / 45) % 8];
+    }
+  
+    function createWeatherItem(icon, label, value) {
+      return `
+        <div class="weather-item">
+          <span class="weather-icon">${icon}</span>
+          <span>${label}: ${value}</span>
+        </div>
+      `;
+    }
+  
+    async function getAirQuality(lat, lon) {
+      try {
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`);
+        const data = await response.json();
+        return data.list[0].main.aqi; // Returns AQI index (1-5)
+      } catch (error) {
+        console.error('Error fetching air quality:', error);
+        return null;
+      }
+    }
+  
+    async function updateWeather(position) {
+      try {
+        const { latitude, longitude } = position.coords;
+        
+        // Fetch weather data
+        const weatherResponse = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${API_KEY}&units=metric`
+        );
+        const weatherData = await weatherResponse.json();
+        
+        // Fetch air quality data
+        const aqi = await getAirQuality(latitude, longitude);
+        
+        // Create weather content
+        let content = '';
+        
+        // Location
+        content += createWeatherItem('📍', 'Location', weatherData.name);
+        
+        // Temperature
+        content += createWeatherItem('🌡️', 'Temperature', `${Math.round(weatherData.main.temp)}°C`);
+        
+        // Humidity
+        content += createWeatherItem('💧', 'Humidity', `${weatherData.main.humidity}%`);
+        
+        // Wind
+        const windSpeed = Math.round(weatherData.wind.speed * 3.6); // m/s to km/h
+        const windDir = getWindDirection(weatherData.wind.deg);
+        content += createWeatherItem('💨', 'Wind', `${windSpeed} km/h ${windDir}`);
+        
+        // Weather condition
+        content += createWeatherItem('🌥️', 'Weather', weatherData.weather[0].description);
+        
+        // Air Quality
+        if (aqi) {
+          const aqiInfo = aqiLevels[aqi];
+          content += createWeatherItem(aqiInfo.icon, 'Air Quality', aqiInfo.description);
+        }
+  
+        // Duplicate content for seamless loop
+        tickerContent.innerHTML = content + content + content;
+  
+      } catch (error) {
+        console.error('Error updating weather:', error);
+        tickerContent.innerHTML = createWeatherItem('⚠️', 'Error', 'Unable to fetch weather data');
+      }
+    }
+  
+    function requestLocationAndWeather() {
+      tickerContent.innerHTML = '<div class="loading-text">Requesting location access...</div>';
+      
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          // Success callback
+          updateWeather,
+          // Error callback
+          (error) => {
+            console.error('Geolocation error:', error);
+            tickerContent.innerHTML = createWeatherItem('⚠️', 'Error', 'Location access denied');
+          },
+          // Options
+          {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0
+          }
+        );
+      } else {
+        tickerContent.innerHTML = createWeatherItem('⚠️', 'Error', 'Geolocation not supported');
+      }
+    }
+  
+    // Initial weather fetch
+    requestLocationAndWeather();
+  
+    // Update weather every 5 minutes
+    setInterval(requestLocationAndWeather, 300000);
+  });
   </script>
 </body>
 </html>

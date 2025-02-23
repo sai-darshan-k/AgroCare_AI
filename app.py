@@ -179,6 +179,10 @@ def maps():
 def shc():
     return render_template('shc.html')
 
+@app.route('/schemes')
+def schemes():
+    return render_template('schemes.html')
+
 # Add a new route specifically for speech responses
 @app.route('/ask_speech', methods=['POST'])
 def ask_speech():
