@@ -45,7 +45,7 @@
                                 <li><a href="/soil_labs">Soil Test Labs</a></li>
                                 <li><a href="/shc">Soil Health Cards</a></li>
                                 <li><a href="https://www.soilhealth.dac.gov.in/piechart">Nutrient Management</a></li>
-                                <li><a href="https://www.soilhealth.dac.gov.in/fertiliser-dosage">Fertilizer recommendation</a></li>
+                                <li><a href="/fertilizer">Fertilizer Recommendation</a></li>
                             </ul>
                         </li>
                         <li class="service-item">
@@ -78,11 +78,19 @@
                     </ul>
                 </div>
             </li>
-            <li><a href="#features">Features</a></li>
-            <li><a href="#objectives">Objectives</a></li>
+            <li><a href="https://chat.whatsapp.com/FFwb7dnuw2kKbQAkABxbkY">Community Forum</a></li>
+            <li><a href="#" onclick="openPopup()">Crop Calendar</a></li>
+            <li><a href="/emarket">Kissan E-Market</a></li>
             <li><a href="#about">About</a></li>
             <li><a href="#contact">Contact</a></li>
+            
         </ul>
+        <div id="popup" class="popup-container">
+          <div class="popup-content">
+              <span class="close" onclick="closePopup()">&times;</span>
+              <img src="static/vege.jpg" alt="Crop Calendar">
+          </div>
+      </div>
         <div class="nav-right">
             <a href="/agrocare" class="ai-button">
                 <div class="logo-container">
@@ -1206,5 +1214,54 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(requestLocationAndWeather, 300000);
   });
   </script>
+
+<!-- Crop Claender -->
+<style>
+.popup-container {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content {
+  position: relative;
+  background: #e0edb6;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 90%;
+  text-align: center;
+  top:30px;
+}
+
+.popup-content img {
+  max-width: 100%;
+  height: 600px;
+}
+
+.close {
+  position: absolute;
+  top: -28px;
+  right: 0px;
+  font-size: 50px;
+  cursor: pointer;
+}
+</style>
+
+<script>
+function openPopup() {
+  document.getElementById("popup").style.display = "flex";
+}
+
+function closePopup() {
+  document.getElementById("popup").style.display = "none";
+}
+</script>
+
 </body>
 </html>

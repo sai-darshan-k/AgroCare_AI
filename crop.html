@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { 
+      background-color: #f0f8e0; 
+      font-family: Georgia, serif; 
+      margin: 0; 
+      padding: 0;
+      min-height: 100vh; /* Ensure body takes full viewport height */
+      display: flex;
+      flex-direction: column; /* Stack content vertically */
+      justify-content: center; /* Center horizontally */
+      align-items: center; /* Center vertically */
+    }
+    .container { 
+      width: 700px; /* Match table width for consistency */
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Center content within container */
+      padding: 0; /* Ensure no padding to eliminate any gaps */
+      border: 2px solid #2e7d32; /* Optional: Add a border to visually group as one unit */
+    }
+    .header { 
+      background-color: #2e7d32; /* Maintain base color for overlay */
+      color: #bbd67b;
+      padding: 0; /* Remove padding to eliminate gaps */
+      text-align: center;
+      background-image: url('https://st4.depositphotos.com/1011549/38664/i/450/depositphotos_386644526-stock-photo-collection-fresh-fruits-vegetables-useful.jpg'); /* Example agriculture background image (fruits/vegetables) */
+      background-size: cover; /* Scale image to cover the header */
+      background-position: center; /* Center the image */
+      background-repeat: no-repeat; /* Prevent image repetition */
+      position: relative; /* For overlay effects */
+      width: 100%; /* Full width of container */
+      height: 60px; /* Maintain height for tighter integration */
+    }
+    .header::before { 
+      content: ''; 
+      position: absolute; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      background-color: rgb(21 42 22 / 80%); /* Slightly darker overlay for better text readability */
+    }
+    .header-content { 
+      position: relative; /* Ensure text stays above the overlay/background */
+      z-index: 1; /* Keep text above the overlay */
+      padding: 5px 0; /* Minimal padding for text alignment */
+    }
+    .header-content h1 { 
+      font-size: 24px; /* Maintain larger font size for header */
+      margin: 0;
+      line-height: 1; /* Tighten line spacing */
+    }
+    .header-content h2 { 
+      font-size: 16px; /* Maintain larger font size for header */
+      margin: 2;
+      line-height: 1; /* Tighten line spacing */
+    }
+    .table { 
+      width: 100%; /* Full width of container (700px) */
+      margin: 0; /* Remove margin to eliminate gap with header */
+      border-collapse: collapse;
+      font-size: 14px; /* Maintain larger font size for table */
+      border-top: none; /* Remove top border to visually connect with header */
+    }
+    .table th { 
+      background-color: #3f51b5; 
+      color: white; 
+      padding: 8px; /* Maintain padding for consistency */
+      text-align: center;
+      border-top: 2px solid #2e7d32; /* Match border with container for cohesion */
+    }
+    .table td { 
+      border: 1px solid #2e7d32; 
+      padding: 6px; /* Maintain padding for compactness, adjust if text overflows */
+      background-color: #c8e6c9; 
+      text-align: center; 
+      vertical-align: middle; 
+      word-wrap: break-word; 
+      max-width: 0; 
+      overflow-wrap: break-word; 
+      line-height: 1.2; /* Maintain tighter line spacing for readability */
+    }
+    .table tr:nth-child(even) td { 
+      background-color: #a5d6a7; 
+    }
+    .table th:nth-child(1), .table td:nth-child(1) { 
+      width: 20%; /* Month column */
+    }
+    .table th:nth-child(2), .table td:nth-child(2) { 
+      width: 40%; /* North India column, now equal to South India */
+    }
+    .table th:nth-child(3), .table td:nth-child(3) { 
+      width: 40%; /* South India column, now equal to North India */
+    }
+    .table td:nth-child(1) { 
+      font-weight: bold; 
+      color: #2e7d32; 
+    }
+    .decoration { 
+      fill: #4caf50; 
+      opacity: 0.3; 
+    }
+    .download-button { 
+      margin-top: 20px; /* Increased space above the button for visibility */
+      padding: 8px 16px; /* Button padding */
+      background-color: #2e7d32; /* Green background to match theme */
+      color: white; /* White text */
+      border: none; /* Remove default border */
+      border-radius: 4px; /* Rounded corners */
+      cursor: pointer; /* Hand cursor on hover */
+      font-family: Georgia, serif; /* Match body font */
+      font-size: 14px; /* Maintain readable font size for button */
+    }
+    .download-button:hover { 
+      background-color: #1b5e20; /* Darker green on hover */
+    }
+    /* Hide button when clicked (using a class) */
+    .hidden { 
+      display: none; 
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-content">
+        <h1>KISSAN 4.0</h1>
+        <h2>Vegetables Crop Calendar</h2>
+      </div>
+    </div>
+    <table class="table">
+      <tr>
+        <th>Month</th>
+        <th>North India</th>
+        <th>South India</th>
+      </tr>
+      <tr>
+        <td>JANUARY</td>
+        <td>Brinjal</td>
+        <td>Lettuce, Spinach, Gourds, Melons, Radish, Carrot, Onion, Tomato, Okra, Brinjal, Bean</td>
+      </tr>
+      <tr>
+        <td>FEBRUARY</td>
+        <td>Applegourd, Bittergourd, Bottle gourd, Cucumber, French Beans, Okra, Sponge, Gourd, Watermelon, Spinach</td>
+        <td>Same as January</td>
+      </tr>
+      <tr>
+        <td>MARCH</td>
+        <td>Same as February</td>
+        <td>Amaranthus, Coriander, Gourds, Beans, Melons, Spinach, Okra</td>
+      </tr>
+      <tr>
+        <td>APRIL</td>
+        <td>Capsicum</td>
+        <td>Onion, Amaranthus, Coriander, Gourds, Okra, Tomato, Chilli</td>
+      </tr>
+      <tr>
+        <td>MAY</td>
+        <td>Onion, Pepper, Brinjal</td>
+        <td>Okra, Onion, Chilli</td>
+      </tr>
+      <tr>
+        <td>JUNE</td>
+        <td>All gourds, Brinjal, Cucumber, Cauliflower (Early), Okra, Onion, Sem, Tomato, Pepper</td>
+        <td>Gourds, Solanaceae, Almost all vegetables</td>
+      </tr>
+      <tr>
+        <td>JULY</td>
+        <td>All gourds, Cucumber, Okra, Sem, Tomato</td>
+        <td>Same as June</td>
+      </tr>
+      <tr>
+        <td>AUGUST</td>
+        <td>Carrot, Cauliflower, Radish, Tomato</td>
+        <td>Carrot, Cauliflower, Beans, Beet</td>
+      </tr>
+      <tr>
+        <td>SEPTEMBER</td>
+        <td>Cabbage, Carrot, Cauliflower, Peas, Radish, Tomato, Lettuce</td>
+        <td>Cauliflower, Cucumber, Onion, Peas, Spinach</td>
+      </tr>
+      <tr>
+        <td>OCTOBER</td>
+        <td>Beet, Brinjal, Cabbage, Cauliflower, Lettuce, Peas, Radish, Spinach, Turnip</td>
+        <td>Brinjal, Cabbage, Capsicum, Cucumber, Beans, Peas, Spinach, Turnip, Watermelon</td>
+      </tr>
+      <tr>
+        <td>NOVEMBER</td>
+        <td>Turnip, Tomato, Radish, Pepper, Peas, Beet</td>
+        <td>Beet, Eggplant, Cabbage, Carrot, Beans, Lettuce, Melon, Okra, Turnip</td>
+      </tr>
+      <tr>
+        <td>DECEMBER</td>
+        <td>Tomato</td>
+        <td>Lettuce, Pumpkin, Watermelon, Muskmelon, Ash gourd, Ridge gourd, Bitter gourd, Bottle gourd, Cucumber, Chilly, Cabbage</td>
+      </tr>
+    </table>
+  </div>
+  <button class="download-button" onclick="downloadJPG()">Download as JPG</button> <!-- Download button outside container, positioned below -->
+
+  <!-- Include html2canvas library -->
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script>
+    function downloadJPG() {
+      const button = document.querySelector('.download-button'); // Get the button
+      button.classList.add('hidden'); // Hide the button before capturing
+
+      const element = document.querySelector('.container'); // Target the container (header + table)
+      html2canvas(element, {
+        scale: 2, // Higher resolution for better quality
+        backgroundColor: '#f0f8e0', // Match body background for seamless output
+        useCORS: true // Allow cross-origin resource sharing for images
+      }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'vegetables_crop_calendar.jpg'; // Output filename
+        link.href = canvas.toDataURL('image/jpeg', 0.95); // Convert to JPG with high quality (0.95)
+        link.click(); // Trigger download
+
+        // Show the button again after download
+        setTimeout(() => {
+          button.classList.remove('hidden');
+        }, 1000); // Delay to ensure download completes before showing button
+      }).catch(error => {
+        console.error('Error generating JPG:', error);
+        // Show the button again if there's an error
+        button.classList.remove('hidden');
+      });
+    }
+  </script>
+</body>
+</html>

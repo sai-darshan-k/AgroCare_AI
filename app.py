@@ -1,7 +1,8 @@
 import os
 import numpy as np
-# from tensorflow import lite
-# from tensorflow.keras.preprocessing.image import load_img, img_to_array
+import joblib
+from tensorflow import lite
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from flask import Flask, render_template, request, jsonify, flash, send_from_directory, session
 from flask_babel import Babel, _
 from werkzeug.utils import secure_filename
@@ -41,30 +42,30 @@ app.secret_key = os.getenv("SECRET_KEY", "your_secret_key")
 logging.basicConfig(level=logging.INFO)
 
 # Google Drive link for the model
-# drive_link = "https://drive.google.com/file/d/1rFdr51QVWy3mpzWPCYgdRH1XCH7Yefv6"  # Model ID extracted
-# model_path = os.getenv("MODEL_PATH", "my_model.tflite")
+drive_link = "https://drive.google.com/file/d/1rFdr51QVWy3mpzWPCYgdRH1XCH7Yefv6"  # Model ID extracted
+model_path = os.getenv("MODEL_PATH", "my_model.tflite")
 
-# # Function to download model from Google Drive
-# def download_model_from_drive(drive_link, destination):
-#     if not os.path.exists(destination):
-#         try:
-#             logging.info('Downloading model from Google Drive...')
-#             gdown.download(drive_link, destination, quiet=False)
-#             logging.info('Model downloaded successfully.')
-#         except Exception as e:
-#             logging.error(f"Error downloading model: {str(e)}")
-#             raise e
+# Function to download model from Google Drive
+def download_model_from_drive(drive_link, destination):
+    if not os.path.exists(destination):
+        try:
+            logging.info('Downloading model from Google Drive...')
+            gdown.download(drive_link, destination, quiet=False)
+            logging.info('Model downloaded successfully.')
+        except Exception as e:
+            logging.error(f"Error downloading model: {str(e)}")
+            raise e
 
-# labels = {0: 'Healthy', 1: 'Powdery', 2: 'Rust'}
+labels = {0: 'Healthy', 1: 'Powdery', 2: 'Rust'}
 
-# # Download and load the TensorFlow Lite model
-# download_model_from_drive(drive_link, model_path)
+# Download and load the TensorFlow Lite model
+download_model_from_drive(drive_link, model_path)
 
-# # Load the TensorFlow Lite model using the interpreter
-# interpreter = lite.Interpreter(model_path=model_path)
-# interpreter.allocate_tensors()
+# Load the TensorFlow Lite model using the interpreter
+interpreter = lite.Interpreter(model_path=model_path)
+interpreter.allocate_tensors()
 
-# logging.info('Model loaded. Check http://127.0.0.1:5000/')
+logging.info('Model loaded. Check http://127.0.0.1:5000/')
 
 # Load the language model
 groqllm = ChatGroq(model="llama3-8b-8192", temperature=0)
@@ -183,6 +184,10 @@ def shc():
 def schemes():
     return render_template('schemes.html')
 
+@app.route('/fertilizer')
+def fertilizer():
+    return render_template('fertilizer.html')
+
 # Add a new route specifically for speech responses
 @app.route('/ask_speech', methods=['POST'])
 def ask_speech():
@@ -263,45 +268,45 @@ def format_answer(answer):
     formatted_answer += "</div>"
     return formatted_answer
 
-# @app.route('/predict', methods=['POST'])
-# def upload():
-#     if 'file' not in request.files:
-#         return jsonify({'prediction': 'No image uploaded'}), 400
+@app.route('/predict', methods=['POST'])
+def upload():
+    if 'file' not in request.files:
+        return jsonify({'prediction': 'No image uploaded'}), 400
 
-#     f = request.files['file']
-#     uploads_dir = os.path.join(os.path.dirname(__file__), 'uploads')
-#     os.makedirs(uploads_dir, exist_ok=True)
+    f = request.files['file']
+    uploads_dir = os.path.join(os.path.dirname(__file__), 'uploads')
+    os.makedirs(uploads_dir, exist_ok=True)
 
-#     file_path = os.path.join(uploads_dir, secure_filename(f.filename))
-#     f.save(file_path)
-#     try:
-#         predictions = getResult(file_path)
-#         predicted_label = labels[np.argmax(predictions)]
-#         return jsonify({'prediction': predicted_label})
-#     except Exception as e:
-#         logging.error(f"Error processing image: {str(e)}")
-#         return jsonify({'prediction': f'Error processing image: {str(e)}'}), 500
+    file_path = os.path.join(uploads_dir, secure_filename(f.filename))
+    f.save(file_path)
+    try:
+        predictions = getResult(file_path)
+        predicted_label = labels[np.argmax(predictions)]
+        return jsonify({'prediction': predicted_label})
+    except Exception as e:
+        logging.error(f"Error processing image: {str(e)}")
+        return jsonify({'prediction': f'Error processing image: {str(e)}'}), 500
 
-# def getResult(image_path):
-#     """
-#     Process the uploaded image and predict the crop disease using TensorFlow Lite model.
-#     """
-#     # Load the image
-#     img = load_img(image_path, target_size=(225, 225))
-#     x = img_to_array(img)
-#     x = x.astype('float32') / 255.
-#     x = np.expand_dims(x, axis=0)
+def getResult(image_path):
+    """
+    Process the uploaded image and predict the crop disease using TensorFlow Lite model.
+    """
+    # Load the image
+    img = load_img(image_path, target_size=(225, 225))
+    x = img_to_array(img)
+    x = x.astype('float32') / 255.
+    x = np.expand_dims(x, axis=0)
 
-#     # Set the input tensor
-#     input_details = interpreter.get_input_details()
-#     interpreter.set_tensor(input_details[0]['index'], x)
+    # Set the input tensor
+    input_details = interpreter.get_input_details()
+    interpreter.set_tensor(input_details[0]['index'], x)
 
-#     # Run inference
-#     interpreter.invoke()
+    # Run inference
+    interpreter.invoke()
 
-#     # Get the output tensor
-#     output_details = interpreter.get_output_details()
-#     predictions = interpreter.get_tensor(output_details[0]['index'])[0]
+    # Get the output tensor
+    output_details = interpreter.get_output_details()
+    predictions = interpreter.get_tensor(output_details[0]['index'])[0]
     return predictions
 
 @app.route('/get_insecticides_data', methods=['POST'])
@@ -814,6 +819,377 @@ def data():
 
 import os
 
+# Load the trained model and encoders
+clf = joblib.load("fertilizer_prediction_model.pkl")
+label_encoders = joblib.load("label_encoders.pkl")
+
+@app.route('/fertilizers', methods=['POST'])
+def fertilizers():
+    try:
+        # Get form data
+        user_data = {
+            "Temparature": float(request.form['temperature']),
+            "Humidity": float(request.form['humidity']),
+            "Moisture": float(request.form['moisture']),
+            "Soil Type": request.form['soil_type'],
+            "Crop Type": request.form['crop_type'],
+            "Nitrogen": int(request.form['nitrogen']),
+            "Potassium": int(request.form['potassium']),
+            "Phosphorous": int(request.form['phosphorous'])
+        }
+
+        # Encode categorical inputs
+        for col in ["Soil Type", "Crop Type"]:
+            if user_data[col] in label_encoders[col].classes_:
+                user_data[col] = label_encoders[col].transform([user_data[col]])[0]
+            else:
+                return jsonify({"error": f"Invalid input for {col}. Please enter a valid category."})
+
+        # Convert input to DataFrame
+        user_df = pd.DataFrame([user_data])
+
+        # Predict fertilizer
+        prediction = clf.predict(user_df)
+        predicted_fertilizer = label_encoders["Fertilizer Name"].inverse_transform(prediction)[0]
+
+        return jsonify({"prediction": predicted_fertilizer})
+    
+    except Exception as e:
+        return jsonify({"error": str(e)})
+    
+
+#Kissan E-Market
+    
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+
+app.config['SECRET_KEY'] = 'kissan_e_market_secret_key'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///kissan_market.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+# Database Models
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    user_type = db.Column(db.String(10), nullable=False)  # 'farmer' or 'consumer'
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # For farmers
+    farm_name = db.Column(db.String(100))
+    location = db.Column(db.String(200))
+    phone = db.Column(db.String(15))
+    
+    def __repr__(self):
+        return f'<User {self.username}>'
+
+class Product(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    price = db.Column(db.Float, nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    category = db.Column(db.String(50), nullable=False)
+    image_url = db.Column(db.String(200))
+    farmer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<Product {self.name}>'
+
+class Cart(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False, default=1)
+    
+    def __repr__(self):
+        return f'<Cart Item {self.id}>'
+
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    total_amount = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(20), default='pending')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<Order {self.id}>'
+
+class OrderItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    
+    def __repr__(self):
+        return f'<OrderItem {self.id}>'
+
+# Routes
+@app.route('/emarket')
+def home():
+    products = Product.query.limit(8).all()
+    return render_template('emarket.html', products=products)
+
+@app.route('/products.html')
+def redirect_products_html():
+    return redirect(url_for('products'))
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        user_type = request.form.get('user_type')
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        # Check if user already exists
+        user_exists = User.query.filter_by(email=email).first()
+        if user_exists:
+            flash('Email already registered')
+            return redirect(url_for('register'))
+        
+        # Create new user
+        hashed_password = generate_password_hash(password)
+        new_user = User(
+            username=username,
+            email=email,
+            password=hashed_password,
+            user_type=user_type
+        )
+        
+        # If farmer, add additional details
+        if user_type == 'farmer':
+            new_user.farm_name = request.form.get('farm_name')
+            new_user.location = request.form.get('location')
+            new_user.phone = request.form.get('phone')
+        
+        db.session.add(new_user)
+        db.session.commit()
+        
+        flash('Registration successful. Please login.')
+        return redirect(url_for('login'))
+    
+    # Get the 'type' query parameter from the URL
+    user_type = request.args.get('type', 'consumer')  # Default to 'consumer' if no type is provided
+    return render_template('register.html', user_type=user_type)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if user and check_password_hash(user.password, password):
+            session['user_id'] = user.id
+            session['user_type'] = user.user_type
+            
+            flash('Login successful')
+            return redirect(url_for('home'))
+        else:
+            flash('Invalid email or password')
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    session.pop('user_type', None)
+    flash('You have been logged out')
+    return redirect(url_for('home'))
+
+@app.route('/farmer/dashboard')
+def farmer_dashboard():
+    if 'user_id' not in session or session['user_type'] != 'farmer':
+        flash('Please login as a farmer to access this page')
+        return redirect(url_for('login'))
+    
+    farmer_id = session['user_id']
+    products = Product.query.filter_by(farmer_id=farmer_id).all()
+    return render_template('farmer_dashboard.html', products=products)
+
+@app.route('/farmer/add_product', methods=['GET', 'POST'])
+def add_product():
+    if 'user_id' not in session or session['user_type'] != 'farmer':
+        flash('Please login as a farmer to access this page')
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        description = request.form.get('description')
+        price = float(request.form.get('price'))
+        quantity = int(request.form.get('quantity'))
+        category = request.form.get('category')
+        image_url = request.form.get('image_url')
+        
+        new_product = Product(
+            name=name,
+            description=description,
+            price=price,
+            quantity=quantity,
+            category=category,
+            image_url=image_url,
+            farmer_id=session['user_id']
+        )
+        
+        db.session.add(new_product)
+        db.session.commit()
+        
+        flash('Product added successfully')
+        return redirect(url_for('farmer_dashboard'))
+    
+    return render_template('add_product.html')
+
+@app.route('/products')
+def products():
+    category = request.args.get('category')
+    if category:
+        products = Product.query.filter_by(category=category).all()
+    else:
+        products = Product.query.all()
+    
+    return render_template('products.html', products=products)
+
+@app.route('/product/<int:product_id>')
+def product_detail(product_id):
+    product = Product.query.get_or_404(product_id)
+    farmer = User.query.get(product.farmer_id)
+    return render_template('product_detail.html', product=product, farmer=farmer)
+
+@app.route('/add_to_cart/<int:product_id>')
+def add_to_cart(product_id):
+    if 'user_id' not in session:
+        flash('Please login to add items to cart')
+        return redirect(url_for('login'))
+    
+    cart_item = Cart.query.filter_by(user_id=session['user_id'], product_id=product_id).first()
+    
+    if cart_item:
+        cart_item.quantity += 1
+    else:
+        new_cart_item = Cart(
+            user_id=session['user_id'],
+            product_id=product_id,
+            quantity=1
+        )
+        db.session.add(new_cart_item)
+    
+    db.session.commit()
+    flash('Item added to cart')
+    return redirect(url_for('cart'))
+
+@app.route('/cart')
+def cart():
+    if 'user_id' not in session:
+        flash('Please login to view your cart')
+        return redirect(url_for('login'))
+    
+    cart_items = Cart.query.filter_by(user_id=session['user_id']).all()
+    total = 0
+    cart_products = []
+    
+    for item in cart_items:
+        product = Product.query.get(item.product_id)
+        total += product.price * item.quantity
+        cart_products.append({
+            'cart_id': item.id,
+            'product': product,
+            'quantity': item.quantity
+        })
+    
+    return render_template('cart.html', cart_products=cart_products, total=total)
+
+@app.route('/checkout', methods=['GET', 'POST'])
+def checkout():
+    if 'user_id' not in session:
+        flash('Please login to checkout')
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        cart_items = Cart.query.filter_by(user_id=session['user_id']).all()
+        
+        if not cart_items:
+            flash('Your cart is empty')
+            return redirect(url_for('cart'))
+        
+        total = 0
+        for item in cart_items:
+            product = Product.query.get(item.product_id)
+            total += product.price * item.quantity
+        
+        new_order = Order(
+            user_id=session['user_id'],
+            total_amount=total,
+            status='pending'
+        )
+        db.session.add(new_order)
+        db.session.flush()
+        
+        for item in cart_items:
+            product = Product.query.get(item.product_id)
+            order_item = OrderItem(
+                order_id=new_order.id,
+                product_id=item.product_id,
+                quantity=item.quantity,
+                price=product.price
+            )
+            db.session.add(order_item)
+            
+            # Update product quantity
+            product.quantity -= item.quantity
+            
+            # Delete cart item
+            db.session.delete(item)
+        
+        db.session.commit()
+        flash('Order placed successfully')
+        return redirect(url_for('orders'))
+    
+    return render_template('checkout.html')
+
+@app.route('/orders')
+def orders():
+    if 'user_id' not in session:
+        flash('Please login to view your orders')
+        return redirect(url_for('login'))
+    
+    orders = Order.query.filter_by(user_id=session['user_id']).order_by(Order.created_at.desc()).all()
+    return render_template('orders.html', orders=orders)
+
+@app.route('/order/<int:order_id>')
+def order_detail(order_id):
+    if 'user_id' not in session:
+        flash('Please login to view order details')
+        return redirect(url_for('login'))
+    
+    order = Order.query.get_or_404(order_id)
+    
+    if order.user_id != session['user_id'] and session['user_type'] != 'farmer':
+        flash('You do not have permission to view this order')
+        return redirect(url_for('orders'))
+    
+    order_items = OrderItem.query.filter_by(order_id=order.id).all()
+    items = []
+    
+    for item in order_items:
+        product = Product.query.get(item.product_id)
+        items.append({
+            'product': product,
+            'quantity': item.quantity,
+            'price': item.price
+        })
+    
+    return render_template('order_detail.html', order=order, items=items)
+
+
 if __name__ == '__main__':
-    port = int(os.getenv("PORT", 10000))  # Use Render's assigned port or default to 10000
+    port = int(os.getenv("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)

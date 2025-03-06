@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - Kissan E-Market</title>
+    <link rel="stylesheet" href="static/styles.css">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="logo-container">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <a href="{{ url_for('home') }}" class="logo">
+                        <div class="logo-container">
+                            <span class="logo-text">KISSAN 4.0</span>
+                            <span class="logo-subtitle">E-Market</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="search-container">
+                    <form action="/search" method="GET">
+                        <input type="text" placeholder="Search for products..." name="search">
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+                <div class="header-actions">
+                    <a href="login.html" class="user-account">
+                        <i class="fas fa-user"></i>
+                        <span class="badge" id="login-status">Login</span>
+                    </a>
+                    <a href="wishlist.html" class="wishlist">
+                        <i class="fas fa-heart"></i>
+                        <span class="badge count">0</span>
+                    </a>
+                    <a href="cart.html" class="cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="badge count">0</span>
+                    </a>
+                </div>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="products.html?category=vegetables">Vegetables</a></li>
+                    <li><a href="products.html?category=fruits">Fruits</a></li>
+                    <li><a href="products.html?category=grains">Grains & Pulses</a></li>
+                    <li><a href="products.html?category=dairy">Dairy Products</a></li>
+                    <li><a href="products.html?category=spices">Spices</a></li>
+                    <li><a href="products.html?category=seeds">Seeds & Farming Tools</a></li>
+                    <li><a href="products.html?category=organic">Organic Products</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="products-section">
+            <div class="container">
+                <div class="page-header">
+                    <h1 id="product-category-title">All Products</h1>
+                    <div class="breadcrumb">
+                        <a href="index.html">Home</a> &gt; <span id="current-category">Products</span>
+                    </div>
+                </div>
+                
+                <div class="products-container">
+                    <aside class="filters-sidebar">
+                        <div class="filter-section">
+                            <h3>Categories</h3>
+                            <ul class="category-list">
+                                <li><a href="products.html" class="active">All Products</a></li>
+                                <li><a href="products.html?category=vegetables">Vegetables</a></li>
+                                <li><a href="products.html?category=fruits">Fruits</a></li>
+                                <li><a href="products.html?category=grains">Grains & Pulses</a></li>
+                                <li><a href="products.html?category=dairy">Dairy Products</a></li>
+                                <li><a href="products.html?category=spices">Spices</a></li>
+                                <li><a href="products.html?category=seeds">Seeds & Farming Tools</a></li>
+                                <li><a href="products.html?category=organic">Organic Products</a></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="filter-section">
+                            <h3>Price Range</h3>
+                            <div class="price-slider">
+                                <input type="range" min="0" max="5000" value="5000" class="slider" id="priceRange">
+                                <div class="price-range-values">
+                                    <span>₹0</span>
+                                    <span id="priceValue">₹5000+</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-section">
+                            <h3>Sort By</h3>
+                            <select id="sort-products">
+                                <option value="relevance">Relevance</option>
+                                <option value="price-low">Price: Low to High</option>
+                                <option value="price-high">Price: High to Low</option>
+                                <option value="newest">Newest First</option>
+                                <option value="rating">Customer Rating</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-section">
+                            <h3>Farmer Location</h3>
+                            <select id="location-filter">
+                                <option value="">All Locations</option>
+                                <option value="north">North India</option>
+                                <option value="south">South India</option>
+                                <option value="east">East India</option>
+                                <option value="west">West India</option>
+                                <option value="central">Central India</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-section">
+                            <h3>Product Type</h3>
+                            <div class="checkbox-group">
+                                <label>
+                                    <input type="checkbox" name="product-type" value="organic"> Organic
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="product-type" value="conventional"> Conventional
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="product-type" value="seasonal"> Seasonal
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button id="apply-filters" class="btn secondary-btn">Apply Filters</button>
+                        <button id="clear-filters" class="btn outline-btn">Clear All</button>
+                    </aside>
+                    
+                    <div class="products-grid">
+                        <!-- Products will be dynamically added here via JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="pagination">
+                    <button class="pagination-btn" disabled><i class="fas fa-chevron-left"></i></button>
+                    <button class="pagination-btn active">1</button>
+                    <button class="pagination-btn">2</button>
+                    <button class="pagination-btn">3</button>
+                    <span class="pagination-ellipsis">...</span>
+                    <button class="pagination-btn">10</button>
+                    <button class="pagination-btn"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>About Kissan E-Market</h3>
+                    <p>A platform connecting farmers directly with consumers, ensuring fair prices and fresh products.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="farmers.html">Farmers</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Categories</h3>
+                    <ul>
+                        <li><a href="products.html?category=vegetables">Vegetables</a></li>
+                        <li><a href="products.html?category=fruits">Fruits</a></li>
+                        <li><a href="products.html?category=grains">Grains & Pulses</a></li>
+                        <li><a href="products.html?category=dairy">Dairy Products</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Farmer's Lane, Agricity</p>
+                    <p><i class="fas fa-phone"></i> +91 98765 43210</p>
+                    <p><i class="fas fa-envelope"></i> info@kissanemarket.com</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Kissan E-Market. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

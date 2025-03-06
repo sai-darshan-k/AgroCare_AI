@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kissan E-Market</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+    }
+    .header {
+      background-color: #ff9800;
+      padding: 10px 20px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .user-section {
+      display: flex;
+      gap: 15px;
+    }
+    .user-section a {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .user-section a:hover {
+      text-decoration: underline;
+    }
+    .nav-menu {
+      background-color: #ffffff;
+      padding: 10px 20px;
+      border-bottom: 1px solid #ddd;
+    }
+    .nav-menu ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: 20px;
+    }
+    .nav-menu a {
+      color: #333;
+      text-decoration: none;
+      font-size: 16px;
+    }
+    .nav-menu a:hover {
+      color: #ff9800;
+    }
+    .banner {
+      background-color: #ff9800;
+      padding: 40px 20px;
+      text-align: center;
+      color: white;
+      margin-bottom: 20px;
+    }
+    .banner h2 {
+      font-size: 32px;
+      margin: 0 0 10px 0;
+    }
+    .banner p {
+      font-size: 18px;
+      margin: 0 0 20px 0;
+    }
+    .banner button {
+      background-color: #ffffff;
+      color: #ff9800;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .banner button:hover {
+      background-color: #e0e0e0;
+    }
+    .product-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+      background-color: #fff;
+      margin: 0 10px;
+    }
+    .product-card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 15px;
+      width: 200px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .product-card h3 {
+      margin: 10px 0;
+      color: #2c3e50;
+    }
+    .product-card p {
+      margin: 5px 0;
+      color: #7f8c8d;
+    }
+    .product-card button {
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .product-card button:hover {
+      background-color: #219653;
+    }
+    .login-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1000;
+    }
+    .modal-content {
+      background-color: white;
+      margin: 15% auto;
+      padding: 20px;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 5px;
+      text-align: center;
+    }
+    .modal-content h3 {
+      margin-top: 0;
+    }
+    .modal-content input {
+      width: 80%;
+      padding: 8px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .modal-content button {
+      background-color: #ff9800;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .modal-content button:hover {
+      background-color: #f57c00;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Kissan E-Market</h1>
+    <div class="user-section">
+      <a href="#" onclick="showLogin('farmer')">Farmer Registration</a> |
+      <a href="#" onclick="showLogin('customer')">Customer Registration</a>
+    </div>
+  </div>
+  <div class="nav-menu">
+    <ul>
+      <li><a href="#">Home</a></li>
+      <li><a href="#">Products</a></li>
+      <li><a href="#">About</a></li>
+    </ul>
+  </div>
+  <div class="banner">
+    <h2>NEW LAUNCH</h2>
+    <h2>Fresh from the Farm</h2>
+    <p>Directly from Farmers to Your Table – Shop Now!</p>
+    <button>Shop Now</button>
+  </div>
+  <div class="product-container" id="product-list"></div>
+
+  <!-- Login/Registration Modal -->
+  <div id="login-modal" class="login-modal">
+    <div class="modal-content">
+      <h3 id="modal-title">Register as <span id="user-type"></span></h3>
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button onclick="registerUser()">Register</button>
+      <button onclick="closeLogin()">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    // Fetch products from Flask API
+    fetch('/e-market/api/products')
+      .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+      })
+      .then(products => {
+        const productList = document.getElementById('product-list');
+        
+        products.forEach(product => {
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          
+          card.innerHTML = `
+            <h3>${product.name}</h3>
+            <p>Price: $${product.price}</p>
+            <p>Farmer: ${product.farmer}</p>
+            <button onclick="addToCart('${product.name}', '${product.price}')">Add to Cart</button>
+          `;
+          
+          productList.appendChild(card);
+        });
+      })
+      .catch(error => {
+        document.getElementById('product-list').innerHTML = '<p>Error loading products.</p>';
+        console.error('Fetch error:', error);
+      });
+
+    // Cart functionality (placeholder)
+    let cart = [];
+    function addToCart(productName, price) {
+      // Check if user is logged in (simulated)
+      if (!localStorage.getItem('user')) {
+        showLogin('customer'); // Default to customer for cart access
+        return;
+      }
+      cart.push({ name: productName, price: parseFloat(price) });
+      alert(`Added ${productName} to your cart! Total items: ${cart.length}`);
+      // Later, this can update a cart UI or send data to Flask
+    }
+
+    // Show login/registration modal
+    function showLogin(userType) {
+      const modal = document.getElementById('login-modal');
+      const userTypeSpan = document.getElementById('user-type');
+      userTypeSpan.textContent = userType === 'farmer' ? 'Farmer' : 'Customer';
+      modal.style.display = 'block';
+    }
+
+    // Close login/registration modal
+    function closeLogin() {
+      document.getElementById('login-modal').style.display = 'none';
+    }
+
+    // Simulate registration (placeholder)
+    function registerUser() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      if (username && password) {
+        localStorage.setItem('user', JSON.stringify({ username, type: document.getElementById('user-type').textContent.toLowerCase() }));
+        alert(`Registered as ${document.getElementById('user-type').textContent} with username: ${username}`);
+        closeLogin();
+      } else {
+        alert('Please fill in both fields.');
+      }
+    }
+  </script>
+</body>
+</html>

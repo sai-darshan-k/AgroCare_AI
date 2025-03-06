@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Kissan E-Market</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='market.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script> <!-- 'defer' ensures script runs after DOM -->
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="logo-container">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <a href="{{ url_for('home') }}" class="logo">
+                        <div class="logo-container">
+                            <span class="logo-text">KISSAN 4.0</span>
+                            <span class="logo-subtitle">E-Market</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="search-container">
+                    <form action="/search" method="GET">
+                        <input type="text" placeholder="Search for products..." name="search">
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+                <div class="header-actions">
+                    <a href="{{ url_for('login') }}" class="user-account">
+                        <i class="fas fa-user"></i>
+                        <span class="badge" id="login-status">Login</span>
+                    </a>
+                    <a href="{{ url_for('cart') }}" class="cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="badge count">0</span>
+                    </a>
+                </div>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="{{ url_for('products', category='vegetables') }}">Vegetables</a></li>
+                    <li><a href="{{ url_for('products', category='fruits') }}">Fruits</a></li>
+                    <li><a href="{{ url_for('products', category='grains') }}">Grains & Pulses</a></li>
+                    <li><a href="{{ url_for('products', category='dairy') }}">Dairy Products</a></li>
+                    <li><a href="{{ url_for('products', category='spices') }}">Spices</a></li>
+                    <li><a href="{{ url_for('products', category='seeds') }}">Seeds & Farming Tools</a></li>
+                    <li><a href="{{ url_for('products', category='organic') }}">Organic Products</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="register-section">
+            <div class="container">
+                <div class="page-header">
+                    <h1>Create Account</h1>
+                    <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+                </div>
+                
+                <div class="register-options">
+                    <div class="option-tabs">
+                        <button class="option-tab {% if user_type == 'consumer' %}active{% endif %}" data-type="consumer">Consumer Registration</button>
+                        <button class="option-tab {% if user_type == 'farmer' %}active{% endif %}" data-type="farmer">Farmer Registration</button>
+                    </div>
+                    
+                    <div class="register-forms">
+                        <!-- Consumer Registration Form -->
+                        <form id="consumer-form" class="{% if user_type == 'consumer' %}active{% endif %}" method="POST" action="{{ url_for('register') }}">
+                            <input type="hidden" name="user_type" value="consumer">
+                            <div class="form-group">
+                                <label for="consumer-username">Username*</label>
+                                <input type="text" id="consumer-username" name="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="consumer-email">Email Address*</label>
+                                <input type="email" id="consumer-email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="consumer-password">Password*</label>
+                                <input type="password" id="consumer-password" name="password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="consumer-confirm-password">Confirm Password*</label>
+                                <input type="password" id="consumer-confirm-password" name="confirm_password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="consumer-phone">Phone Number</label>
+                                <input type="tel" id="consumer-phone" name="phone">
+                            </div>
+                            <div class="form-group">
+                                <label for="consumer-address">Delivery Address</label>
+                                <textarea id="consumer-address" name="address" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <input type="checkbox" id="consumer-terms" name="terms" required>
+                                <label for="consumer-terms">I accept the <a href="#">Terms and Conditions</a></label>
+                            </div>
+                            <button type="submit" class="btn primary-btn">Register as Consumer</button>
+                        </form>
+                        
+                        <!-- Farmer Registration Form -->
+                        <form id="farmer-form" class="{% if user_type == 'farmer' %}active{% endif %}" method="POST" action="{{ url_for('register') }}">
+                            <input type="hidden" name="user_type" value="farmer">
+                            <div class="form-group">
+                                <label for="farmer-username">Username*</label>
+                                <input type="text" id="farmer-username" name="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="farmer-email">Email Address*</label>
+                                <input type="email" id="farmer-email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="farmer-password">Password*</label>
+                                <input type="password" id="farmer-password" name="password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="farmer-confirm-password">Confirm Password*</label>
+                                <input type="password" id="farmer-confirm-password" name="confirm_password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="farm-name">Farm Name*</label>
+                                <input type="text" id="farm-name" name="farm_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="farmer-location">Farm Location*</label>
+                                <input type="text" id="farmer-location" name="location" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="farmer-phone">Phone Number*</label>
+                                <input type="tel" id="farmer-phone" name="phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="farm-description">Farm Description</label>
+                                <textarea id="farm-description" name="description" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="farm-products">Products you want to sell</label>
+                                <select id="farm-products" name="products" multiple>
+                                    <option value="vegetables">Vegetables</option>
+                                    <option value="fruits">Fruits</option>
+                                    <option value="grains">Grains & Pulses</option>
+                                    <option value="dairy">Dairy Products</option>
+                                    <option value="spices">Spices</option>
+                                    <option value="organic">Organic Products</option>
+                                </select>
+                                <small>Hold Ctrl/Cmd to select multiple options</small>
+                            </div>
+                            <div class="form-group">
+                                <input type="checkbox" id="farmer-terms" name="terms" required>
+                                <label for="farmer-terms">I accept the <a href="#">Terms and Conditions</a></label>
+                            </div>
+                            <button type="submit" class="btn primary-btn">Register as Farmer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>About Kissan E-Market</h3>
+                    <p>A platform connecting farmers directly with consumers, ensuring fair prices and fresh products.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="{{ url_for('home') }}">Home</a></li>
+                        <li><a href="{{ url_for('products') }}">Products</a></li>
+                        <li><a href="#">Farmers</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Categories</h3>
+                    <ul>
+                        <li><a href="{{ url_for('products', category='vegetables') }}">Vegetables</a></li>
+                        <li><a href="{{ url_for('products', category='fruits') }}">Fruits</a></li>
+                        <li><a href="{{ url_for('products', category='grains') }}">Grains & Pulses</a></li>
+                        <li><a href="{{ url_for('products', category='dairy') }}">Dairy Products</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Farmer's Lane, Agricity</p>
+                    <p><i class="fas fa-phone"></i> +91 98765 43210</p>
+                    <p><i class="fas fa-envelope"></i> info@kissanemarket.com</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Kissan E-Market. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

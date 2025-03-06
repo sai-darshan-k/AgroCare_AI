@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kissan E-Market - Direct from Farm to Home</title>
+    <link rel="stylesheet" href="static/market.css">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-top">
+                <div class="logo-container">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <a href="{{ url_for('home') }}" class="logo">
+                        <div class="logo-container">
+                            <span class="logo-text">KISSAN 4.0</span>
+                            <span class="logo-subtitle">E-Market</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="search-container">
+                    <form action="/search" method="GET">
+                        <input type="text" placeholder="Search for products..." name="search">
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+                <div class="header-actions">
+                    <a href="login.html" class="user-account">
+                        <i class="fas fa-user"></i>
+                        <span class="badge" id="login-status">Login</span>
+                    </a>
+                    <a href="wishlist.html" class="wishlist">
+                        <i class="fas fa-heart"></i>
+                        <span class="badge count">0</span>
+                    </a>
+                    <a href="cart.html" class="cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="badge count">0</span>
+                    </a>
+                </div>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="products.html?category=vegetables">Vegetables</a></li>
+                    <li><a href="products.html?category=fruits">Fruits</a></li>
+                    <li><a href="products.html?category=grains">Grains & Pulses</a></li>
+                    <li><a href="products.html?category=dairy">Dairy Products</a></li>
+                    <li><a href="products.html?category=spices">Spices</a></li>
+                    <li><a href="products.html?category=seeds">Seeds & Farming Tools</a></li>
+                    <li><a href="products.html?category=organic">Organic Products</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+       <!-- Hero Slider -->
+<section class="hero-slider">
+    <div class="slider-container">
+        <div class="slide active">
+            <div class="slide-content">
+                <h1>Welcome to Kissan E-Market</h1>
+                <h2>Direct from Farm to Home</h2>
+                <a href="products.html" class="btn primary-btn">Explore Now</a>
+            </div>
+            <img src="static/images/farm7.avif" alt="Fresh farm products">
+        </div>
+        <div class="slide">
+            <div class="slide-content">
+                <h1>100% Organic Products</h1>
+                <h2>Support Local Farmers</h2>
+                <a href="{{ url_for('register') }}?type=consumer" class="btn primary-btn">Buy Organic</a>
+            </div>
+            <img src="static/images/organic2.png" alt="Organic farming">
+        </div>
+        <div class="slide">
+            <div class="slide-content">
+                <h1>Farmer Registration</h1>
+                <h2>Sell Your Products Directly</h2>
+                <a href="{{ url_for('register') }}?type=farmer" class="btn primary-btn">Register as Farmer</a>
+            </div>
+            <img src="static/images/sell.avif" alt="Farmer with produce">
+        </div>
+        <button class="slide-arrow prev-arrow"><i class="fas fa-chevron-left"></i></button>
+        <button class="slide-arrow next-arrow"><i class="fas fa-chevron-right"></i></button>
+        <div class="slider-dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+</section>
+
+        <!-- Featured Products -->
+        <section class="featured-products">
+            <div class="container">
+                <h2 class="section-title">Featured Products</h2>
+                <div class="product-grid">
+                    <!-- Products will be dynamically added here via JavaScript -->
+                </div>
+                <a href="products.html" class="btn secondary-btn view-all">View All Products</a>
+            </div>
+        </section>
+
+        <!-- Benefits Section -->
+        <section class="benefits">
+            <div class="container">
+                <h2 class="section-title">Why Choose Kissan E-Market</h2>
+                <div class="benefits-grid">
+                    <div class="benefit-card">
+                        <i class="fas fa-tractor"></i>
+                        <h3>Direct from Farmers</h3>
+                        <p>Buy fresh produce directly from farmers without middlemen.</p>
+                    </div>
+                    <div class="benefit-card">
+                        <i class="fas fa-leaf"></i>
+                        <h3>Organic & Fresh</h3>
+                        <p>Access to organic and freshly harvested products.</p>
+                    </div>
+                    <div class="benefit-card">
+                        <i class="fas fa-rupee-sign"></i>
+                        <h3>Fair Prices</h3>
+                        <p>Better prices for farmers and consumers with direct trade.</p>
+                    </div>
+                    <div class="benefit-card">
+                        <i class="fas fa-truck"></i>
+                        <h3>Fast Delivery</h3>
+                        <p>Quick delivery to ensure freshness of products.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Farmer Spotlight -->
+        <section class="farmer-spotlight">
+            <div class="container">
+                <h2 class="section-title">Featured Farmers</h2>
+                <div class="farmer-grid">
+                    <!-- Farmers will be dynamically added here via JavaScript -->
+                </div>
+                <a href="farmers.html" class="btn secondary-btn view-all">View All Farmers</a>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-grid">
+                    <div class="cta-card">
+                        <h3>Are you a Farmer?</h3>
+                        <p>Register and sell your products directly to consumers.</p>
+                        <a href="{{ url_for('register') }}?type=farmer" class="btn primary-btn">Register as Farmer</a>
+                    </div>
+                    <div class="cta-card">
+                        <h3>Looking for Fresh Produce?</h3>
+                        <p>Register as a consumer and start shopping.</p>
+                        <a href="{{ url_for('register') }}?type=consumer" class="btn primary-btn">Register as Consumer</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>About Kissan E-Market</h3>
+                    <p>A platform connecting farmers directly with consumers, ensuring fair prices and fresh products.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="farmers.html">Farmers</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Categories</h3>
+                    <ul>
+                        <li><a href="products.html?category=vegetables">Vegetables</a></li>
+                        <li><a href="products.html?category=fruits">Fruits</a></li>
+                        <li><a href="products.html?category=grains">Grains & Pulses</a></li>
+                        <li><a href="products.html?category=dairy">Dairy Products</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Farmer's Lane, Agricity</p>
+                    <p><i class="fas fa-phone"></i> +91 98765 43210</p>
+                    <p><i class="fas fa-envelope"></i> info@kissanemarket.com</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Kissan E-Market. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{{ action|capitalize }} - Kissan E-Market</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='commerce.css') }}">
+</head>
+<body>
+  <div class="login-modal">
+    <div class="modal-content">
+      <h3>{{ action|capitalize }} as {{ request.args.get('user_type', 'Customer') }}</h3>
+      <form method="POST" action="">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="hidden" name="user_type" value="{{ request.args.get('user_type', 'customer') }}">
+        <button type="submit">Submit</button>
+        <button type="button" onclick="window.location.href='{{ url_for('e_market.kissan_e_market') }}'">Cancel</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

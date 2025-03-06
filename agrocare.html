@@ -261,7 +261,7 @@
         }
 
         .examples p {
-            color: var(--primary);
+            color: var(--);
             font-size: 1.2rem;
             margin-bottom: 1rem;
         }
@@ -284,34 +284,15 @@
             padding-left: 1.5rem;
         }
 
-.completion {
-    line-height: 1.6;
-    font-size: 1.05rem;
-    white-space: pre-line;
-}
+        .bot-response {
 
-.completion p {
-    margin-bottom: 1rem;
-}
+            backdrop-filter: blur(5px);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 800px;
 
-.completion ul, .completion ol {
-    margin-left: 1.5rem;
-    margin-bottom: 1rem;
-}
-
-.completion li {
-    margin-bottom: 0.5rem;
-}
-
-.completion strong {
-    color: var(--primary);
-    font-weight: bold;
-}
-
-.completion h3, .completion h4 {
-    color: var(--accent);
-    margin: 1.5rem 0 0.75rem 0;
-}
+        }
 
         @media (max-width: 768px) {
             .logo h1 {
@@ -355,6 +336,29 @@
             </div>
         </div>
     </div>
+    <div id="cameraModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🚀 Coming Soon!</h2>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 1.2rem; margin-bottom: 1.5rem;">
+                    <span style="color: var(--primary);">We're working on something exciting!</span>
+                </p>
+                <p>Our advanced AI-powered plant disease detection system is currently under development. Soon you'll be able to:</p>
+                <ul style="list-style: none; margin: 1.5rem 0;">
+                    <li style="margin: 0.8rem 0;">🌱 Upload plant photos for instant disease detection</li>
+                    <li style="margin: 0.8rem 0;">🔍 Get detailed analysis of plant health</li>
+                    <li style="margin: 0.8rem 0;">💡 Receive treatment recommendations</li>
+                    <li style="margin: 0.8rem 0;">📊 Track plant health over time</li>
+                </ul>
+                <p style="color: var(--accent);">Stay tuned for the release! We're making sure it's perfect for you.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="close-modal" onclick="closeCameraModal()">Got it!</button>
+            </div>
+        </div>
+    </div>
     <header>
         <div class="logo">
             <img src="{{ url_for('static', filename='mainlogo.png') }}" alt="Kissan 4.0">
@@ -376,8 +380,7 @@
                 <div class="search-wrapper">
                     <input type="text" id="questionInput" placeholder="Ask any farming related question..." onfocus="hideExamples()" oninput="hideExamples()">
                     <div class="action-buttons">
-                        <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="uploadImage();">
-                        <button class="upload-btn" onclick="document.getElementById('imageInput').click();" title="Upload plant image for disease detection">
+                        <button class="upload-btn" onclick="showCameraModal()" title="Upload plant image for disease detection">
                             <img src="{{ url_for('static', filename='cam2.png') }}" alt="Camera">
                         </button>
                         <button class="submit-btn" onclick="submitQuestion()" title="Send question">
@@ -396,9 +399,9 @@
                     <li onclick="insertExample('How can I protect my crops from frost damage?')">How can I protect my crops from frost damage?</li>
                 </ul>
             </div>
-            <div class="uploaded-image" id="uploadedImage" style="display: none;">
+            <!-- <div class="uploaded-image" id="uploadedImage" style="display: none;">
                 <img id="imagePreview" src="" alt="Uploaded Image">
-            </div>
+            </div> -->
             <div class="bot-response" id="botResponse"></div>
         </div>
     </main>
@@ -435,36 +438,57 @@
             });
         }
 
-        function uploadImage() {
-            var imageInput = document.getElementById('imageInput').files[0];
-            var formData = new FormData();
-            formData.append('file', imageInput);
 
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('imagePreview').src = e.target.result;
-                document.getElementById('uploadedImage').style.display = 'block';
-                hideExamples();
-            };
-            reader.readAsDataURL(imageInput);
+        function showCameraModal() {
+    document.getElementById('cameraModal').style.display = 'block';
+}
 
-            $.ajax({
-                url: '/predict',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    var prediction = response.prediction;
-                    console.log('Prediction:', prediction);
-                    document.getElementById('botResponse').innerHTML = `<div class="completion">Prediction: ${prediction}</div>`;
-                },
-                error: function(error) {
-                    console.error('Error:', error);
-                    alert('Error occurred while uploading the image. Please try again later.');
-                }
-            });
-        }
+function closeCameraModal() {
+    document.getElementById('cameraModal').style.display = 'none';
+}
+
+// Close camera modal if clicking outside
+window.onclick = function(event) {
+    var welcomeModal = document.getElementById('welcomeModal');
+    var cameraModal = document.getElementById('cameraModal');
+    if (event.target == welcomeModal) {
+        welcomeModal.style.display = 'none';
+    }
+    if (event.target == cameraModal) {
+        cameraModal.style.display = 'none';
+    }
+}
+
+        // function uploadImage() {
+        //     var imageInput = document.getElementById('imageInput').files[0];
+        //     var formData = new FormData();
+        //     formData.append('file', imageInput);
+
+        //     var reader = new FileReader();
+        //     reader.onload = function(e) {
+        //         document.getElementById('imagePreview').src = e.target.result;
+        //         document.getElementById('uploadedImage').style.display = 'block';
+        //         hideExamples();
+        //     };
+        //     reader.readAsDataURL(imageInput);
+
+        //     $.ajax({
+        //         url: '/predict',
+        //         type: 'POST',
+        //         data: formData,
+        //         processData: false,
+        //         contentType: false,
+        //         success: function(response) {
+        //             var prediction = response.prediction;
+        //             console.log('Prediction:', prediction);
+        //             document.getElementById('botResponse').innerHTML = `<div class="completion">Prediction: ${prediction}</div>`;
+        //         },
+        //         error: function(error) {
+        //             console.error('Error:', error);
+        //             alert('Error occurred while uploading the image. Please try again later.');
+        //         }
+        //     });
+        // }
     </script>
 
 <script>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kissan E-Market</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='commerce.css') }}">
+</head>
+<body>
+  <header class="header">
+    <h1>Kissan E-Market</h1>
+    <div class="user-section">
+      {% if not session.user %}
+        <a href="{{ url_for('e_market.register') }}?user_type=farmer">Farmer Registration</a> |
+        <a href="{{ url_for('e_market.register') }}?user_type=customer">Customer Registration</a>
+      {% else %}
+        <span>Welcome, {{ session.user.username }} ({{ session.user.type }})</span> |
+        <a href="{{ url_for('e_market.logout') }}">Logout</a>
+      {% endif %}
+    </div>
+  </header>
+  <nav class="nav-menu">
+    <ul>
+      <li><a href="#">Home</a></li>
+      <li><a href="#">Products</a></li>
+      <li><a href="#">About</a></li>
+    </ul>
+  </nav>
+  <div class="banner">
+    <h2>NEW LAUNCH</h2>
+    <h2>Fresh from the Farm</h2>
+    <p>Directly from Farmers to Your Table – Shop Now!</p>
+    <button>Shop Now</button>
+  </div>
+  <div class="product-container" id="product-list"></div>
+
+  <!-- Login/Registration Modal -->
+  <div id="login-modal" class="login-modal" style="display: none;">
+    <div class="modal-content">
+      <h3>Register as {{ request.args.get('user_type', 'Customer') }}</h3>
+      <form id="login-form" method="POST" action="{{ url_for('e_market.' + (action if action == 'register' else 'login')) }}">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="hidden" name="user_type" value="{{ request.args.get('user_type', 'customer') }}">
+        <button type="submit">Submit</button>
+        <button type="button" onclick="closeLogin()">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch('/e-market/api/products')
+        .then(response => {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.json();
+        })
+        .then(products => {
+          const productList = document.getElementById('product-list');
+          products.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+              <h3>${product.name}</h3>
+              <p>Price: $${product.price}</p>
+              <p>Farmer: ${product.farmer}</p>
+              <button onclick="addToCart('${product.name}', ${product.price})">Add to Cart</button>
+            `;
+            productList.appendChild(card);
+          });
+        })
+        .catch(error => {
+          document.getElementById('product-list').innerHTML = '<p>Error loading products.</p>';
+          console.error('Fetch error:', error);
+        });
+
+      // Simulate cart (using localStorage for simplicity)
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+      window.addToCart = function(productName, price) {
+        if (!document.cookie.includes('user')) {  // Simplified check; use Flask session in production
+          document.getElementById('login-modal').style.display = 'block';
+          return;
+        }
+        cart.push({ name: productName, price: parseFloat(price) });
+        localStorage.setItem('cart', JSON.stringify(cart));
+        alert(`Added ${productName} to your cart! Total items: ${cart.length}`);
+      };
+
+      window.closeLogin = function() {
+        document.getElementById('login-modal').style.display = 'none';
+      };
+    });
+  </script>
+</body>
+</html>

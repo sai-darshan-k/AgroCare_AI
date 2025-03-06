@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Fertilizer Recommendation System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #22c55e;
+            --primary-hover: #16a34a;
+            --background-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --error-color: #ef4444;
+            --success-color: #22c55e;
+            --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --input-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .header h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .header p {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 0.875rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            box-shadow: var(--input-shadow);
+            background-color: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            ring: 2px solid var(--primary-color);
+        }
+
+        .form-group input:hover,
+        .form-group select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn i {
+            font-size: 1.125rem;
+        }
+
+        .result-section {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            display: none;
+        }
+
+        .result-success {
+            background-color: #f0fdf4;
+            border: 1px solid var(--success-color);
+        }
+
+        .result-error {
+            background-color: #fef2f2;
+            border: 1px solid var(--error-color);
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .loader i {
+            color: var(--primary-color);
+            font-size: 2rem;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader p {
+            margin-top: 0.75rem;
+            color: var(--text-color);
+            font-size: 0.875rem;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .helper-text {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon input {
+            padding-right: 2.5rem;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            .header {
+                padding: 1.5rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.75rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-leaf"></i>
+                Smart Fertilizer Recommendation
+            </h1>
+            <p>Get personalized fertilizer recommendations based on your crop and soil conditions</p>
+        </div>
+
+        <div class="card">
+            <form id="fertilizerForm" onsubmit="predictFertilizer(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="temperature">Temperature (°C)</label>
+                        <div class="input-with-icon">
+                            <input type="number" id="temperature" name="temperature" required step="0.1" min="0" max="50" placeholder="Enter temperature">
+                            <i class="fas fa-temperature-high"></i>
+                        </div>
+                        <span class="helper-text">Range: 0-50°C</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="humidity">Humidity (%)</label>
+                        <div class="input-with-icon">
+                            <input type="number" id="humidity" name="humidity" required step="0.1" min="0" max="100" placeholder="Enter humidity">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <span class="helper-text">Range: 0-100%</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="moisture">Moisture (%)</label>
+                        <div class="input-with-icon">
+                            <input type="number" id="moisture" name="moisture" required step="0.1" min="0" max="100" placeholder="Enter moisture">
+                            <i class="fas fa-water"></i>
+                        </div>
+                        <span class="helper-text">Range: 0-100%</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="soil_type">Soil Type</label>
+                        <select id="soil_type" name="soil_type" required>
+                            <option value="">Select Soil Type</option>
+                            <option value="Sandy">Sandy</option>
+                            <option value="Loamy">Loamy</option>
+                            <option value="Clay">Clay</option>
+                            <option value="Black">Black</option>
+                            <option value="Red">Red</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="crop_type">Crop Type</label>
+                        <select id="crop_type" name="crop_type" required>
+                            <option value="">Select Crop Type</option>
+                            <option value="Wheat">Wheat</option>
+                            <option value="Maize">Maize</option>
+                            <option value="Sugarcane">Sugarcane</option>
+                            <option value="Paddy">Paddy</option>
+                            <option value="Cotton">Cotton</option>
+                            <option value="Tobacco">Tobacco</option>
+                            <option value="Barley">Barley</option>
+                            <option value="Millets">Millets</option>
+                            <option value="Oil Seeds">Oil Seeds</option>
+                            <option value="Pulses">Pulses</option>
+                            <option value="Ground Nuts">Ground Nuts</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nitrogen">Nitrogen (mg/kg)</label>
+                        <div class="input-with-icon">
+                            <input type="number" id="nitrogen" name="nitrogen" required min="0" placeholder="Enter nitrogen content">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="potassium">Potassium (mg/kg)</label>
+                        <div class="input-with-icon">
+                            <input type="number" id="potassium" name="potassium" required min="0" placeholder="Enter potassium content">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phosphorous">Phosphorous (mg/kg)</label>
+                        <div class="input-with-icon">
+                            <input type="number" id="phosphorous" name="phosphorous" required min="0" placeholder="Enter phosphorous content">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-check-circle"></i>
+                    Get Recommendation
+                </button>
+            </form>
+
+            <div class="loader">
+                <i class="fas fa-spinner"></i>
+                <p>Analyzing your inputs...</p>
+            </div>
+
+            <div id="result" class="result-section"></div>
+        </div>
+    </div>
+
+    <script>
+        async function predictFertilizer(event) {
+    event.preventDefault();
+    
+    const form = document.getElementById('fertilizerForm');
+    const loader = document.querySelector('.loader');
+    const result = document.getElementById('result');
+    
+    // Show loader
+    loader.style.display = 'block';
+    result.style.display = 'none';
+    
+    try {
+        const formData = new FormData(form);
+        const response = await fetch('/fertilizers', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        // Hide loader
+        loader.style.display = 'none';
+        result.style.display = 'block';
+        
+        if (data.error) {
+            result.className = 'result-section result-error';
+            result.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>${data.error}</span>
+                </div>
+            `;
+        } else {
+            // Map fertilizer names to their image paths
+            const fertilizerImages = {
+                "Urea": "/static/vege.jpg",
+                "DAP": "/images/fertilizers/dap.jpg",
+                "14-35-14": "/images/fertilizers/14-35-14.jpg",
+                "28-28": "/images/fertilizers/28-28.jpg",
+                "17-17-17": "/images/fertilizers/17-17-17.jpg",
+                "20-20": "/images/fertilizers/20-20.jpg",
+                "10-26-26": "/images/fertilizers/10-26-26.jpg"
+            };
+            
+            // Get the image path for the predicted fertilizer
+            const imagePath = fertilizerImages[data.prediction] || '/images/fertilizers/default.jpg';
+            
+            result.className = 'result-section result-success';
+            result.innerHTML = `
+                <h3 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                    <i class="fas fa-check-circle"></i>
+                    Recommended Fertilizer
+                </h3>
+                <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <p style="font-size: 1.25rem; font-weight: 600;">${data.prediction}</p>
+                    </div>
+                    <div style="flex: 1; min-width: 200px; text-align: center;">
+                        <img src="${imagePath}" alt="${data.prediction}" 
+                             style="max-width: 100%; height: auto; max-height: 200px; border-radius: 0.5rem; box-shadow: var(--card-shadow);" 
+                             onerror="this.src='/images/fertilizers/default.jpg'">
+                    </div>
+                </div>
+            `;
+        }
+    } catch (error) {
+        loader.style.display = 'none';
+        result.style.display = 'block';
+        result.className = 'result-section result-error';
+        result.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>An error occurred. Please try again.</span>
+            </div>
+        `;
+    }
+}
+    </script>
+</body>
+</html>
