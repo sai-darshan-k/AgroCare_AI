@@ -1,4 +1,5 @@
 ﻿Flask
+sklearn
 tensorflow
 flask_babel
 langchain-core
