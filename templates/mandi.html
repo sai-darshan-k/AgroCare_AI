@@ -22,6 +22,41 @@
             border-radius: 8px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
+        body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-image: url('https://tci.cornell.edu/wp-content/uploads/2021/08/Fruit_Mandi_by_PradeepGaurs_Shutterstock-1536x1025.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: var(--text-color);
+    line-height: 1.6;
+    min-height: 100vh;
+    text-align: center;
+    padding: 20px;
+    position: relative; /* For overlay positioning */
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3); /* Semi-transparent black overlay */
+    z-index: 0; /* Places overlay behind content */
+}
+
+.container {
+    position: relative; /* Ensures container stays above overlay */
+    z-index: 1; /* Brings container above overlay */
+    max-width: 1200px;
+    margin: auto;
+    background: rgba(255, 255, 255, 0.695); /* White with slight transparency */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(255, 255, 255, 0.05);
+}
 
         h2 {
             text-align: center;

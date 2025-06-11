@@ -31,7 +31,43 @@
             line-height: 1.5;
             padding: 1rem;
         }
+        body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-image: url('https://eos.com/wp-content/uploads/2023/11/components-of-different-types-of-fertilizers.jpg');
+    background-size: cover; /* Ensures the image covers the entire background */
+    background-position: center; /* Centers the image */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    background-attachment: fixed; /* Keeps the background fixed while scrolling */
+    color: var(--text-color);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3); /* Semi-transparent black overlay */
+    z-index: 0; /* Places overlay behind content */
+}
 
+.container {
+    position: relative; /* Ensures container stays above overlay */
+    z-index: 1; /* Brings container above overlay */
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+    background: rgba(255, 255, 255, 0.366); /* White with 90% opacity (10% transparent) */
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+    margin-bottom: 2rem;
+        }
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -64,7 +100,7 @@
         }
 
         .card {
-            background: white;
+            background: rgba(255, 255, 255, 0.508);
             padding: 2rem;
             border-radius: 1rem;
             box-shadow: var(--card-shadow);
@@ -157,6 +193,24 @@
         .result-error {
             background-color: #fef2f2;
             border: 1px solid var(--error-color);
+        }
+
+        .result-section ul {
+            margin-top: 0.5rem;
+        }
+
+        .result-section li {
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+        }
+
+        .result-section button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .result-section button:active {
+            transform: translateY(0);
         }
 
         .loader {
@@ -338,83 +392,110 @@
     </div>
 
     <script>
-        async function predictFertilizer(event) {
-    event.preventDefault();
-    
-    const form = document.getElementById('fertilizerForm');
-    const loader = document.querySelector('.loader');
-    const result = document.getElementById('result');
-    
-    // Show loader
-    loader.style.display = 'block';
-    result.style.display = 'none';
-    
-    try {
-        const formData = new FormData(form);
-        const response = await fetch('/fertilizers', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const data = await response.json();
-        
-        // Hide loader
-        loader.style.display = 'none';
-        result.style.display = 'block';
-        
-        if (data.error) {
-            result.className = 'result-section result-error';
-            result.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span>${data.error}</span>
-                </div>
-            `;
-        } else {
-            // Map fertilizer names to their image paths
-            const fertilizerImages = {
-                "Urea": "/static/vege.jpg",
-                "DAP": "/images/fertilizers/dap.jpg",
-                "14-35-14": "/images/fertilizers/14-35-14.jpg",
-                "28-28": "/images/fertilizers/28-28.jpg",
-                "17-17-17": "/images/fertilizers/17-17-17.jpg",
-                "20-20": "/images/fertilizers/20-20.jpg",
-                "10-26-26": "/images/fertilizers/10-26-26.jpg"
+        function getApplicationRate(fertilizer) {
+            const rates = {
+                "Urea": "100-150 kg",
+                "DAP": "50-75 kg",
+                "14-35-14": "80-120 kg",
+                "28-28": "75-100 kg",
+                "17-17-17": "80-110 kg",
+                "20-20": "70-100 kg",
+                "10-26-26": "90-130 kg"
             };
-            
-            // Get the image path for the predicted fertilizer
-            const imagePath = fertilizerImages[data.prediction] || '/images/fertilizers/default.jpg';
-            
-            result.className = 'result-section result-success';
-            result.innerHTML = `
-                <h3 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-                    <i class="fas fa-check-circle"></i>
-                    Recommended Fertilizer
-                </h3>
-                <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
-                    <div style="flex: 1; min-width: 200px;">
-                        <p style="font-size: 1.25rem; font-weight: 600;">${data.prediction}</p>
-                    </div>
-                    <div style="flex: 1; min-width: 200px; text-align: center;">
-                        <img src="${imagePath}" alt="${data.prediction}" 
-                             style="max-width: 100%; height: auto; max-height: 200px; border-radius: 0.5rem; box-shadow: var(--card-shadow);" 
-                             onerror="this.src='/images/fertilizers/default.jpg'">
-                    </div>
-                </div>
-            `;
+            return rates[fertilizer] || "80-120 kg";
         }
-    } catch (error) {
-        loader.style.display = 'none';
-        result.style.display = 'block';
-        result.className = 'result-section result-error';
-        result.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <i class="fas fa-exclamation-circle"></i>
-                <span>An error occurred. Please try again.</span>
-            </div>
-        `;
-    }
-}
+
+        function getApplicationTime(fertilizer) {
+            return "during early morning or late afternoon";
+        }
+
+        async function predictFertilizer(event) {
+            event.preventDefault();
+            
+            const form = document.getElementById('fertilizerForm');
+            const loader = document.querySelector('.loader');
+            const result = document.getElementById('result');
+            
+            // Show loader
+            loader.style.display = 'block';
+            result.style.display = 'none';
+            
+            try {
+                const formData = new FormData(form);
+                const response = await fetch('/fertilizers', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                // Hide loader
+                loader.style.display = 'none';
+                result.style.display = 'block';
+                
+                if (data.error) {
+                    result.className = 'result-section result-error';
+                    result.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>${data.error}</span>
+                        </div>
+                    `;
+                } else {
+                    const fertilizerImages = {
+                        "Urea": "/static/urea.png",
+                        "DAP": "/static/dap.jpg",
+                        "14-35-14": "/static/14-35-14.jpg",
+                        "28-28": "/static/28-28.png",
+                        "17-17-17": "/static/17-17-17.jpg",
+                        "20-20": "/static/20-20.jpg",
+                        "10-26-26": "/static/10-26-26.jpg"
+                    };
+                    
+                    const imagePath = fertilizerImages[data.prediction] || '/images/fertilizers/default.jpg';
+                    
+                    result.className = 'result-section result-success';
+                    result.innerHTML = `
+                        <h3 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                            <i class="fas fa-check-circle"></i>
+                            Recommended Fertilizer
+                        </h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
+                            <div style="flex: 1; min-width: 200px;">
+                                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                    <img src="${imagePath}" alt="${data.prediction}" 
+                                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 0.5rem; box-shadow: var(--card-shadow);"
+                                         onerror="this.src='/images/fertilizers/default.jpg'">
+                                    <p style="font-size: 1.25rem; font-weight: 600;">${data.prediction}</p>
+                                </div>
+                                <button style="background-color: var(--primary-color); color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; cursor: pointer; width: 100%; max-width: 200px;">
+                                    <i class="fas fa-shopping-cart"></i> Buy Now
+                                </button>
+                            </div>
+                            <div style="flex: 1; min-width: 200px;">
+                                <h4 style="margin-bottom: 0.5rem;">How to Use</h4>
+                                <ul style="list-style-type: disc; padding-left: 1.5rem;">
+                                    <li>Apply ${getApplicationRate(data.prediction)} per acre</li>
+                                    <li>Spread evenly across the soil surface</li>
+                                    <li>Water thoroughly after application</li>
+                                    <li>Best applied ${getApplicationTime(data.prediction)}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                loader.style.display = 'none';
+                result.style.display = 'block';
+                result.className = 'result-section result-error';
+                result.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>An error occurred. Please try again.</span>
+                    </div>
+                `;
+            }
+        }
     </script>
 </body>
 </html>

@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kissan E-Market - Direct from Farm to Home</title>
-    <link rel="stylesheet" href="static/market.css">
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='market.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -24,86 +23,142 @@
                     </a>
                 </div>
                 <div class="search-container">
-                    <form action="/search" method="GET">
-                        <input type="text" placeholder="Search for products..." name="search">
-                        <button type="submit"><i class="fas fa-search"></i></button>
+                    <form id="search-form" action="#" method="GET">
+                        <input type="text" id="search-bar" placeholder="Search for products..." name="search">
+                        <button type="submit" id="search-btn"><i class="fas fa-search"></i></button>
                     </form>
                 </div>
                 <div class="header-actions">
-                    <a href="login.html" class="user-account">
-                        <i class="fas fa-user"></i>
-                        <span class="badge" id="login-status">Login</span>
-                    </a>
-                    <a href="wishlist.html" class="wishlist">
-                        <i class="fas fa-heart"></i>
-                        <span class="badge count">0</span>
-                    </a>
-                    <a href="cart.html" class="cart">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span class="badge count">0</span>
-                    </a>
+                    <!-- User Icon -->
+                    <div class="header-action-item user-account">
+                        <a href="#" class="icon-link">
+                            <i class="fas fa-user"></i>
+                        </a>
+                        {% if 'user_id' in session and username %}
+                            <div class="user-info">
+                                <span class="user-text">Welcome, {{ username }}</span>
+                            </div>
+                        {% else %}
+                            <a href="#" id="login-btn" class="user-text login-link">Login</a>
+                        {% endif %}
+                    </div>
+                    <!-- Wishlist Icon -->
+                    <div class="header-action-item">
+                        <a href="wishlist.html" class="icon-link wishlist">
+                            <i class="fas fa-heart"></i>
+                            <span class="badge count">0</span>
+                        </a>
+                    </div>
+                    <!-- Cart Icon -->
+                    <div class="header-action-item">
+                        <a href="{{ url_for('cart') }}" class="icon-link cart">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="badge count">0</span>
+                        </a>
+                    </div>
+                    <!-- Logout Button -->
+                    {% if 'user_id' in session %}
+                        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+                    {% endif %}
                 </div>
             </div>
             <nav class="main-nav">
                 <ul>
-                    <li><a href="products.html?category=vegetables">Vegetables</a></li>
-                    <li><a href="products.html?category=fruits">Fruits</a></li>
-                    <li><a href="products.html?category=grains">Grains & Pulses</a></li>
-                    <li><a href="products.html?category=dairy">Dairy Products</a></li>
-                    <li><a href="products.html?category=spices">Spices</a></li>
-                    <li><a href="products.html?category=seeds">Seeds & Farming Tools</a></li>
-                    <li><a href="products.html?category=organic">Organic Products</a></li>
+                    <li><a href="{{ url_for('products', category='vegetables') }}">Vegetables</a></li>
+                    <li><a href="{{ url_for('products', category='fruits') }}">Fruits</a></li>
+                    <li><a href="{{ url_for('products', category='grains') }}">Grains & Pulses</a></li>
+                    <li><a href="{{ url_for('products', category='dairy') }}">Dairy Products</a></li>
+                    <li><a href="{{ url_for('products', category='spices') }}">Spices</a></li>
+                    <li><a href="{{ url_for('products', category='seeds') }}">Seeds & Farming Tools</a></li>
+                    <li><a href="{{ url_for('products', category='organic') }}">Organic Products</a></li>
                 </ul>
             </nav>
         </div>
     </header>
-
     <main>
-       <!-- Hero Slider -->
-<section class="hero-slider">
-    <div class="slider-container">
-        <div class="slide active">
-            <div class="slide-content">
-                <h1>Welcome to Kissan E-Market</h1>
-                <h2>Direct from Farm to Home</h2>
-                <a href="products.html" class="btn primary-btn">Explore Now</a>
+        
+        <!-- Hero Slider -->
+        <section class="hero-slider">
+            <div class="slider-container">
+                <div class="slide active">
+                    <div class="slide-content">
+                        <h1>Welcome to Kissan E-Market</h1>
+                        <h2>Direct from Farm to Home</h2>
+                        <a href="{{ url_for('products') }}" class="btn primary-btn">Explore Now</a>
+                    </div>
+                    <img src="{{ url_for('static', filename='images/farm7.avif') }}" alt="Fresh farm products">
+                </div>
+                <div class="slide">
+                    <div class="slide-content">
+                        <h1>100% Organic Products</h1>
+                        <h2>Support Local Farmers</h2>
+                        <a href="{{ url_for('register') }}?type=consumer" class="btn primary-btn">Buy Organic</a>
+                    </div>
+                    <img src="{{ url_for('static', filename='images/organic2.png') }}" alt="Organic farming">
+                </div>
+                <div class="slide">
+                    <div class="slide-content">
+                        <h1>Farmer Registration</h1>
+                        <h2>Sell Your Products Directly</h2>
+                        <a href="{{ url_for('register') }}?type=farmer" class="btn primary-btn">Register as Farmer</a>
+                    </div>
+                    <img src="{{ url_for('static', filename='images/sell.avif') }}" alt="Farmer with produce">
+                </div>
+                <button class="slide-arrow prev-arrow"><i class="fas fa-chevron-left"></i></button>
+                <button class="slide-arrow next-arrow"><i class="fas fa-chevron-right"></i></button>
+                <div class="slider-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
             </div>
-            <img src="static/images/farm7.avif" alt="Fresh farm products">
-        </div>
-        <div class="slide">
-            <div class="slide-content">
-                <h1>100% Organic Products</h1>
-                <h2>Support Local Farmers</h2>
-                <a href="{{ url_for('register') }}?type=consumer" class="btn primary-btn">Buy Organic</a>
-            </div>
-            <img src="static/images/organic2.png" alt="Organic farming">
-        </div>
-        <div class="slide">
-            <div class="slide-content">
-                <h1>Farmer Registration</h1>
-                <h2>Sell Your Products Directly</h2>
-                <a href="{{ url_for('register') }}?type=farmer" class="btn primary-btn">Register as Farmer</a>
-            </div>
-            <img src="static/images/sell.avif" alt="Farmer with produce">
-        </div>
-        <button class="slide-arrow prev-arrow"><i class="fas fa-chevron-left"></i></button>
-        <button class="slide-arrow next-arrow"><i class="fas fa-chevron-right"></i></button>
-        <div class="slider-dots">
-            <span class="dot active"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
-        </div>
-    </div>
-</section>
+        </section>
 
+        <!-- Login Popup -->
+        <div id="login-popup" class="popup" style="display: none;">
+            <div class="popup-content login-container">
+                <span class="close-btn" id="close-login">×</span>
+                <h2>Login to Kissan E-Market</h2>
+                {% if login_error %}
+                    <p class="error">{{ login_error }}</p>
+                {% endif %}
+                <form method="POST" action="{{ url_for('login') }}">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" placeholder="Enter your username">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required placeholder="Enter your password">
+                    </div>
+                    <p class="login-note">*Login with either username or email</p>
+                    <button type="submit" class="btn primary-btn">Login</button>
+                </form>
+                <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+            </div>
+        </div>
+
+        <!-- Rest of the page remains unchanged -->
         <!-- Featured Products -->
         <section class="featured-products">
             <div class="container">
                 <h2 class="section-title">Featured Products</h2>
                 <div class="product-grid">
-                    <!-- Products will be dynamically added here via JavaScript -->
+                    {% for product in products %}
+                        <div class="product-card">
+                            <img src="{{ product.image_url or url_for('static', filename='images/default-product.jpg') }}" alt="{{ product.name }}">
+                            <h3>{{ product.name }}</h3>
+                            <p>{{ product.description|truncate(50) }}</p>
+                            <p class="price">₹{{ product.price }}</p>
+                            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn secondary-btn">View Details</a>
+                        </div>
+                    {% endfor %}
                 </div>
-                <a href="products.html" class="btn secondary-btn view-all">View All Products</a>
+                <a href="{{ url_for('products') }}" class="btn secondary-btn view-all">View All Products</a>
             </div>
         </section>
 
@@ -177,7 +232,7 @@
                     <h3>Quick Links</h3>
                     <ul>
                         <li><a href="about.html">About Us</a></li>
-                        <li><a href="products.html">Products</a></li>
+                        <li><a href="{{ url_for('products') }}">Products</a></li>
                         <li><a href="farmers.html">Farmers</a></li>
                         <li><a href="contact.html">Contact Us</a></li>
                     </ul>
@@ -185,15 +240,15 @@
                 <div class="footer-column">
                     <h3>Categories</h3>
                     <ul>
-                        <li><a href="products.html?category=vegetables">Vegetables</a></li>
-                        <li><a href="products.html?category=fruits">Fruits</a></li>
-                        <li><a href="products.html?category=grains">Grains & Pulses</a></li>
-                        <li><a href="products.html?category=dairy">Dairy Products</a></li>
+                        <li><a href="{{ url_for('products', category='vegetables') }}">Vegetables</a></li>
+                        <li><a href="{{ url_for('products', category='fruits') }}">Fruits</a></li>
+                        <li><a href="{{ url_for('products', category='grains') }}">Grains & Pulses</a></li>
+                        <li><a href="{{ url_for('products', category='dairy') }}">Dairy Products</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Contact Us</h3>
-                    <p><i class="fas fa-map-marker-alt"></i> 123 Farmer's Lane, Agricity</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Christ University, Bangalore</p>
                     <p><i class="fas fa-phone"></i> +91 98765 43210</p>
                     <p><i class="fas fa-envelope"></i> info@kissanemarket.com</p>
                     <div class="social-icons">
@@ -205,11 +260,41 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 Kissan E-Market. All rights reserved.</p>
+                <p>© 2025 Kissan E-Market. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <!-- JavaScript -->
+    <script>
+        const loginBtn = document.getElementById('login-btn');
+        const loginPopup = document.getElementById('login-popup');
+        const closeLogin = document.getElementById('close-login');
+
+        if (loginBtn) {
+            loginBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginPopup.style.display = 'block';
+            });
+        }
+
+        if (closeLogin) {
+            closeLogin.addEventListener('click', () => {
+                loginPopup.style.display = 'none';
+            });
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target === loginPopup) {
+                loginPopup.style.display = 'none';
+            }
+        });
+
+        // Auto-show login popup if required
+        {% if show_login %}
+            loginPopup.style.display = 'block';
+        {% endif %}
+    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

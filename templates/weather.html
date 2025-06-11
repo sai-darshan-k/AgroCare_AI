@@ -732,7 +732,7 @@
                 <div id="map"></div>
     
                 <div class="aqi-container">
-                    <h2>Air Quality Index</h2>
+                    <h2>Air Quality Index (Levels)</h2>
                     <div class="aqi-level">
                         <span class="aqi-value"></span>
                         <span class="aqi-description"></span>
@@ -833,33 +833,34 @@
             }
         }
       
-        // Get current location with proper handling
         function getCurrentLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    position => {
-                        currentPosition.lat = position.coords.latitude;
-                        currentPosition.lon = position.coords.longitude;
-                        initMap(currentPosition.lat, currentPosition.lon);
-                        fetchWeatherData();
-                    },
-                    error => {
-                        console.error("Location error:", error);
-                        currentPosition.lat = 51.5074;  // Default to London
-                        currentPosition.lon = -0.1278;
-                        initMap(currentPosition.lat, currentPosition.lon);
-                        fetchWeatherData();
-                    },
-                    { timeout: 10000 }
-                );
-            } else {
-                console.warn("Geolocation not supported.");
-                currentPosition.lat = 51.5074;
-                currentPosition.lon = -0.1278;
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                console.log("Geolocation Success:", position.coords.latitude, position.coords.longitude);
+                currentPosition.lat = position.coords.latitude;
+                currentPosition.lon = position.coords.longitude;
                 initMap(currentPosition.lat, currentPosition.lon);
                 fetchWeatherData();
-            }
-        }
+            },
+            error => {
+                console.error("Geolocation Error:", error.message, error.code);
+                // Default to a different location for testing, e.g., New York
+                currentPosition.lat = 40.8239;
+                currentPosition.lon = -73.8371;
+                initMap(currentPosition.lat, currentPosition.lon);
+                fetchWeatherData();
+            },
+            { timeout: 10000, enableHighAccuracy: true, maximumAge: 0 }
+        );
+    } else {
+        console.warn("Geolocation not supported by browser.");
+        currentPosition.lat = 40.8239;
+        currentPosition.lon = -73.8371;
+        initMap(currentPosition.lat, currentPosition.lon);
+        fetchWeatherData();
+    }
+}
       
         async function fetchWeatherData() {
     try {
@@ -1169,7 +1170,7 @@ function updateAQI(data) {
     const aqiDesc = document.querySelector('.aqi-description');
 
     aqiLevel.style.backgroundColor = aqiColor;
-    aqiValue.textContent = `AQI: ${aqi}`;
+    aqiValue.textContent = `AQI Level: ${aqi}`;
     aqiDesc.textContent = aqiDescription;
 
     // Extract the pollutant components from the data
@@ -1460,6 +1461,8 @@ document.querySelector('.back-button').addEventListener('click', function() {
 });
 
 </script>
+
+
     
 
 </body>

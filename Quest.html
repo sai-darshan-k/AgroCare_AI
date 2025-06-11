@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KISSAN 4.0 Insight Dashboard</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(120deg, #f8a39f, #b2dfdb);
+            margin: 0;
+            padding: 15px;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            background: rgba(225, 178, 152, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: #388e3c;
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 10px;
+        }
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 220px;
+            position: relative;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        .card h3 {
+            margin: 0 0 15px;
+            color: #2e7d32;
+            font-size: 1.2em;
+            text-align: center;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .card canvas {
+            max-height: 180px;
+            width: 100%;
+        }
+        /* Improved alignment for all cards - removing staggered positioning */
+        #isFarmerChartCard { grid-column: 1 / 2; }
+        #profitableChartCard { grid-column: 2 / 3; }
+        #useTechChartCard { grid-column: 3 / 4; }
+        #stateChartCard { grid-column: 4 / 5; }
+        #freeServiceChartCard { grid-column: 1 / 2; }
+        #challengesChartCard { grid-column: 2 / 3; }
+        #soilTestChartCard { grid-column: 3 / 4; }
+        #aiSystemChartCard { grid-column: 4 / 5; }
+        #govSchemeChartCard { grid-column: 1 / 2; }
+        #directSaleChartCard { grid-column: 2 / 3; }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.3em;
+            color: #555;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        #fileInput, #downloadBtn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 25px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background 0.3s, transform 0.2s;
+        }
+        #fileInput:hover, #downloadBtn:hover {
+            background: #388e3c;
+            transform: scale(1.05);
+        }
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .card { transform: none; } /* Reset transforms for smaller screens */
+        }
+        @media (max-width: 600px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>KISSAN 4.0 Survey</h1>
+        </div>
+        <div id="loading">Upload 'quest.xlsx' to see insights</div>
+        <div class="dashboard" id="dashboard" style="display: none;">
+            <div class="card" id="isFarmerChartCard">
+                <h3>Farmer Status</h3>
+                <canvas id="isFarmerChart"></canvas>
+            </div>
+            <div class="card" id="profitableChartCard">
+                <h3>Profitability</h3>
+                <canvas id="profitableChart"></canvas>
+            </div>
+            <div class="card" id="useTechChartCard">
+                <h3>Tech Usage</h3>
+                <canvas id="techChart"></canvas>
+            </div>
+            <div class="card" id="stateChartCard">
+                <h3>State Spread</h3>
+                <canvas id="stateChart"></canvas>
+            </div>
+            <div class="card" id="freeServiceChartCard">
+                <h3>Free Service Interest</h3>
+                <canvas id="freeServiceChart"></canvas>
+            </div>
+            <div class="card" id="challengesChartCard">
+                <h3>Top Challenges</h3>
+                <canvas id="challengesChart"></canvas>
+            </div>
+            <div class="card" id="soilTestChartCard">
+                <h3>Soil Testing</h3>
+                <canvas id="soilTestChart"></canvas>
+            </div>
+            <div class="card" id="aiSystemChartCard">
+                <h3>AI Interest</h3>
+                <canvas id="aiSystemChart"></canvas>
+            </div>
+            <div class="card" id="govSchemeChartCard">
+                <h3>Govt. Schemes</h3>
+                <canvas id="govSchemeChart"></canvas>
+            </div>
+            <div class="card" id="directSaleChartCard">
+                <h3>Direct Sales</h3>
+                <canvas id="directSaleChart"></canvas>
+            </div>
+        </div>
+        <input type="file" id="fileInput" accept=".xlsx" onchange="loadFile(event)">
+        <button id="downloadBtn" onclick="downloadDashboard()" style="display: none;">Download Dashboard as JPG</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        let charts = {};
+
+        function loadFile(event) {
+            const file = event.target.files[0];
+            if (!file || !file.name.endsWith('.xlsx')) {
+                document.getElementById('loading').textContent = 'Please upload a valid .xlsx file.';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                renderDashboard(jsonData);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function processData(rows) {
+            const headers = rows[0];
+            const dataRows = rows.slice(1);
+            const result = {};
+
+            const singleFields = ['isFarmer', 'profitable', 'useTech', 'state', 'freeService', 'soilTest', 'aiSystem', 'govScheme', 'directSale'];
+            singleFields.forEach(field => {
+                const index = headers.indexOf(field);
+                if (index !== -1) {
+                    result[field] = {};
+                    dataRows.forEach(row => {
+                        const value = row[index] || 'Unknown';
+                        result[field][value] = (result[field][value] || 0) + 1;
+                    });
+                }
+            });
+
+            const challengesIndex = headers.indexOf('challenges');
+            if (challengesIndex !== -1) {
+                result.challenges = {};
+                dataRows.forEach(row => {
+                    const values = row[challengesIndex] ? row[challengesIndex].split(',') : [];
+                    values.forEach(value => {
+                        const trimmed = value.trim();
+                        result.challenges[trimmed] = (result.challenges[trimmed] || 0) + 1;
+                    });
+                });
+            }
+
+            return result;
+        }
+
+        function createChart(id, type, labels, data, backgroundColor, options = {}) {
+            if (charts[id]) charts[id].destroy();
+            const ctx = document.getElementById(id).getContext('2d');
+            charts[id] = new Chart(ctx, {
+                type,
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        backgroundColor,
+                        borderColor: type === 'line' ? '#4caf50' : '#fff',
+                        borderWidth: 1,
+                        pointBackgroundColor: type === 'line' ? '#388e3c' : undefined,
+                        pointRadius: type === 'line' ? 3 : 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { font: { size: 10 }, padding: 8, boxWidth: 10 } 
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: { size: 12 },
+                            bodyFont: { size: 10 },
+                            padding: 8
+                        }
+                    },
+                    scales: (type === 'bar' || type === 'line') ? {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { display: false }, 
+                            ticks: { font: { size: 10 }, stepSize: Math.max(...data) > 10 ? Math.ceil(Math.max(...data) / 5) : 1 } 
+                        },
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { font: { size: 10 }, maxRotation: 45, minRotation: 45 } 
+                        }
+                    } : undefined,
+                    animation: { duration: 1200, easing: 'easeOutBounce' },
+                    ...options
+                }
+            });
+        }
+
+        function renderDashboard(rows) {
+            try {
+                const processedData = processData(rows);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'grid';
+                document.getElementById('downloadBtn').style.display = 'block';
+
+                if (processedData.isFarmer) {
+                    createChart('isFarmerChart', 'pie', Object.keys(processedData.isFarmer), Object.values(processedData.isFarmer), ['#2e7d32', '#7cb342']);
+                }
+                if (processedData.profitable) {
+                    createChart('profitableChart', 'bar', Object.keys(processedData.profitable), Object.values(processedData.profitable), ['#388e3c', '#66bb6a', '#aed581']);
+                }
+                if (processedData.useTech) {
+                    createChart('techChart', 'pie', Object.keys(processedData.useTech), Object.values(processedData.useTech), ['#4caf50', '#c0ca33']);
+                }
+                if (processedData.state) {
+                    const topStates = Object.entries(processedData.state).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                    createChart('stateChart', 'bar', topStates.map(s => s[0]), topStates.map(s => s[1]), '#66bb6a', { indexAxis: 'y' });
+                }
+                if (processedData.freeService) {
+                    createChart('freeServiceChart', 'doughnut', Object.keys(processedData.freeService), Object.values(processedData.freeService), ['#2e7d32', '#ffca28'], { cutout: '60%' });
+                }
+                if (processedData.challenges) {
+                    const topChallenges = Object.entries(processedData.challenges).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                    createChart('challengesChart', 'bar', topChallenges.map(c => c[0]), topChallenges.map(c => c[1]), '#4caf50');
+                }
+                if (processedData.soilTest) {
+                    createChart('soilTestChart', 'pie', Object.keys(processedData.soilTest), Object.values(processedData.soilTest), ['#66bb6a', '#aed581', '#d4e157']);
+                }
+                if (processedData.aiSystem) {
+                    createChart('aiSystemChart', 'bar', Object.keys(processedData.aiSystem), Object.values(processedData.aiSystem), ['#388e3c', '#7cb342', '#c0ca33']);
+                }
+                if (processedData.govScheme) {
+                    createChart('govSchemeChart', 'doughnut', Object.keys(processedData.govScheme), Object.values(processedData.govScheme), ['#4caf50', '#ffca28', '#d4e157'], { cutout: '60%' });
+                }
+                if (processedData.directSale) {
+                    createChart('directSaleChart', 'pie', Object.keys(processedData.directSale), Object.values(processedData.directSale), ['#2e7d32', '#66bb6a', '#aed581']);
+                }
+            } catch (err) {
+                console.error('Error rendering dashboard:', err);
+                document.getElementById('loading').textContent = 'Failed to process file. Check format.';
+            }
+        }
+
+        function downloadDashboard() {
+            const container = document.querySelector('.container');
+            const fileInput = document.getElementById('fileInput');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            // Temporarily hide file input and download button
+            fileInput.style.display = 'none';
+            downloadBtn.style.display = 'none';
+            
+            html2canvas(container, {
+                backgroundColor: '#fff',
+                scale: 2,
+                useCORS: true,
+                width: container.offsetWidth,
+                height: container.offsetHeight
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'KISSAN_4.0_Dashboard.jpg';
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.click();
+                
+                // Restore visibility
+                fileInput.style.display = 'block';
+                downloadBtn.style.display = 'block';
+            }).catch(err => {
+                console.error('Error generating image:', err);
+                alert('Failed to download dashboard image.');
+                
+                // Restore visibility in case of error
+                fileInput.style.display = 'block';
+                downloadBtn.style.display = 'block';
+            });
+        }
+    </script>
+</body>
+</html>

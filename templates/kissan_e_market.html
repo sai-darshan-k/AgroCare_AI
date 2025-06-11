@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kissan E-Market</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='commerce.css') }}">
+  <!-- Assuming you're using Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
   <header class="header">
@@ -25,6 +27,10 @@
       <li><a href="#">Products</a></li>
       <li><a href="#">About</a></li>
     </ul>
+    <div class="search-container">
+      <input type="text" id="search-bar" placeholder="Search products...">
+      <button id="search-btn">Search</button>
+    </div>
   </nav>
   <div class="banner">
     <h2>NEW LAUNCH</h2>
@@ -45,6 +51,14 @@
         <button type="submit">Submit</button>
         <button type="button" onclick="closeLogin()">Cancel</button>
       </form>
+    </div>
+  </div>
+
+  <!-- Popup for unavailable products -->
+  <div id="search-popup" class="popup" style="display: none;">
+    <div class="popup-content">
+      <p id="popup-message"></p>
+      <button onclick="closePopup()">Close</button>
     </div>
   </div>
 

@@ -1361,9 +1361,6 @@ button[type="submit"] {
         padding: 20px 15px;
     }
 }
-/* Remove this */
-/* form { display: block; } */
-
 /* Popup Styles */
 .popup {
     display: none;
@@ -1411,11 +1408,7 @@ button[type="submit"] {
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
-}
-
-/* Ensure login form is visible when popup is shown */
-.login-container form {
-    display: block;
+    display: block; /* Ensure inputs are not hidden */
 }
 
 .login-container .btn {
@@ -1453,355 +1446,25 @@ button[type="submit"] {
     color: #333;
 }
 
-/* Register Section */
-.register-options {
-    margin-top: 20px;
-}
-
-.option-tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.option-tab {
-    padding: 10px 20px;
-    background: #f1f1f1;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-}
-
-.option-tab.active {
-    background: #28a745;
-    color: white;
-}
-
-.register-forms {
-    position: relative;
-}
-
-.register-form {
-    display: none; /* Hide all registration forms by default */
-}
-
-.register-form.active {
-    display: block; /* Show only the active registration form */
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
+/* Ensure form is visible */
+form {
     display: block;
-    margin-bottom: 5px;
 }
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.flash-messages {
-    position: fixed;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1001;
-    width: 90%;
-    max-width: 500px;
-    text-align: center;
-}
-
-.flash-messages p {
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
-}
-
-.flash-messages .success {
-    background-color: #28a745;
-    color: white;
-}
-
-.flash-messages .error {
-    background-color: #dc3545;
-    color: white;
-}
+/* Add to market.css */
 .user-account {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.user-info {
-    margin-top: 5px;
-}
-
-.user-info .badge {
-    display: block;
-    font-size: 0.9em;
-    color: #333;
-    background: none;
-    padding: 0;
-}
-
-.logout-link {
-    font-size: 0.8em;
-    color: #007bff;
-    text-decoration: none;
-    margin-top: 2px;
-}
-
-.logout-link:hover {
-    text-decoration: underline;
-}
-
-.login-link .badge {
-    font-size: 0.9em;
-    background: none;
-    padding: 0;
-}
-.popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.popup-content {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-    position: relative;
-}
-
-.success-container h2 {
-    color: #28a745; /* Green color for success */
-    margin-bottom: 10px;
-}
-
-.success-container p {
-    margin-bottom: 20px;
-}
-
-.close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 24px;
-    cursor: pointer;
-    color: #333;
-}
-
-.btn.primary-btn {
-    background-color: #28a745;
-    color: #fff;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 5px;
-}
-
-.btn.primary-btn:hover {
-    background-color: #218838;
-}
-.success-message {
-    background-color: #d4edda;
-    border: 1px solid #c3e6cb;
-    padding: 20px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.success-message h2 {
-    color: #28a745;
-    margin-bottom: 10px;
-}
-
-.success-message p {
-    color: #155724;
-}
-
-.success-message a {
-    color: #007bff;
-    text-decoration: underline;
-}
-
-.success-message a:hover {
-    color: #0056b3;
-}
-/* Ensure header-top is flexible */
-.header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    position: relative; /* Allows absolute positioning of logout */
-}
-
-/* Style header-actions to align items */
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 20px; /* Space between icons and logout */
-}
-
-/* Style the logout link */
-.logout-link {
-    color: #ff6200; /* Orange color */
-    text-decoration: none;
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-    position: absolute;
-    right: -110px; /* Pushes it to the far right */
-    top: 50%;
-    transform: translateY(-50%); /* Centers vertically */
-}
-
-.logout-link:hover {
-    background-color: #ff620033; /* Light orange background on hover */
-    color: #e65a00; /* Slightly darker orange on hover */
-}
-
-/* Ensure user-account stays in place */
-.user-account {
     display: flex;
     align-items: center;
     gap: 5px;
 }
-/* Ensure header-top is flexible */
-.header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    position: relative; /* Allows absolute positioning of logout */
-}
 
-/* Style header-actions to align icons horizontally */
-.header-actions {
-    display: flex;
-    align-items: flex-start; /* Align items at the top to keep icons in a row */
-    gap: 20px; /* Consistent spacing between icons */
-    position: relative;
-    margin-top: 15px; /* For absolute positioning of logout */
-}
-
-/* Style each header-action-item (icon container) */
-.header-action-item {
-    display: flex;
-    flex-direction: column; /* Stack icon and text vertically within each item */
-    align-items: center; /* Center-align icon and text */
-    position: relative; /* For badge positioning */
-}
-
-/* Style the icon links */
-.icon-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary-color);
-    font-size: 1.5rem; /* Icon size */
-    position: relative; /* For badge positioning */
-}
-
-/* Style the user-info (Welcome, Username) */
-.user-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 5px; /* Space between icon and text */
-}
-
-/* Style the text below icons */
-.user-text {
-    display: block;
-    font-size: 0.9rem;
-    color: var(--text-color);
-    text-align: center;
-}
-
-/* Style the login link when not logged in */
-.login-link {
-    font-size: 0.9rem;
-    color: var(--primary-color);
+.logout-link {
+    font-size: 0.9em;
+    color: #007bff;
     text-decoration: none;
+    margin-left: 5px;
 }
 
-.login-link:hover {
-    color: var(--primary-dark);
-}
-
-/* Style the badge (count) */
-.badge.count {
-    background-color: var(--secondary-color);
-    color: white;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: -8px; /* Adjusted to sit above the icon */
-    right: 15px; /* Adjusted to sit to the right of the icon */
-    font-size: 0.8rem;
-}
-
-/* Style the logout link */
-/* Style the logout button */
-.logout-btn {
-    background-color: #ffab77; /* Orange background */
-    color: rgb(216, 149, 5); /* White text */
-    text-decoration: none;
-    font-weight: bold;
-    padding: 8px 16px; /* Increased padding for button-like feel */
-    border-radius: 5px; /* Rounded corners */
-    transition: background-color 0.3s ease; /* Smooth transition */
-    position: absolute;
-    right: -140px; /* Pushes it to the far right */
-    top: 30%;
-    transform: translateY(-50%); /* Centers vertically */
-}
-
-.logout-btn:hover {
-    background-color: #e65a00; /* Slightly darker orange on hover */
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .header-actions {
-        gap: 15px; /* Reduce gap on smaller screens */
-    }
-    .user-text {
-        font-size: 0.8rem; /* Smaller text on mobile */
-    }
-    .icon-link {
-        font-size: 1.3rem; /* Slightly smaller icons */
-    }
-    .logout-btn {
-        right: -10px; /* Adjust position on smaller screens */
-        padding: 6px 12px; /* Slightly smaller padding */
-    }
+.logout-link:hover {
+    text-decoration: underline;
 }

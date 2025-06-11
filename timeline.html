@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kissan 4.0 Business Model Timeline</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #0d6832;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .chart-container {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0;
+            position: relative;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 35px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, #0d6832, #52b788);
+            z-index: 1;
+        }
+        .timeline-item {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            width: 170px;
+        }
+        .timeline-dot {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            border: 4px solid #52b788;
+            box-shadow: 0 0 0 4px white;
+        }
+        .timeline-content {
+            background-color: #f0f7f3;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            min-height: 180px;
+        }
+        .timeline-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #0d6832;
+        }
+        .timeline-list {
+            text-align: left;
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+        .timeline-list li {
+            margin-bottom: 5px;
+        }
+        .button {
+            background-color: #0d6832;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #074d24;
+        }
+        .bullet-points {
+            background-color: #f0f7f3;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .bullet-points h2 {
+            color: #0d6832;
+            margin-top: 0;
+        }
+        .bullet-points ul {
+            padding-left: 20px;
+        }
+        .bullet-points li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Kissan 4.0: Business Model Timeline</h1>
+        
+        <div class="chart-container">
+            <svg id="businessModelTimeline" width="100%" height="380" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="timelineGradient" x1="0%" y1="0%" x2="100%" y1="0%">
+                        <stop offset="0%" style="stop-color:#0d6832;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#52b788;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                
+                <!-- Timeline Line -->
+                <rect x="50" y="150" width="800" height="8" fill="url(#timelineGradient)" rx="4" />
+                
+                <!-- Year 1 Node -->
+                <g class="timeline-node">
+                    <circle cx="150" cy="154" r="40" stroke="#0d6832" stroke-width="3" fill="white" />
+                    <text x="150" y="154" text-anchor="middle" alignment-baseline="middle" font-size="14" font-weight="bold" fill="#0d6832">YEAR 1</text>
+                    
+                    <!-- B2C Content Up -->
+                    <rect x="70" y="40" width="160" height="90" rx="8" fill="#f0f7f3" stroke="#52b788" stroke-width="2"/>
+                    <text x="150" y="60" text-anchor="middle" font-size="14" font-weight="bold" fill="#0d6832">B2C Model</text>
+                    <text x="150" y="85" text-anchor="middle" font-size="12">IoT Poles</text>
+                    <text x="150" y="105" text-anchor="middle" font-size="12">7-8K Users</text>
+                    <text x="150" y="125" text-anchor="middle" font-size="12" font-weight="bold">₹2.4Cr Revenue</text>
+                    
+                    <!-- C2C Content Down -->
+                    <rect x="70" y="178" width="160" height="70" rx="8" fill="#e6f2ec" stroke="#52b788" stroke-width="1" stroke-dasharray="4"/>
+                    <text x="150" y="198" text-anchor="middle" font-size="14" font-weight="bold" fill="#0d6832">C2C Exploration</text>
+                    <text x="150" y="220" text-anchor="middle" font-size="12">Market Research</text>
+                    <text x="150" y="240" text-anchor="middle" font-size="12">Platform Prototype</text>
+                </g>
+                
+                <!-- Year 2 Node -->
+                <g class="timeline-node">
+                    <circle cx="450" cy="154" r="40" stroke="#0d6832" stroke-width="3" fill="white" />
+                    <text x="450" y="154" text-anchor="middle" alignment-baseline="middle" font-size="14" font-weight="bold" fill="#0d6832">YEAR 2</text>
+                    
+                    <!-- B2C Content Up -->
+                    <rect x="370" y="40" width="160" height="90" rx="8" fill="#f0f7f3" stroke="#52b788" stroke-width="2"/>
+                    <text x="450" y="60" text-anchor="middle" font-size="14" font-weight="bold" fill="#0d6832">B2C Expansion</text>
+                    <text x="450" y="85" text-anchor="middle" font-size="12">Scale Poles Sales</text>
+                    <text x="450" y="105" text-anchor="middle" font-size="12">30K Users</text>
+                    <text x="450" y="125" text-anchor="middle" font-size="12" font-weight="bold">Growing Revenue</text>
+                    
+                    <!-- C2C Content Down -->
+                    <rect x="370" y="178" width="160" height="70" rx="8" fill="#f0f7f3" stroke="#52b788" stroke-width="2"/>
+                    <text x="450" y="198" text-anchor="middle" font-size="14" font-weight="bold" fill="#0d6832">C2C Launch</text>
+                    <text x="450" y="220" text-anchor="middle" font-size="12">Basic e-Market</text>
+                    <text x="450" y="240" text-anchor="middle" font-size="12">Initial Commissions</text>
+                </g>
+                
+                <!-- Year 3 Node -->
+                <g class="timeline-node">
+                    <circle cx="750" cy="154" r="40" stroke="#0d6832" stroke-width="3" fill="white" />
+                    <text x="750" y="154" text-anchor="middle" alignment-baseline="middle" font-size="14" font-weight="bold" fill="#0d6832">YEAR 3</text>
+                    
+                    <!-- B2C Content Up -->
+                    <rect x="670" y="40" width="160" height="90" rx="8" fill="#f0f7f3" stroke="#52b788" stroke-width="2"/>
+                    <text x="750" y="60" text-anchor="middle" font-size="14" font-weight="bold" fill="#0d6832">B2C Maturity</text>
+                    <text x="750" y="85" text-anchor="middle" font-size="12">40% Hardware Adoption</text>
+                    <text x="750" y="105" text-anchor="middle" font-size="12">75K Users</text>
+                    <text x="750" y="125" text-anchor="middle" font-size="12" font-weight="bold">₹31.5Cr Subscriptions</text>
+                    
+                    <!-- C2C Content Down -->
+                    <rect x="670" y="178" width="160" height="90" rx="8" fill="#f0f7f3" stroke="#52b788" stroke-width="2"/>
+                    <text x="750" y="198" text-anchor="middle" font-size="14" font-weight="bold" fill="#0d6832">C2C Scale</text>
+                    <text x="750" y="220" text-anchor="middle" font-size="12">Full e-Market</text>
+                    <text x="750" y="240" text-anchor="middle" font-size="12">7.5% Commission</text>
+                    <text x="750" y="260" text-anchor="middle" font-size="12" font-weight="bold">₹37.5Cr Total Revenue</text>
+                </g>
+                
+                <!-- Arrows -->
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#0d6832" />
+                    </marker>
+                </defs>
+                <path d="M 190 154 L 410 154" stroke="#0d6832" stroke-width="2" marker-end="url(#arrowhead)" />
+                <path d="M 490 154 L 710 154" stroke="#0d6832" stroke-width="2" marker-end="url(#arrowhead)" />
+            </svg>
+        </div>
+        
+        <button class="button" onclick="downloadSVG('businessModelTimeline', 'Kissan_4.0_Business_Model_Timeline')">Download Timeline Chart</button>
+        
+        <div class="bullet-points">
+            <h2>Key Business Model Points</h2>
+            <ul>
+                <li><strong>Year 1: B2C Focus with C2C Exploration</strong> - Deploy IoT poles to 7-8K users generating ₹2.4Cr through hardware sales and subscriptions while researching e-Market feasibility.</li>
+                <li><strong>Year 2: B2C Expansion with C2C Launch</strong> - Scale pole sales and subscriptions while launching a basic version of Kissan e-Market with initial commissions from farmer-to-farmer transactions.</li>
+                <li><strong>Year 3: B2C + C2C Integration</strong> - Achieve 75K users with 40% hardware adoption, generating ₹31.5Cr from subscriptions and scaling the e-Market with 7.5% commissions for a total of ₹37.5Cr revenue.</li>
+                <li><strong>Evolution Strategy</strong> - Begin with farmer tools (B2C) and transition to farmer markets (C2C), creating a comprehensive agricultural ecosystem.</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        function downloadSVG(svgId, filename) {
+            const svg = document.getElementById(svgId);
+            const serializer = new XMLSerializer();
+            let source = serializer.serializeToString(svg);
+            
+            // Add name spaces
+            if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
+                source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+            }
+            if(!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)){
+                source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+            }
+            
+            // Add XML declaration
+            source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+            
+            // Convert SVG source to URI data scheme
+            const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);
+            
+            // Create download link
+            const downloadLink = document.createElement("a");
+            downloadLink.href = url;
+            downloadLink.download = filename + ".svg";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    </script>
+</body>
+</html>
