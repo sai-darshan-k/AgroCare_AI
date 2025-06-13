@@ -64,14 +64,7 @@
             cursor: pointer;
             font-size: 16px;
             margin: 10px;
-            background-color: green; /* Green background */
-    color: white; /* White text color */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    padding: 10px 15px; /* Padding */
-    cursor: pointer; /* Pointer cursor */
-    font-size: 16px; /* Font size */
-    transition: background-color 0.3s; 
+            transition: background-color 0.3s;
         }
         #startSpeechButton:hover, .go-back-button:hover {
             background-color: #45a049;
@@ -116,7 +109,6 @@
         .play-button:hover {
             background-color: #45a049;
         }
-        /* Center the audio player */
         .audio-player-container {
             display: flex;
             justify-content: center;
@@ -125,15 +117,15 @@
             margin-top: 20px;
         }
         #homeButton {
-    background-color: green; /* Green background */
-    color: white; /* White text color */
-    border: none; /* No border */
-    border-radius: 5px; /* Rounded corners */
-    padding: 10px 15px; /* Padding */
-    cursor: pointer; /* Pointer cursor */
-    font-size: 16px; /* Font size */
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
-}
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
     </style>
 </head>
 <body>
@@ -157,10 +149,9 @@
         </div>
     </header>
     
-    <!-- Centered Audio Player -->
     <div class="audio-player-container">
-        <audio controls>
-            <source src="{{ audio_url }}" type="audio/mp3">
+        <audio controls id="audioPlayer">
+            <source src="" type="audio/mp3">
             Your browser does not support the audio element.
         </audio>
     </div>
@@ -191,7 +182,7 @@
         function startSpeechRecognition() {
             document.getElementById('botResponse').innerHTML = '';
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = selectedLanguage; // Use selected language
+            recognition.lang = selectedLanguage; // Use selected language for recognition
             recognition.interimResults = false;
 
             recognition.onresult = function (event) {
@@ -212,34 +203,34 @@
         }
 
         function submitQuestion(question, lang) {
-    $.ajax({
-        url: '/ask_speech',  // New endpoint for speech interface
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ question: question, language: lang }),
-        success: function(response) {
-            const answer = response.answer;
-            const audioUrl = response.audio_url;
+            $.ajax({
+                url: '/ask_speech',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ question: question, language: lang }),
+                success: function(response) {
+                    const answer = response.answer;
+                    const audioUrl = response.audio_url;
 
-            // Display the response
-            const botResponseDiv = document.getElementById('botResponse');
-            const answerDiv = document.createElement('div');
-            answerDiv.classList.add('completion');
-            answerDiv.innerHTML = `<strong>Response:</strong> <br>${answer}`;
-            botResponseDiv.appendChild(answerDiv);
+                    // Display the translated response
+                    const botResponseDiv = document.getElementById('botResponse');
+                    const answerDiv = document.createElement('div');
+                    answerDiv.classList.add('completion');
+                    answerDiv.innerHTML = `<strong>Response:</strong> <br>${answer}`;
+                    botResponseDiv.appendChild(answerDiv);
 
-            // Update the audio player
-            const audioElement = document.querySelector('audio');
-            audioElement.src = audioUrl;
-            audioElement.style.display = 'block';
-            audioElement.play();
-        },
-        error: function(error) {
-            console.error('Error:', error);
-            alert('Error occurred while sending the question. Please try again later.');
+                    // Update the audio player
+                    const audioElement = document.getElementById('audioPlayer');
+                    audioElement.src = audioUrl;
+                    audioElement.style.display = 'block';
+                    audioElement.play();
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                    alert('Error occurred while sending the question. Please try again later.');
+                }
+            });
         }
-    });
-}
     </script>
 </body>
 </html>

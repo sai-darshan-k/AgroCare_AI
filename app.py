@@ -37,6 +37,7 @@ import time
 import json
 from flask_sqlalchemy import SQLAlchemy
 from dateutil import parser
+from translate import Translator
 
 # Ensure consistent language detection
 DetectorFactory.seed = 0
@@ -86,6 +87,12 @@ prompt = """(System: You are a crop assistant designed to give responses in the 
 
 (user: Question: {question})"""
 promptinstance = ChatPromptTemplate.from_template(prompt)
+
+# Prompt for speech (concise, 150 characters)
+speech_prompt = """(System: You are a crop assistant designed to give responses in English. The system receives questions in English (translated from the user's input language) and should provide clear, concise answers in English, equal or limited to 500 characters. Do not repeat points.)
+
+(user: Question: {question})"""
+speech_promptinstance = ChatPromptTemplate.from_template(speech_prompt)
 
 # Create a directory for storing the audio files
 AUDIO_DIR = os.path.join(os.getcwd(), 'static', 'audio')
@@ -258,18 +265,100 @@ def schemes():
 def fertilizer():
     return render_template('fertilizer.html')
 
+def translate_long_text(text, translator, max_length=500):
+    """Split text into chunks under max_length and translate each chunk."""
+    if not text:
+        return ""
+    # Split text into sentences or chunks
+    sentences = []
+    current_chunk = ""
+    for sentence in text.split('. '):  # Split by sentence
+        if len(current_chunk) + len(sentence) + 2 <= max_length:
+            current_chunk += sentence + ". " if sentence else ""
+        else:
+            if current_chunk:
+                sentences.append(current_chunk.strip())
+            current_chunk = sentence + ". " if sentence else ""
+    if current_chunk:
+        sentences.append(current_chunk.strip())
+    
+    # Translate each chunk
+    translated_chunks = []
+    for chunk in sentences:
+        try:
+            translated = translator.translate(chunk)
+            translated_chunks.append(translated)
+        except Exception as e:
+            logging.error(f"Error translating chunk: {str(e)}")
+            return f"Translation error: {str(e)}"
+    return " ".join(translated_chunks)
+
 @app.route('/ask_speech', methods=['POST'])
 def ask_speech():
-    question = request.json.get('question')
-    logging.info(f"Received speech question: {question}")
+    data = request.json
+    question = data.get('question')
+    language = data.get('language', 'en-US')
+    logging.info(f"Received speech question: {question} in language: {language}")
+
     try:
-        detected_language = detect_language(question)
-        response = promptinstance | groqllm | StrOutputParser()
-        answer = response.invoke({'question': question})
-        formatted_answer = format_answer(answer)  # With HTML for display
-        audio_filename = generate_audio(formatted_answer, detected_language)  # Cleaned text for audio
+        # Map language codes to translate library language codes
+        lang_map = {
+            'en-US': 'en',
+            'kn-IN': 'kn',
+            'ta-IN': 'ta',
+            'hi-IN': 'hi',
+            'te-IN': 'te'
+        }
+        target_lang = lang_map.get(language, 'en')
+
+        # Initialize translator for the target language
+        translator_to_en = Translator(to_lang='en', from_lang=target_lang)
+        translator_to_target = Translator(to_lang=target_lang, from_lang='en')
+
+        # Translate question to English if not in English
+        question_en = question
+        if target_lang != 'en':
+            try:
+                question_en = translator_to_en.translate(question)
+                logging.info(f"Translated question to English: {question_en}")
+            except Exception as e:
+                logging.error(f"Error translating question to English: {str(e)}")
+                return jsonify({'answer': f'Error translating question: {str(e)}'}), 500
+
+        # Get response from the model in English using speech prompt
+        response = speech_promptinstance | groqllm | StrOutputParser()
+        answer_en = response.invoke({'question': question_en})
+        # Clean Markdown formatting from LLM response
+        answer_en = re.sub(r'[\*]+', '', answer_en)  # Remove * or **
+        logging.info(f"Cleaned English response: {answer_en}")
+        formatted_answer_en = format_answer(answer_en)
+
+        # Translate response back to the target language if not English
+        answer_translated = answer_en
+        if target_lang != 'en':
+            try:
+                answer_translated = translate_long_text(answer_en, translator_to_target)
+                if answer_translated.startswith("Translation error"):
+                    raise Exception(answer_translated)
+                logging.info(f"Translated response to {target_lang}: {answer_translated}")
+            except Exception as e:
+                logging.error(f"Error translating response to {target_lang}: {str(e)}")
+                return jsonify({'answer': f'Error translating response: {str(e)}'}), 500
+
+        # Log the text to be used for audio generation
+        logging.info(f"Text for audio generation: {answer_translated}")
+
+        # Format the translated answer for display
+        formatted_answer = format_answer(answer_translated)
+
+        # Generate audio in the target language
+        audio_filename = generate_audio(answer_translated, target_lang)
+        if not audio_filename:
+            logging.error("Failed to generate audio file")
+            return jsonify({'answer': 'Error generating audio file'}), 500
+
         return jsonify({
-            'answer': formatted_answer,  # HTML-formatted text for display
+            'answer': formatted_answer,
             'audio_url': f"/static/audio/{audio_filename}?t={int(time.time())}"
         })
     except Exception as e:
@@ -297,9 +386,16 @@ def strip_html_tags(text):
 
 def generate_audio(text, lang='en'):
     try:
-        # Strip HTML tags before generating audio
+        # Strip HTML tags and clean text
         clean_text = strip_html_tags(text)
-        audio_filename = "response.mp3"
+        # Remove Markdown formatting (asterisks, etc.)
+        clean_text = re.sub(r'[\*]+', '', clean_text)  # Remove * or **
+        clean_text = clean_text.strip()
+        if not clean_text:
+            logging.error("Cleaned text is empty after processing")
+            return None
+        logging.info(f"Generating audio for text: {clean_text} (lang: {lang})")
+        audio_filename = f"response_{lang}_{int(time.time())}.mp3"  # Unique filename
         audio_path = os.path.join(AUDIO_DIR, audio_filename)
         tts = gTTS(text=clean_text, lang=lang, slow=False)
         tts.save(audio_path)
