@@ -293,6 +293,75 @@ def translate_long_text(text, translator, max_length=500):
             return f"Translation error: {str(e)}"
     return " ".join(translated_chunks)
 
+def fetch_sensor_data():
+    try:
+        response = requests.get('https://iot-delta-vert.vercel.app/sensor-data', timeout=5)
+        response.raise_for_status()
+        data = response.json()
+        logging.info(f"Fetched sensor data: {data}")
+        return data
+    except requests.RequestException as e:
+        logging.error(f"Error fetching sensor data: {str(e)}")
+        return {
+            "temperature": None,
+            "humidity": None,
+            "rain_intensity": None,
+            "rain_detected": None,
+            "soil_moisture": None,
+            "water_layer": None,
+            "last_update": None
+        }
+
+# Add this function after existing imports and before any routes (e.g., after fetch_sensor_data)
+def fetch_weather_forecast():
+    try:
+        api_key = "e10f65c590d431935edaaf55555c6146"
+        lat, lon = 12.9716, 77.5946  # Bangalore coordinates
+        url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}&units=metric"
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+        
+        # Extract relevant forecast data (next 24 hours, simplified)
+        forecast = []
+        for entry in data['list'][:8]:  # Next 24 hours (3-hour intervals)
+            dt = datetime.fromtimestamp(entry['dt']).strftime("%Y-%m-%d %H:%M")
+            temp = entry['main']['temp']
+            weather = entry['weather'][0]['description']
+            forecast.append(f"{dt}: {temp}°C, {weather}")
+        
+        forecast_summary = f"Weather forecast for Bangalore: " + "; ".join(forecast)
+        logging.info(f"Fetched weather forecast: {forecast_summary}")
+        return forecast_summary
+    except requests.RequestException as e:
+        logging.error(f"Error fetching weather forecast: {str(e)}")
+        return "No weather forecast available. Please try again later."
+
+def fetch_weather_forecast():
+    try:
+        api_key = "e10f65c590d431935edaaf55555c6146"
+        lat, lon = 12.9716, 77.5946  # Bangalore coordinates
+        url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}&units=metric"
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+        
+        # Extract relevant forecast data (next 24 hours, simplified)
+        forecast = []
+        for entry in data['list'][:8]:  # Next 24 hours (3-hour intervals)
+            dt = datetime.fromtimestamp(entry['dt']).strftime("%Y-%m-%d %H:%M")
+            temp = entry['main']['temp']
+            weather = entry['weather'][0]['description']
+            forecast.append(f"{dt}: {temp}°C, {weather}")
+        
+        forecast_summary = f"Weather forecast for Bangalore: " + "; ".join(forecast)
+        logging.info(f"Fetched weather forecast: {forecast_summary}")
+        return forecast_summary
+    except requests.RequestException as e:
+        logging.error(f"Error fetching weather forecast: {str(e)}")
+        return "No weather forecast available. Please try again later."
+
+# Replace the existing /ask_speech route with this
 @app.route('/ask_speech', methods=['POST'])
 def ask_speech():
     data = request.json
@@ -325,11 +394,38 @@ def ask_speech():
                 logging.error(f"Error translating question to English: {str(e)}")
                 return jsonify({'answer': f'Error translating question: {str(e)}'}), 500
 
-        # Get response from the model in English using speech prompt
-        response = speech_promptinstance | groqllm | StrOutputParser()
+        # Fetch sensor data
+        sensor_data = fetch_sensor_data()
+        if all(v is None for v in sensor_data.values()):
+            sensor_context = "No sensor data available. Please ensure the sensor device is connected and sending data."
+        else:
+            sensor_context = (
+                f"Current sensor data: "
+                f"Temperature: {sensor_data['temperature'] or 'N/A'}°C, "
+                f"Humidity: {sensor_data['humidity'] or 'N/A'}%, "
+                f"Soil Moisture: {sensor_data['soil_moisture'] or 'N/A'}, "
+                f"Rain Intensity: {sensor_data['rain_intensity'] or 'N/A'}, "
+                f"Rain Detected: {sensor_data['rain_detected'] or 'N/A'}, "
+                f"Water Layer: {sensor_data['water_layer'] or 'N/A'}, "
+                f"Last Update: {sensor_data['last_update'] or 'N/A'}"
+            )
+
+        # Fetch weather forecast
+        weather_context = fetch_weather_forecast()
+
+        # Enhanced prompt with sensor data and weather forecast
+        enhanced_speech_prompt = f"""
+        (System: You are a crop assistant designed to give responses in English. The system receives questions in English (translated from the user's input language) and should provide clear, concise answers in English, equal or limited to 500 characters. Use the following sensor data and weather forecast to answer questions about environmental conditions or weather when relevant: {sensor_context}; {weather_context}. Do not repeat points.)
+
+        (user: Question: {question_en})
+        """
+        enhanced_promptinstance = ChatPromptTemplate.from_template(enhanced_speech_prompt)
+
+        # Get response from the model in English
+        response = enhanced_promptinstance | groqllm | StrOutputParser()
         answer_en = response.invoke({'question': question_en})
-        # Clean Markdown formatting from LLM response
-        answer_en = re.sub(r'[\*]+', '', answer_en)  # Remove * or **
+        # Clean Markdown formatting
+        answer_en = re.sub(r'[\*]+', '', answer_en)
         logging.info(f"Cleaned English response: {answer_en}")
         formatted_answer_en = format_answer(answer_en)
 
@@ -345,7 +441,7 @@ def ask_speech():
                 logging.error(f"Error translating response to {target_lang}: {str(e)}")
                 return jsonify({'answer': f'Error translating response: {str(e)}'}), 500
 
-        # Log the text to be used for audio generation
+        # Log the text for audio generation
         logging.info(f"Text for audio generation: {answer_translated}")
 
         # Format the translated answer for display
@@ -364,7 +460,7 @@ def ask_speech():
     except Exception as e:
         logging.error(f"Error in speech response: {str(e)}")
         return jsonify({'answer': f'Error processing your request: {str(e)}'}), 500
-
+    
 @app.route('/ask', methods=['POST'])
 def ask():
     question = request.json.get('question')
