@@ -58,8 +58,8 @@ db = SQLAlchemy(app)
 logging.basicConfig(level=logging.INFO)
 
 # Google Drive link for the model
-drive_link = "https://drive.google.com/file/d/1rFdr51QVWy3mpzWPCYgdRH1XCH7Yefv6"
-model_path = os.getenv("MODEL_PATH", "my_model.tflite")
+# drive_link = "https://drive.google.com/file/d/1rFdr51QVWy3mpzWPCYgdRH1XCH7Yefv6"
+# model_path = os.getenv("MODEL_PATH", "my_model.tflite")
 
 # Function to download model from Google Drive
 def download_model_from_drive(drive_link, destination):
@@ -397,6 +397,18 @@ def generate_audio(text, lang='en'):
         logging.info(f"Generating audio for text: {clean_text} (lang: {lang})")
         audio_filename = f"response_{lang}_{int(time.time())}.mp3"  # Unique filename
         audio_path = os.path.join(AUDIO_DIR, audio_filename)
+        
+        # Delete all existing audio files in the AUDIO_DIR
+        for existing_file in os.listdir(AUDIO_DIR):
+            existing_file_path = os.path.join(AUDIO_DIR, existing_file)
+            try:
+                if os.path.isfile(existing_file_path) and existing_file.endswith('.mp3'):
+                    os.remove(existing_file_path)
+                    logging.info(f"Deleted existing audio file: {existing_file_path}")
+            except Exception as e:
+                logging.error(f"Error deleting existing audio file {existing_file_path}: {str(e)}")
+        
+        # Generate and save the new audio file
         tts = gTTS(text=clean_text, lang=lang, slow=False)
         tts.save(audio_path)
         logging.info(f"Audio file generated: {audio_path}")
