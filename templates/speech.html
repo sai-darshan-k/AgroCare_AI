@@ -165,6 +165,7 @@
             box-shadow: 0 10px 30px rgba(39, 174, 96, 0.3);
             position: relative;
             overflow: hidden;
+            touch-action: manipulation;
         }
 
         .microphone-btn:hover {
@@ -448,12 +449,12 @@
             <!-- Speech Controls -->
             <div class="speech-controls">
                 <div class="microphone-container">
-                    <button id="startSpeechButton" class="microphone-btn" onclick="startSpeechRecognition()">
+                    <button id="startSpeechButton" class="microphone-btn">
                         <i class="fas fa-microphone"></i>
                     </button>
                 </div>
                 <div class="speech-status" id="speechStatus">
-                    Click the microphone to start speaking
+                    Click or hold the microphone to start speaking
                 </div>
                 <div class="nav-buttons">
                     <button class="nav-btn secondary" onclick="window.history.back()">
@@ -495,6 +496,8 @@
     <script>
         let selectedLanguage = "en-US";
         let isRecording = false;
+        let recognition = null;
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
         // Update language selection
         document.getElementById("language-select").addEventListener("change", function () {
@@ -522,12 +525,12 @@
         }
 
         function startSpeechRecognition() {
-            const button = document.getElementById('startSpeechButton');
-            const responseContainer = document.getElementById('responseContainer');
-            
             if (isRecording) {
                 return; // Prevent multiple recordings
             }
+
+            const button = document.getElementById('startSpeechButton');
+            const responseContainer = document.getElementById('responseContainer');
 
             // Clear previous responses
             responseContainer.innerHTML = '';
@@ -539,7 +542,7 @@
                 return;
             }
 
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = selectedLanguage;
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
@@ -581,16 +584,23 @@
                         break;
                 }
                 
-                updateSpeechStatus('Click the microphone to start speaking');
+                updateSpeechStatus(isMobile ? 'Hold the microphone to start speaking' : 'Hold SPACE to start speaking');
                 alert(errorMessage);
             };
 
             recognition.onend = function() {
                 isRecording = false;
                 button.classList.remove('recording');
+                updateSpeechStatus(isMobile ? 'Hold the microphone to start speaking' : 'Hold SPACE to start speaking');
             };
 
             recognition.start();
+        }
+
+        function stopSpeechRecognition() {
+            if (recognition && isRecording) {
+                recognition.stop();
+            }
         }
 
         function displayMessage(content, type) {
@@ -647,7 +657,7 @@
                         }, 500);
                     }
                     
-                    updateSpeechStatus('Response ready! Click microphone for another question.');
+                    updateSpeechStatus('Response ready! ' + (isMobile ? 'Hold microphone for another question.' : 'Hold SPACE for another question.'));
                 },
                 error: function(xhr, status, error) {
                     hideLoading();
@@ -661,23 +671,51 @@
                     }
                     
                     displayMessage(errorMessage, 'answer');
-                    updateSpeechStatus('Error occurred. Click microphone to try again.');
+                    updateSpeechStatus('Error occurred. ' + (isMobile ? 'Hold microphone to try again.' : 'Hold SPACE to try again.'));
                 }
             });
         }
 
-        // Add keyboard shortcuts
-        document.addEventListener('keydown', function(event) {
-            if (event.code === 'Space' && !isRecording) {
+        // Setup event listeners based on device type
+        const micButton = document.getElementById('startSpeechButton');
+        if (isMobile) {
+            micButton.removeAttribute('onclick'); // Remove click handler for mobile
+            micButton.addEventListener('touchstart', function(event) {
                 event.preventDefault();
-                startSpeechRecognition();
-            }
-        });
+                if (!isRecording) {
+                    startSpeechRecognition();
+                }
+            });
+            micButton.addEventListener('touchend', function(event) {
+                event.preventDefault();
+                if (isRecording) {
+                    stopSpeechRecognition();
+                }
+            });
+        } else {
+            micButton.addEventListener('click', startSpeechRecognition);
+            // Add keyboard shortcuts for non-mobile (hold Space)
+            let isSpaceHeld = false;
+            document.addEventListener('keydown', function(event) {
+                if (event.code === 'Space' && !isRecording && !isSpaceHeld && !event.repeat) {
+                    event.preventDefault();
+                    isSpaceHeld = true;
+                    startSpeechRecognition();
+                }
+            });
+            document.addEventListener('keyup', function(event) {
+                if (event.code === 'Space' && isRecording && isSpaceHeld) {
+                    event.preventDefault();
+                    isSpaceHeld = false;
+                    stopSpeechRecognition();
+                }
+            });
+        }
 
         // Add visual feedback on page load
         window.addEventListener('load', function() {
             setTimeout(() => {
-                updateSpeechStatus('Ready! Click the microphone or press SPACE to start.');
+                updateSpeechStatus(isMobile ? 'Hold the microphone to start speaking' : 'Hold SPACE to start speaking');
             }, 1000);
         });
     </script>
