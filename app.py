@@ -32,6 +32,7 @@ from collections import OrderedDict
 import gdown
 from langdetect import detect, DetectorFactory
 from langdetect.lang_detect_exception import LangDetectException
+from apscheduler.schedulers.background import BackgroundScheduler
 from gtts import gTTS
 import time
 import json
@@ -56,6 +57,20 @@ db = SQLAlchemy(app)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
+
+# Define keep-alive function to ping the public Render URL
+def keep_alive():
+    try:
+        # Ping the public Render URL
+        response = requests.get("https://agrocare-ai-v1vn.onrender.com/", timeout=5)
+        logging.info(f"Keep-alive ping sent, status code: {response.status_code}")
+    except Exception as e:
+        logging.error(f"Keep-alive ping failed: {str(e)}")
+
+# Initialize and start scheduler
+scheduler = BackgroundScheduler()
+scheduler.add_job(keep_alive, 'interval', minutes=5)
+scheduler.start()
 
 # Google Drive link for the model
 # drive_link = "https://drive.google.com/file/d/1rFdr51QVWy3mpzWPCYgdRH1XCH7Yefv6"
@@ -471,6 +486,7 @@ def ask_speech():
     except Exception as e:
         logging.error(f"Error in speech response: {str(e)}")
         return jsonify({'answer': f'Error processing your request: {str(e)}'}), 500
+    
 @app.route('/ask', methods=['POST'])
 def ask():
     question = request.json.get('question')
@@ -1487,20 +1503,8 @@ def update_sensor_data():
             with data_lock:
                 data = request.get_json()
                 sensor_data.update(data)
+                # Add timestamp for when data was updated
                 sensor_data["last_update"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                
-                # Forward data to agrocare-ai
-                try:
-                    forward_url = "https://agrocare-ai-v1vn.onrender.com/sensor-data"
-                    headers = {"Content-Type": "application/json"}
-                    response = requests.post(forward_url, json=data, headers=headers, timeout=5)
-                    if response.status_code == 200:
-                        logging.info(f"Forwarded sensor data to agrocare-ai: {response.json()}")
-                    else:
-                        logging.error(f"Failed to forward to agrocare-ai: {response.status_code} - {response.text}")
-                except requests.RequestException as e:
-                    logging.error(f"Error forwarding to agrocare-ai: {str(e)}")
-            
             return jsonify({"message": "Data updated", "timestamp": sensor_data["last_update"]}), 200
         return jsonify({"error": "Invalid JSON"}), 400
     elif request.method == 'GET':
@@ -1512,9 +1516,8 @@ def sensor_dashboard():
     """Render the leaf diagnosis page"""
     return render_template('sensor_dashboard.html')
 
-
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # Create database tables
+        db.create_all()
     port = int(os.getenv("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=port, debug=False)
