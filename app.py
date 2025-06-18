@@ -361,13 +361,13 @@ def fetch_weather_forecast():
         logging.error(f"Error fetching weather forecast: {str(e)}")
         return "No weather forecast available. Please try again later."
 
-# Replace the existing /ask_speech route with this
 @app.route('/ask_speech', methods=['POST'])
 def ask_speech():
     data = request.json
     question = data.get('question')
     language = data.get('language', 'en-US')
-    logging.info(f"Received speech question: {question} in language: {language}")
+    crop_type = data.get('crop_type', 'generic')  # Default crop type
+    logging.info(f"Received speech question: {question} in language: {language}, crop_type: {crop_type}")
 
     try:
         # Map language codes to translate library language codes
@@ -399,23 +399,29 @@ def ask_speech():
         if all(v is None for v in sensor_data.values()):
             sensor_context = "No sensor data available. Please ensure the sensor device is connected and sending data."
         else:
+            # Calculate water level percentage based on soil_moisture (4095 = dry, 0 = wet)
+            soil_moisture = sensor_data.get('soil_moisture', 0)
+            # Map 4095 to 0% (dry), 0 to 100% (wet)
+            water_level = round(((4095 - soil_moisture) / 4095) * 100) if soil_moisture <= 4095 else 0
+
             sensor_context = (
                 f"Current sensor data: "
+                f"Soil Moisture: {soil_moisture or 'N/A'}, "
+                f"Water Level: {water_level}%, "
+                f"Water Layer: {sensor_data['water_layer'] or 'N/A'}, "
                 f"Temperature: {sensor_data['temperature'] or 'N/A'}°C, "
                 f"Humidity: {sensor_data['humidity'] or 'N/A'}%, "
-                f"Soil Moisture: {sensor_data['soil_moisture'] or 'N/A'}, "
                 f"Rain Intensity: {sensor_data['rain_intensity'] or 'N/A'}, "
                 f"Rain Detected: {sensor_data['rain_detected'] or 'N/A'}, "
-                f"Water Layer: {sensor_data['water_layer'] or 'N/A'}, "
                 f"Last Update: {sensor_data['last_update'] or 'N/A'}"
             )
 
         # Fetch weather forecast
         weather_context = fetch_weather_forecast()
 
-        # Enhanced prompt with sensor data and weather forecast
-        enhanced_speech_prompt = f"""
-        (System: You are a crop assistant designed to give responses in English. The system receives questions in English (translated from the user's input language) and should provide clear, concise answers in English, equal or limited to 500 characters. Use the following sensor data and weather forecast to answer questions about environmental conditions or weather when relevant: {sensor_context}; {weather_context}. Do not repeat points.)
+        # Enhanced prompt with corrected soil moisture interpretation
+        enhanced_speech_prompt = """
+        (System: You are a crop assistant for {crop_type}. Use sensor data ({sensor_context}) and weather ({weather_context}) to give concise irrigation/soil advice in English. Soil moisture: 4095 is dry (0% water level), 0 is wet (100%). Focus on soil moisture, water level, and water layer for actionable recommendations. Recommend watering for soil moisture ≥2500. Limit to 500 characters. Do not repeat points.)
 
         (user: Question: {question_en})
         """
@@ -423,7 +429,12 @@ def ask_speech():
 
         # Get response from the model in English
         response = enhanced_promptinstance | groqllm | StrOutputParser()
-        answer_en = response.invoke({'question': question_en})
+        answer_en = response.invoke({
+            'question_en': question_en,
+            'crop_type': crop_type,
+            'sensor_context': sensor_context,
+            'weather_context': weather_context
+        })
         # Clean Markdown formatting
         answer_en = re.sub(r'[\*]+', '', answer_en)
         logging.info(f"Cleaned English response: {answer_en}")
@@ -460,7 +471,6 @@ def ask_speech():
     except Exception as e:
         logging.error(f"Error in speech response: {str(e)}")
         return jsonify({'answer': f'Error processing your request: {str(e)}'}), 500
-    
 @app.route('/ask', methods=['POST'])
 def ask():
     question = request.json.get('question')
@@ -1477,8 +1487,20 @@ def update_sensor_data():
             with data_lock:
                 data = request.get_json()
                 sensor_data.update(data)
-                # Add timestamp for when data was updated
                 sensor_data["last_update"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                
+                # Forward data to agrocare-ai
+                try:
+                    forward_url = "https://agrocare-ai-v1vn.onrender.com/sensor-data"
+                    headers = {"Content-Type": "application/json"}
+                    response = requests.post(forward_url, json=data, headers=headers, timeout=5)
+                    if response.status_code == 200:
+                        logging.info(f"Forwarded sensor data to agrocare-ai: {response.json()}")
+                    else:
+                        logging.error(f"Failed to forward to agrocare-ai: {response.status_code} - {response.text}")
+                except requests.RequestException as e:
+                    logging.error(f"Error forwarding to agrocare-ai: {str(e)}")
+            
             return jsonify({"message": "Data updated", "timestamp": sensor_data["last_update"]}), 200
         return jsonify({"error": "Invalid JSON"}), 400
     elif request.method == 'GET':
