@@ -2,7 +2,14 @@ import os
 import re
 import numpy as np
 import joblib
+from tensorflow import lite
+from flask import Flask, render_template, request, jsonify
 import tensorflow as tf
+from werkzeug.utils import secure_filename
+import threading
+import datetime
+from PIL import Image
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from flask import Flask, render_template, request, jsonify, flash, send_from_directory, session, redirect, url_for
 from flask_babel import Babel, _
 from werkzeug.utils import secure_filename
@@ -32,9 +39,6 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 from dateutil import parser
 from translate import Translator
-from PIL import Image
-from tensorflow.keras.preprocessing.image import load_img, img_to_array
-import threading
 
 # Ensure consistent language detection
 DetectorFactory.seed = 0
@@ -47,12 +51,6 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "your_secret_key")
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///kissan_market.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['UPLOAD_FOLDER'] = 'Uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
-app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
-
-# Create upload folder if it doesn't exist
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
@@ -60,9 +58,9 @@ db = SQLAlchemy(app)
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
-# Define keep-alive function to ping the public Render URL
 def keep_alive():
     try:
+        # Ping the public Render URL
         response = requests.get("https://agrocare-ai-v1vn.onrender.com/", timeout=5)
         logging.info(f"Keep-alive ping sent, status code: {response.status_code}")
     except Exception as e:
@@ -75,55 +73,31 @@ scheduler.start()
 
 # Google Drive link for the model
 drive_link = "https://drive.google.com/file/d/1rFdr51QVWy3mpzWPCYgdRH1XCH7Yefv6"
-model_path = os.getenv("MODEL_PATH", "model_quantized.tflite")
-
-# Function to validate TFLite model
-def is_valid_tflite_model(file_path):
-    try:
-        with open(file_path, 'rb') as f:
-            header = f.read(4)
-            return header == b'TFL3'  # TFLite models start with 'TFL3'
-    except Exception as e:
-        logging.error(f"Error validating TFLite model: {str(e)}")
-        return False
+model_path = os.getenv("MODEL_PATH", "my_model.tflite")
 
 # Function to download model from Google Drive
 def download_model_from_drive(drive_link, destination):
-    if os.path.exists(destination) and is_valid_tflite_model(destination):
-        logging.info('Valid TFLite model already exists at destination.')
-        return
-    try:
-        logging.info('Downloading model from Google Drive...')
-        gdown.download(drive_link, destination, quiet=False)
-        if not is_valid_tflite_model(destination):
-            logging.error('Downloaded file is not a valid TFLite model.')
-            os.remove(destination)  # Remove invalid file
-            raise ValueError("Downloaded file is not a valid TFLite model.")
-        logging.info('Model downloaded and validated successfully.')
-    except Exception as e:
-        logging.error(f"Error downloading or validating model: {str(e)}")
-        raise e
+    if not os.path.exists(destination):
+        try:
+            logging.info('Downloading model from Google Drive...')
+            gdown.download(drive_link, destination, quiet=False)
+            logging.info('Model downloaded successfully.')
+        except Exception as e:
+            logging.error(f"Error downloading model: {str(e)}")
+            raise e
 
 labels = {0: 'Healthy', 1: 'Powdery', 2: 'Rust'}
 
 # Download and load the TensorFlow Lite model
-try:
-    download_model_from_drive(drive_link, model_path)
-    interpreter = tf.lite.Interpreter(model_path=model_path)
-    interpreter.allocate_tensors()
+download_model_from_drive(drive_link, model_path)
+interpreter = lite.Interpreter(model_path=model_path)
+interpreter.allocate_tensors()
 
-    # Get input and output details
-    input_details = interpreter.get_input_details()
-    output_details = interpreter.get_output_details()
-
-    logging.info('Model loaded successfully. Check http://127.0.0.1:5000/')
-except Exception as e:
-    logging.error(f"Failed to load TFLite model: {str(e)}")
-    raise RuntimeError(f"Model initialization failed: {str(e)}")
+logging.info('Model loaded. Check http://127.0.0.1:5000/')
 
 # Load the language model
 groqllm = ChatGroq(model="llama3-8b-8192", temperature=0)
-prompt = """(System: You are a crop assistant designed to give responses in the primary language as English. However, if the user asks a question in any language you should respond in the same language as the input. If the language is not one of these, the response will be in English. The system should detect the language of the input and provide a response accordingly. Do not repeat points and keep the response clear and concise.)
+prompt = """(System: You are a crop assistant designed to give responses in English. The system receives questions in English (translated from the user's input language) and should provide clear, concise answers in English. Do not repeat points.)
 
 (user: Question: {question})"""
 promptinstance = ChatPromptTemplate.from_template(prompt)
@@ -234,7 +208,7 @@ class OrderItem(db.Model):
 # Routes
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html')  # Root route to avoid 404
 
 @app.route('/insecticides')
 def insecticides():
@@ -305,11 +279,13 @@ def fertilizer():
     return render_template('fertilizer.html')
 
 def translate_long_text(text, translator, max_length=500):
+    """Split text into chunks under max_length and translate each chunk."""
     if not text:
         return ""
+    # Split text into sentences or chunks
     sentences = []
     current_chunk = ""
-    for sentence in text.split('. '):
+    for sentence in text.split('. '):  # Split by sentence
         if len(current_chunk) + len(sentence) + 2 <= max_length:
             current_chunk += sentence + ". " if sentence else ""
         else:
@@ -319,6 +295,7 @@ def translate_long_text(text, translator, max_length=500):
     if current_chunk:
         sentences.append(current_chunk.strip())
     
+    # Translate each chunk
     translated_chunks = []
     for chunk in sentences:
         try:
@@ -348,17 +325,43 @@ def fetch_sensor_data():
             "last_update": None
         }
 
+# Add this function after existing imports and before any routes (e.g., after fetch_sensor_data)
 def fetch_weather_forecast():
     try:
         api_key = "e10f65c590d431935edaaf55555c6146"
-        lat, lon = 12.9716, 77.5946
+        lat, lon = 12.9716, 77.5946  # Bangalore coordinates
         url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}&units=metric"
         response = requests.get(url, timeout=5)
         response.raise_for_status()
         data = response.json()
         
+        # Extract relevant forecast data (next 24 hours, simplified)
         forecast = []
-        for entry in data['list'][:8]:
+        for entry in data['list'][:8]:  # Next 24 hours (3-hour intervals)
+            dt = datetime.fromtimestamp(entry['dt']).strftime("%Y-%m-%d %H:%M")
+            temp = entry['main']['temp']
+            weather = entry['weather'][0]['description']
+            forecast.append(f"{dt}: {temp}°C, {weather}")
+        
+        forecast_summary = f"Weather forecast for Bangalore: " + "; ".join(forecast)
+        logging.info(f"Fetched weather forecast: {forecast_summary}")
+        return forecast_summary
+    except requests.RequestException as e:
+        logging.error(f"Error fetching weather forecast: {str(e)}")
+        return "No weather forecast available. Please try again later."
+
+def fetch_weather_forecast():
+    try:
+        api_key = "e10f65c590d431935edaaf55555c6146"
+        lat, lon = 12.9716, 77.5946  # Bangalore coordinates
+        url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}&units=metric"
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        data = response.json()
+        
+        # Extract relevant forecast data (next 24 hours, simplified)
+        forecast = []
+        for entry in data['list'][:8]:  # Next 24 hours (3-hour intervals)
             dt = datetime.fromtimestamp(entry['dt']).strftime("%Y-%m-%d %H:%M")
             temp = entry['main']['temp']
             weather = entry['weather'][0]['description']
@@ -376,10 +379,11 @@ def ask_speech():
     data = request.json
     question = data.get('question')
     language = data.get('language', 'en-US')
-    crop_type = data.get('crop_type', 'generic')
+    crop_type = data.get('crop_type', 'generic')  # Default crop type
     logging.info(f"Received speech question: {question} in language: {language}, crop_type: {crop_type}")
 
     try:
+        # Map language codes to translate library language codes
         lang_map = {
             'en-US': 'en',
             'kn-IN': 'kn',
@@ -389,9 +393,11 @@ def ask_speech():
         }
         target_lang = lang_map.get(language, 'en')
 
+        # Initialize translator for the target language
         translator_to_en = Translator(to_lang='en', from_lang=target_lang)
         translator_to_target = Translator(to_lang=target_lang, from_lang='en')
 
+        # Translate question to English if not in English
         question_en = question
         if target_lang != 'en':
             try:
@@ -401,53 +407,53 @@ def ask_speech():
                 logging.error(f"Error translating question to English: {str(e)}")
                 return jsonify({'answer': f'Error translating question: {str(e)}'}), 500
 
-        # Check for mandi-related keywords
-        mandi_keywords = ['mandi', 'Mandi', 'APMC']
-        redirect_url = None
-        if any(keyword.lower() in question_en.lower() for keyword in mandi_keywords):
-            redirect_url = 'https://agrocare-ai-v1vn.onrender.com/mandi' if os.getenv("FLASK_ENV") == "production" else 'http://localhost:5000/mandi'
-            answer_en = "Redirecting you to the Mandi page for market information."
+        # Fetch sensor data
+        sensor_data = fetch_sensor_data()
+        if all(v is None for v in sensor_data.values()):
+            sensor_context = "No sensor data available. Please ensure the sensor device is connected and sending data."
         else:
-            sensor_data = fetch_sensor_data()
-            if all(v is None for v in sensor_data.values()):
-                sensor_context = "No sensor data available. Please ensure the sensor device is connected and sending data."
-            else:
-                soil_moisture = sensor_data.get('soil_moisture', 0)
-                water_level = round(((4095 - soil_moisture) / 4095) * 100) if soil_moisture <= 4095 else 0
+            # Calculate water level percentage based on soil_moisture (4095 = dry, 0 = wet)
+            soil_moisture = sensor_data.get('soil_moisture', 0)
+            # Map 4095 to 0% (dry), 0 to 100% (wet)
+            water_level = round(((4095 - soil_moisture) / 4095) * 100) if soil_moisture <= 4095 else 0
 
-                sensor_context = (
-                    f"Current sensor data: "
-                    f"Soil Moisture: {soil_moisture or 'N/A'}, "
-                    f"Water Level: {water_level}%, "
-                    f"Water Layer: {sensor_data['water_layer'] or 'N/A'}, "
-                    f"Temperature: {sensor_data['temperature'] or 'N/A'}°C, "
-                    f"Humidity: {sensor_data['humidity'] or 'N/A'}%, "
-                    f"Rain Intensity: {sensor_data['rain_intensity'] or 'N/A'}, "
-                    f"Rain Detected: {sensor_data['rain_detected'] or 'N/A'}, "
-                    f"Last Update: {sensor_data['last_update'] or 'N/A'}"
-                )
+            sensor_context = (
+                f"Current sensor data: "
+                f"Soil Moisture: {soil_moisture or 'N/A'}, "
+                f"Water Level: {water_level}%, "
+                f"Water Layer: {sensor_data['water_layer'] or 'N/A'}, "
+                f"Temperature: {sensor_data['temperature'] or 'N/A'}°C, "
+                f"Humidity: {sensor_data['humidity'] or 'N/A'}%, "
+                f"Rain Intensity: {sensor_data['rain_intensity'] or 'N/A'}, "
+                f"Rain Detected: {sensor_data['rain_detected'] or 'N/A'}, "
+                f"Last Update: {sensor_data['last_update'] or 'N/A'}"
+            )
 
-            weather_context = fetch_weather_forecast()
+        # Fetch weather forecast
+        weather_context = fetch_weather_forecast()
 
-            enhanced_speech_prompt = """
-            (System: You are a crop assistant for {crop_type}. Use sensor data ({sensor_context}) and weather ({weather_context}) to give concise irrigation/soil advice in English. Soil moisture: 4095 is dry (0% water level), 0 is wet (100%). Focus on soil moisture, water level, and water layer for actionable recommendations. Recommend watering for soil moisture ≥2500. Limit to 500 characters. Do not repeat points.)
+        # Enhanced prompt with corrected soil moisture interpretation
+        enhanced_speech_prompt = """
+        (System: You are a crop assistant for {crop_type}. Use sensor data ({sensor_context}) and weather ({weather_context}) to give concise irrigation/soil advice in English. Soil moisture: 4095 is dry (0% water level), 0 is wet (100%). Focus on soil moisture, water level, and water layer for actionable recommendations. Recommend watering for soil moisture ≥2500. Limit to 500 characters. Do not repeat points.)
 
-            (user: Question: {question_en})
-            """
-            enhanced_promptinstance = ChatPromptTemplate.from_template(enhanced_speech_prompt)
+        (user: Question: {question_en})
+        """
+        enhanced_promptinstance = ChatPromptTemplate.from_template(enhanced_speech_prompt)
 
-            response = enhanced_promptinstance | groqllm | StrOutputParser()
-            answer_en = response.invoke({
-                'question_en': question_en,
-                'crop_type': crop_type,
-                'sensor_context': sensor_context,
-                'weather_context': weather_context
-            })
-            answer_en = re.sub(r'[\*]+', '', answer_en)
-            logging.info(f"Cleaned English response: {answer_en}")
-
+        # Get response from the model in English
+        response = enhanced_promptinstance | groqllm | StrOutputParser()
+        answer_en = response.invoke({
+            'question_en': question_en,
+            'crop_type': crop_type,
+            'sensor_context': sensor_context,
+            'weather_context': weather_context
+        })
+        # Clean Markdown formatting
+        answer_en = re.sub(r'[\*]+', '', answer_en)
+        logging.info(f"Cleaned English response: {answer_en}")
         formatted_answer_en = format_answer(answer_en)
 
+        # Translate response back to the target language if not English
         answer_translated = answer_en
         if target_lang != 'en':
             try:
@@ -459,22 +465,22 @@ def ask_speech():
                 logging.error(f"Error translating response to {target_lang}: {str(e)}")
                 return jsonify({'answer': f'Error translating response: {str(e)}'}), 500
 
+        # Log the text for audio generation
         logging.info(f"Text for audio generation: {answer_translated}")
+
+        # Format the translated answer for display
         formatted_answer = format_answer(answer_translated)
 
+        # Generate audio in the target language
         audio_filename = generate_audio(answer_translated, target_lang)
         if not audio_filename:
             logging.error("Failed to generate audio file")
             return jsonify({'answer': 'Error generating audio file'}), 500
 
-        response_data = {
+        return jsonify({
             'answer': formatted_answer,
             'audio_url': f"/static/audio/{audio_filename}?t={int(time.time())}"
-        }
-        if redirect_url:
-            response_data['redirect_url'] = redirect_url
-
-        return jsonify(response_data)
+        })
     except Exception as e:
         logging.error(f"Error in speech response: {str(e)}")
         return jsonify({'answer': f'Error processing your request: {str(e)}'}), 500
@@ -493,20 +499,26 @@ def ask():
         return jsonify({'answer': f'Error processing your request: {str(e)}'}), 500
 
 def strip_html_tags(text):
+    """Remove HTML tags from text."""
+    from bs4 import BeautifulSoup
     soup = BeautifulSoup(text, "html.parser")
     return soup.get_text()
 
 def generate_audio(text, lang='en'):
     try:
+        # Strip HTML tags and clean text
         clean_text = strip_html_tags(text)
-        clean_text = re.sub(r'[\*]+', '', clean_text).strip()
+        # Remove Markdown formatting (asterisks, etc.)
+        clean_text = re.sub(r'[\*]+', '', clean_text)  # Remove * or **
+        clean_text = clean_text.strip()
         if not clean_text:
             logging.error("Cleaned text is empty after processing")
             return None
         logging.info(f"Generating audio for text: {clean_text} (lang: {lang})")
-        audio_filename = f"response_{lang}_{int(time.time())}.mp3"
+        audio_filename = f"response_{lang}_{int(time.time())}.mp3"  # Unique filename
         audio_path = os.path.join(AUDIO_DIR, audio_filename)
         
+        # Delete all existing audio files in the AUDIO_DIR
         for existing_file in os.listdir(AUDIO_DIR):
             existing_file_path = os.path.join(AUDIO_DIR, existing_file)
             try:
@@ -516,6 +528,7 @@ def generate_audio(text, lang='en'):
             except Exception as e:
                 logging.error(f"Error deleting existing audio file {existing_file_path}: {str(e)}")
         
+        # Generate and save the new audio file
         tts = gTTS(text=clean_text, lang=lang, slow=False)
         tts.save(audio_path)
         logging.info(f"Audio file generated: {audio_path}")
@@ -556,17 +569,16 @@ def upload():
     except Exception as e:
         logging.error(f"Error processing image: {str(e)}")
         return jsonify({'prediction': f'Error processing image: {str(e)}'}), 500
-    finally:
-        if os.path.exists(file_path):
-            os.remove(file_path)
 
 def getResult(image_path):
     img = load_img(image_path, target_size=(225, 225))
     x = img_to_array(img)
     x = x.astype('float32') / 255.
     x = np.expand_dims(x, axis=0)
+    input_details = interpreter.get_input_details()
     interpreter.set_tensor(input_details[0]['index'], x)
     interpreter.invoke()
+    output_details = interpreter.get_output_details()
     predictions = interpreter.get_tensor(output_details[0]['index'])[0]
     return predictions
 
@@ -766,7 +778,7 @@ nltk.download('vader_lexicon', download_dir=nltk.data.path[0])
 
 RSS_FEEDS = {
     "india": "https://feeds.feedburner.com/ndtvnews-india-news",
-    "world": "https://feeds.feedburner.com/ndtvnews-world-nEws",
+    "world": "https://feeds.feedburner.com/ndtvnews-world-news",
     "education": {"The Hindu Education": "https://www.thehindu.com/education/feeder/default.rss"},
     "agriculture": {"The Hindu Agriculture": "https://www.thehindu.com/sci-tech/agriculture/feeder/default.rss"},
     "health": "https://www.thehindu.com/sci-tech/health/feeder/default.rss",
@@ -1166,7 +1178,7 @@ def orders():
 def order_detail(order_id):
     if 'user_id' not in session:
         flash('Please login to view order details')
-        return redirect(url_for('login'))
+        return redirect(url_for('orders'))
     order = Order.query.get_or_404(order_id)
     if order.user_id != session['user_id'] and session['user_type'] != 'farmer':
         flash('You do not have permission to view this order')
@@ -1183,7 +1195,28 @@ def order_detail(order_id):
     return render_template('order_detail.html', order=order, items=items)
 
 # Disease Diagnosis
+app.config['UPLOAD_FOLDER'] = 'Uploads'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
+app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg'}
+
+# Create upload folder if it doesn't exist
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# Define image size
 IMG_SIZE = (256, 256)
+
+# Load the TFLite model
+model_path = 'model_quantized.tflite'
+interpreter = tf.lite.Interpreter(model_path=model_path)
+interpreter.allocate_tensors()
+
+# Get input and output details
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
+# Log model input details for debugging
+print("Input details:", input_details)
+print("Output details:", output_details)
 
 # Original class names
 original_class_names = [
@@ -1321,7 +1354,7 @@ disease_info = {
         "seasonal_risk": "Late summer, in wet conditions."
     },
     "Spider_mites Two-spotted_spider_mite": {
-        "disease_name": "Spider Mites (Two-spotted)",
+        "disease_name": "Spider Mites (Two-Spotted)",
         "symptoms": "Tiny yellow spots on leaves, webbing, leaf drop.",
         "organic_cure": "Spray with water, use insecticidal soap, introduce predatory mites.",
         "prevention_tips": "Maintain humidity, monitor plants, avoid dust buildup.",
@@ -1351,41 +1384,49 @@ disease_info = {
 }
 
 def allowed_file(filename):
+    """Check if the file extension is allowed"""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
 def get_modified_class_name(original_name):
+    """Strip crop prefix from class name"""
     return original_name.split("___")[-1].replace(",_", "_")
 
 def preprocess_image(image_file):
+    """Preprocess image for prediction"""
     try:
-        img = Image.open(image_file).convert('RGB')
+        img = Image.open(image_file).convert('RGB')  # Ensure RGB format
         img = img.resize(IMG_SIZE)
-        img_array = np.array(img, dtype=np.float32)
-        img_array = np.expand_dims(img_array, 0)
-        img_array = img_array / 255.0
+        img_array = np.array(img, dtype=np.float32)  # Explicitly set to float32
+        img_array = np.expand_dims(img_array, 0)     # Add batch dimension
+        img_array = img_array / 255.0                # Rescale to [0, 1]
         return img_array
     except Exception as e:
         raise ValueError(f"Image preprocessing failed: {str(e)}")
 
 def predict_disease(image_file):
+    """Make prediction using TFLite model"""
     try:
         input_data = preprocess_image(image_file)
+        
+        print("Input shape:", input_data.shape)
+        print("Input dtype:", input_data.dtype)
+        
         interpreter.set_tensor(input_details[0]['index'], input_data)
         interpreter.invoke()
         output_data = interpreter.get_tensor(output_details[0]['index'])
         
+        print("Raw output:", output_data[0])
+        
         predicted_class = np.argmax(output_data[0])
-        # Ensure confidence is calculated as a percentage (0-100)
-        confidence = float(np.max(output_data[0]))  # Get max probability
-        if confidence > 1.0:  # Handle cases where output isn't normalized
-            confidence = confidence / np.sum(output_data[0]) if np.sum(output_data[0]) != 0 else 0.0
-        confidence = min(max(confidence * 100, 0.0), 100.0)  # Scale to percentage and clamp
-        modified_predicted_name = get_modified_class_name(original_class_names[predicted_class])
+        confidence = float(np.max(output_data[0]))
+        
+        original_predicted_name = original_class_names[predicted_class]
+        modified_predicted_name = get_modified_class_name(original_predicted_name)
         disease_details = disease_info.get(modified_predicted_name, {})
         
         return {
             "disease_name": disease_details.get("disease_name", "Unknown"),
-            "confidence": round(confidence, 2),
+            "confidence": confidence,
             "symptoms": disease_details.get("symptoms", "No information available"),
             "organic_cure": disease_details.get("organic_cure", "No information available"),
             "prevention_tips": disease_details.get("prevention_tips", "No information available"),
@@ -1396,10 +1437,12 @@ def predict_disease(image_file):
 
 @app.route('/leaf-diagnosis')
 def leaf_diagnosis():
+    """Render the leaf diagnosis page"""
     return render_template('leaf_diagnosis.html')
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    """Handle file upload and prediction"""
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
     
@@ -1460,10 +1503,11 @@ def update_sensor_data():
 
 @app.route('/sensor-dashboard')
 def sensor_dashboard():
+    """Render the sensor dashboard page"""
     return render_template('sensor_dashboard.html')
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()
+        db.create_all()  # Create database tables
     port = int(os.getenv("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=False)
