@@ -371,10 +371,6 @@ header {
                 <div class="search-wrapper">
                     <input type="text" id="questionInput" placeholder="Ask any farming related question..." onfocus="hideExamples()" oninput="hideExamples()">
                     <div class="action-buttons">
-                        <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="uploadImage();">
-                        <button class="upload-btn" onclick="document.getElementById('imageInput').click();" title="Upload plant image for disease detection">
-                            <img src="{{ url_for('static', filename='cam2.png') }}" alt="Camera">
-                        </button>
                         <button class="submit-btn" onclick="submitQuestion()" title="Send question">
                             <img src="{{ url_for('static', filename='send1.png') }}" alt="Send">
                         </button>
