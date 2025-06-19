@@ -1053,56 +1053,57 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 'image/jpeg');
     }
 
-    function analyzeImage() {
-        if (!selectedFile) {
-            showError('Please select or capture an image first');
-            return;
-        }
-
-        loadingContainer.style.display = 'block';
-        resultSection.style.display = 'none';
-        errorMessage.style.display = 'none';
-
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-
-        console.log('Analyzing file:', selectedFile.name);
-
-        fetch('/upload', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                const result = data.result;
-                const confidencePercent = Math.round(result.confidence * 100);
-
-                // Update UI with results
-                diseaseName.textContent = result.disease_name;
-                confidenceValue.textContent = confidencePercent;
-                confidenceFill.style.width = `${confidencePercent}%`;
-                symptoms.textContent = result.symptoms;
-                organicCure.textContent = result.organic_cure;
-                preventionTips.textContent = result.prevention_tips;
-                seasonalRisk.textContent = result.seasonal_risk;
-
-                loadingContainer.style.display = 'none';
-                resultSection.style.display = 'block';
-            } else {
-                showError(data.error || 'Analysis failed. Please try again.');
-            }
-        })
-        .catch(error => {
-            console.error('Fetch error:', error);
-            showError('An error occurred while analyzing the image.');
-        });
+function analyzeImage() {
+    if (!selectedFile) {
+        showError('Please select or capture an image first');
+        return;
     }
+
+    loadingContainer.style.display = 'block';
+    resultSection.style.display = 'none';
+    errorMessage.style.display = 'none';
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    console.log('Analyzing file:', selectedFile.name);
+
+    fetch('/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            const result = data.result;
+            // Use confidence directly as it is already in percentage
+            const confidencePercent = Math.round(result.confidence);
+
+            // Update UI with results
+            diseaseName.textContent = result.disease_name;
+            confidenceValue.textContent = confidencePercent;
+            confidenceFill.style.width = `${confidencePercent}%`;
+            symptoms.textContent = result.symptoms;
+            organicCure.textContent = result.organic_cure;
+            preventionTips.textContent = result.prevention_tips;
+            seasonalRisk.textContent = result.seasonal_risk;
+
+            loadingContainer.style.display = 'none';
+            resultSection.style.display = 'block';
+        } else {
+            showError(data.error || 'Analysis failed. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        showError('An error occurred while analyzing the image.');
+    });
+}
 });
 </script>
   <!-- Google Translate Widget -->

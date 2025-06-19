@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AgroCare</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <style>
+   <style>
 :root {
     --primary: #00ff9d;
     --secondary: #0a192f;
@@ -28,12 +28,15 @@ body {
     flex-direction: column;
     position: relative;
     overflow-x: hidden;
-    background-image: url('{{ url_for("static", filename="bg15.avif") }}');
+    /* Background image added here */
+    background-image: url('{{ url_for("static", filename="bg15.avif") }}'); /* Replace with your actual image path */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: fixed;
+    background-attachment: fixed; /* This keeps the image fixed during scroll */
 }
+
+/* Removed the pseudo-element that had the gradients */
 
 header {
     padding: 2rem;
@@ -81,7 +84,7 @@ header {
 }
 
 .button-container button {
-    background: rgba(10, 25, 47, 0.7);
+    background: rgba(10, 25, 47, 0.7); /* More opaque for better readability */
     border: 1px solid var(--accent);
     color: var(--accent);
     padding: 0.8rem 1.5rem;
@@ -159,6 +162,7 @@ header {
     height: 24px;
 }
 
+/* Modal Styles */
 .modal {
     display: none;
     position: fixed;
@@ -295,23 +299,13 @@ header {
 }
 
 .completion strong {
-    color: #000000;
+    color: #000000;    ;
     font-weight: bold;
 }
 
 .completion h3, .completion h4 {
     color: var(--accent);
     margin: 1.5rem 0 0.75rem 0;
-}
-
-.completion a {
-    color: var(--accent);
-    transition: color 0.3s ease;
-}
-
-.completion a:hover {
-    color: var(--primary);
-    text-decoration: none;
 }
 
 @media (max-width: 768px) {
@@ -328,71 +322,7 @@ header {
         margin: 20% auto;
     }
 }
-
-#google_translate_element {
-    position: fixed;
-    top: 10px;
-    right: 20px;
-    z-index: 1000;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 5px;
-    border-radius: 6px;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.goog-te-gadget-simple {
-    border: none !important;
-    border-radius: 4px !important;
-    padding: 8px 12px !important;
-    font-family: Arial, sans-serif !important;
-    font-size: 14px !important;
-    background-color: #9ffff5 !important;
-    color: white !important;
-    cursor: pointer !important;
-    transition: 0.3s ease-in-out;
-}
-
-.goog-te-gadget-simple:hover {
-    background-color: #3a5b0c !important;
-}
-
-.goog-te-menu-value {
-    color: white !important;
-    text-decoration: none !important;
-    margin: 0 !important;
-}
-
-.goog-te-gadget img,
-.goog-te-banner-frame,
-.skiptranslate > iframe.skiptranslate {
-    display: none !important;
-}
-
-body {
-    top: 0 !important;
-    position: static !important;
-}
-
-html, body {
-    height: 100%;
-    min-height: 100vh;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}
-
-@media (max-width: 768px) {
-    #google_translate_element {
-        top: 50px;
-        right: 10px;
-    }
-
-    .goog-te-gadget-simple {
-        padding: 6px 10px !important;
-        font-size: 13px !important;
-    }
-}
-    </style>
+</style>
 </head>
 <body>
     <div id="welcomeModal" class="modal">
@@ -434,13 +364,17 @@ html, body {
             <div class="button-container">
                 <button id="homeButton" onclick="window.location.href='{{ url_for('index') }}'">Home</button>
                 <button id="letsTalkButton" onclick="window.location.href='{{ url_for('speech') }}'">Let's Talk</button>
-                <button id="weatherButton" onclick="showLeafDiagnosisMessage()">Leaf Diagnosis</button>
+                <button id="weatherButton" onclick="window.location.href='{{ url_for('leaf_diagnosis') }}'">Leaf Diagnosis</button>
                 <button id="refresh-button" onclick="location.reload();">Refresh</button>
             </div>
             <div class="search-container">
                 <div class="search-wrapper">
                     <input type="text" id="questionInput" placeholder="Ask any farming related question..." onfocus="hideExamples()" oninput="hideExamples()">
                     <div class="action-buttons">
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="uploadImage();">
+                        <button class="upload-btn" onclick="document.getElementById('imageInput').click();" title="Upload plant image for disease detection">
+                            <img src="{{ url_for('static', filename='cam2.png') }}" alt="Camera">
+                        </button>
                         <button class="submit-btn" onclick="submitQuestion()" title="Send question">
                             <img src="{{ url_for('static', filename='send1.png') }}" alt="Send">
                         </button>
@@ -526,52 +460,125 @@ html, body {
                 }
             });
         }
-
-        function showLeafDiagnosisMessage() {
-            const message = `
-                <div class="completion">
-                    <p>Due to free tire deployment, the Leaf Disease Diagnosis functionality is temporarily hosted separately. To access it, please <a href="https://plant-disease-detection-68m2.onrender.com/" target="_blank" style="color: #361eff; text-decoration: underline;">click here</a>.</p>
-                </div>
-            `;
-            document.getElementById('botResponse').innerHTML = message;
-            hideExamples();
-        }
-
-        window.onload = function() {
-            document.getElementById('welcomeModal').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('welcomeModal').style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            var modal = document.getElementById('welcomeModal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
     </script>
 
-    <div id="google_translate_element"></div>
+<script>
+    // Show modal on page load
+    window.onload = function() {
+        document.getElementById('welcomeModal').style.display = 'block';
+    }
 
-    <script type="text/javascript">
-        function googleTranslateElementInit() {
-            new google.translate.TranslateElement({
-                pageLanguage: 'en',
-                includedLanguages: 'en,hi,mr,ta,te,kn,ml,gu,pa,bn,or,as,ur,sa',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                autoDisplay: false
-            }, 'google_translate_element');
+    // Close modal function
+    function closeModal() {
+        document.getElementById('welcomeModal').style.display = 'none';
+    }
+
+    // Close modal if clicking outside
+    window.onclick = function(event) {
+        var modal = document.getElementById('welcomeModal');
+        if (event.target == modal) {
+            modal.style.display = 'none';
         }
+    }
 
-        window.addEventListener("pageshow", function () {
-            if (!document.querySelector(".goog-te-gadget")) {
-                googleTranslateElementInit();
-            }
-        });
-    </script>
+    // Your existing JavaScript functions remain the same
+</script>
+  <!-- Google Translate Widget -->
+<div id="google_translate_element"></div>
 
-    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script type="text/javascript">
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'en',
+        includedLanguages: 'en,hi,mr,ta,te,kn,ml,gu,pa,bn,or,as,ur,sa',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+        autoDisplay: false
+      }, 'google_translate_element');
+    }
+  
+    // Reinitialize when navigating back
+    window.addEventListener("pageshow", function () {
+      if (!document.querySelector(".goog-te-gadget")) {
+        googleTranslateElementInit();
+      }
+    });
+  </script>
+  
+
+<!-- Load Google Translate API -->
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+<style>
+  /* Positioning the Google Translate Widget */
+  #google_translate_element {
+    position: fixed;
+    top: 10px;  /* Adjust for better positioning */
+    right: 20px;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 5px;
+    border-radius: 6px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Styling the Google Translate dropdown */
+  .goog-te-gadget-simple {
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 8px 12px !important;
+    font-family: Arial, sans-serif !important;
+    font-size: 14px !important;
+    background-color: #9ffff5 !important; /* Green theme */
+    color: white !important;
+    cursor: pointer !important;
+    transition: 0.3s ease-in-out;
+  }
+
+  .goog-te-gadget-simple:hover {
+    background-color: #3a5b0c !important; /* Darker on hover */
+  }
+
+  .goog-te-menu-value {
+    color: white !important;
+    text-decoration: none !important;
+    margin: 0 !important;
+  }
+
+  /* Hide the Google Translate logo and branding */
+  .goog-te-gadget img,
+  .goog-te-banner-frame,
+  .skiptranslate > iframe.skiptranslate {
+    display: none !important;
+  }
+
+  /* Prevent body from shifting when Google Translate loads */
+  body {
+    top: 0 !important;
+    position: static !important;
+  }
+
+  /* Ensure background extends fully */
+  html, body {
+    height: 100%;
+    min-height: 100vh;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  /* Responsive Design for Mobile */
+  @media (max-width: 768px) {
+    #google_translate_element {
+      top: 50px;
+      right: 10px;
+    }
+
+    .goog-te-gadget-simple {
+      padding: 6px 10px !important;
+      font-size: 13px !important;
+    }
+  }
+</style>
+
 </body>
 </html>
