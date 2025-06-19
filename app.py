@@ -77,29 +77,49 @@ scheduler.start()
 drive_link = "https://drive.google.com/file/d/1rFdr51QVWy3mpzWPCYgdRH1XCH7Yefv6"
 model_path = os.getenv("MODEL_PATH", "model_quantized.tflite")
 
+# Function to validate TFLite model
+def is_valid_tflite_model(file_path):
+    try:
+        with open(file_path, 'rb') as f:
+            header = f.read(4)
+            return header == b'TFL3'  # TFLite models start with 'TFL3'
+    except Exception as e:
+        logging.error(f"Error validating TFLite model: {str(e)}")
+        return False
+
 # Function to download model from Google Drive
 def download_model_from_drive(drive_link, destination):
-    if not os.path.exists(destination):
-        try:
-            logging.info('Downloading model from Google Drive...')
-            gdown.download(drive_link, destination, quiet=False)
-            logging.info('Model downloaded successfully.')
-        except Exception as e:
-            logging.error(f"Error downloading model: {str(e)}")
-            raise e
+    if os.path.exists(destination) and is_valid_tflite_model(destination):
+        logging.info('Valid TFLite model already exists at destination.')
+        return
+    try:
+        logging.info('Downloading model from Google Drive...')
+        gdown.download(drive_link, destination, quiet=False)
+        if not is_valid_tflite_model(destination):
+            logging.error('Downloaded file is not a valid TFLite model.')
+            os.remove(destination)  # Remove invalid file
+            raise ValueError("Downloaded file is not a valid TFLite model.")
+        logging.info('Model downloaded and validated successfully.')
+    except Exception as e:
+        logging.error(f"Error downloading or validating model: {str(e)}")
+        raise e
 
 labels = {0: 'Healthy', 1: 'Powdery', 2: 'Rust'}
 
 # Download and load the TensorFlow Lite model
-download_model_from_drive(drive_link, model_path)
-interpreter = tf.lite.Interpreter(model_path=model_path)
-interpreter.allocate_tensors()
+try:
+    download_model_from_drive(drive_link, model_path)
+    interpreter = tf.lite.Interpreter(model_path=model_path)
+    interpreter.allocate_tensors()
 
-# Get input and output details
-input_details = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
+    # Get input and output details
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
 
-logging.info('Model loaded successfully. Check http://127.0.0.1:5000/')
+    logging.info('Model loaded successfully. Check http://127.0.0.1:5000/')
+except Exception as e:
+    logging.error(f"Failed to load TFLite model: {str(e)}")
+    raise RuntimeError(f"Model initialization failed: {str(e)}")
 
 # Load the language model
 groqllm = ChatGroq(model="llama3-8b-8192", temperature=0)
@@ -381,43 +401,51 @@ def ask_speech():
                 logging.error(f"Error translating question to English: {str(e)}")
                 return jsonify({'answer': f'Error translating question: {str(e)}'}), 500
 
-        sensor_data = fetch_sensor_data()
-        if all(v is None for v in sensor_data.values()):
-            sensor_context = "No sensor data available. Please ensure the sensor device is connected and sending data."
+        # Check for mandi-related keywords
+        mandi_keywords = ['mandi', 'Mandi', 'APMC']
+        redirect_url = None
+        if any(keyword.lower() in question_en.lower() for keyword in mandi_keywords):
+            redirect_url = 'https://agrocare-ai-v1vn.onrender.com/mandi' if os.getenv("FLASK_ENV") == "production" else 'http://localhost:5000/mandi'
+            answer_en = "Redirecting you to the Mandi page for market information."
         else:
-            soil_moisture = sensor_data.get('soil_moisture', 0)
-            water_level = round(((4095 - soil_moisture) / 4095) * 100) if soil_moisture <= 4095 else 0
+            sensor_data = fetch_sensor_data()
+            if all(v is None for v in sensor_data.values()):
+                sensor_context = "No sensor data available. Please ensure the sensor device is connected and sending data."
+            else:
+                soil_moisture = sensor_data.get('soil_moisture', 0)
+                water_level = round(((4095 - soil_moisture) / 4095) * 100) if soil_moisture <= 4095 else 0
 
-            sensor_context = (
-                f"Current sensor data: "
-                f"Soil Moisture: {soil_moisture or 'N/A'}, "
-                f"Water Level: {water_level}%, "
-                f"Water Layer: {sensor_data['water_layer'] or 'N/A'}, "
-                f"Temperature: {sensor_data['temperature'] or 'N/A'}°C, "
-                f"Humidity: {sensor_data['humidity'] or 'N/A'}%, "
-                f"Rain Intensity: {sensor_data['rain_intensity'] or 'N/A'}, "
-                f"Rain Detected: {sensor_data['rain_detected'] or 'N/A'}, "
-                f"Last Update: {sensor_data['last_update'] or 'N/A'}"
-            )
+                sensor_context = (
+                    f"Current sensor data: "
+                    f"Soil Moisture: {soil_moisture or 'N/A'}, "
+                    f"Water Level: {water_level}%, "
+                    f"Water Layer: {sensor_data['water_layer'] or 'N/A'}, "
+                    f"Temperature: {sensor_data['temperature'] or 'N/A'}°C, "
+                    f"Humidity: {sensor_data['humidity'] or 'N/A'}%, "
+                    f"Rain Intensity: {sensor_data['rain_intensity'] or 'N/A'}, "
+                    f"Rain Detected: {sensor_data['rain_detected'] or 'N/A'}, "
+                    f"Last Update: {sensor_data['last_update'] or 'N/A'}"
+                )
 
-        weather_context = fetch_weather_forecast()
+            weather_context = fetch_weather_forecast()
 
-        enhanced_speech_prompt = """
-        (System: You are a crop assistant for {crop_type}. Use sensor data ({sensor_context}) and weather ({weather_context}) to give concise irrigation/soil advice in English. Soil moisture: 4095 is dry (0% water level), 0 is wet (100%). Focus on soil moisture, water level, and water layer for actionable recommendations. Recommend watering for soil moisture ≥2500. Limit to 500 characters. Do not repeat points.)
+            enhanced_speech_prompt = """
+            (System: You are a crop assistant for {crop_type}. Use sensor data ({sensor_context}) and weather ({weather_context}) to give concise irrigation/soil advice in English. Soil moisture: 4095 is dry (0% water level), 0 is wet (100%). Focus on soil moisture, water level, and water layer for actionable recommendations. Recommend watering for soil moisture ≥2500. Limit to 500 characters. Do not repeat points.)
 
-        (user: Question: {question_en})
-        """
-        enhanced_promptinstance = ChatPromptTemplate.from_template(enhanced_speech_prompt)
+            (user: Question: {question_en})
+            """
+            enhanced_promptinstance = ChatPromptTemplate.from_template(enhanced_speech_prompt)
 
-        response = enhanced_promptinstance | groqllm | StrOutputParser()
-        answer_en = response.invoke({
-            'question_en': question_en,
-            'crop_type': crop_type,
-            'sensor_context': sensor_context,
-            'weather_context': weather_context
-        })
-        answer_en = re.sub(r'[\*]+', '', answer_en)
-        logging.info(f"Cleaned English response: {answer_en}")
+            response = enhanced_promptinstance | groqllm | StrOutputParser()
+            answer_en = response.invoke({
+                'question_en': question_en,
+                'crop_type': crop_type,
+                'sensor_context': sensor_context,
+                'weather_context': weather_context
+            })
+            answer_en = re.sub(r'[\*]+', '', answer_en)
+            logging.info(f"Cleaned English response: {answer_en}")
+
         formatted_answer_en = format_answer(answer_en)
 
         answer_translated = answer_en
@@ -439,10 +467,14 @@ def ask_speech():
             logging.error("Failed to generate audio file")
             return jsonify({'answer': 'Error generating audio file'}), 500
 
-        return jsonify({
+        response_data = {
             'answer': formatted_answer,
             'audio_url': f"/static/audio/{audio_filename}?t={int(time.time())}"
-        })
+        }
+        if redirect_url:
+            response_data['redirect_url'] = redirect_url
+
+        return jsonify(response_data)
     except Exception as e:
         logging.error(f"Error in speech response: {str(e)}")
         return jsonify({'answer': f'Error processing your request: {str(e)}'}), 500
