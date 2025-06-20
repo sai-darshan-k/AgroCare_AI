@@ -682,14 +682,19 @@
         </div>
     </div>
 
-    <script>
-// Constants for water level thresholds (now based on percentage)
+ <script>
+// Constants for water level thresholds
 const WATER_LEVELS = {
     THRESHOLDS: {
-        VERY_WET: 0,   // 0% water (dry)
+        VERY_WET: 2500,
+        SHALLOW_WET: 1700,
+        MODERATELY_WET: 1300
+    },
+    PERCENTAGES: {
+        VERY_WET: 0,
         SHALLOW_WET: 40,
-        MODERATELY_WET: 60,
-        DEEP_WET: 80
+        MODERATELY_WET: 75,
+        DEEP_WET: 95
     }
 };
 
@@ -699,13 +704,13 @@ const historyData = {
     humidity: [],
     rainIntensity: [],
     soilMoisture: [],
-    waterLevel: [], // Store percentages
+    waterLevel: [],
     rainEvents: 0,
     lastRainDuration: 0,
     rainStartTime: null
 };
 
-// Initialize charts (unchanged)
+// Initialize charts
 const rainIntensityChart = new ApexCharts(document.getElementById('rainIntensityChart'), {
     series: [{
         name: 'Rain Intensity',
@@ -848,25 +853,25 @@ const soilChart = new ApexCharts(document.getElementById('soilChart'), {
 soilChart.render();
 
 // Helper functions
-function convertSoilMoistureToWaterLevel(soilMoisture) {
-    if (soilMoisture == null || isNaN(soilMoisture) || soilMoisture > 4095 || soilMoisture < 0) {
-        return 0; // Default to 0% if invalid
-    }
-    return Math.round(((4095 - soilMoisture) / 4095) * 100); // Same as speech module
-}
-
-function getWaterStatus(percentage) {
-    if (percentage <= WATER_LEVELS.THRESHOLDS.VERY_WET) return 'Dry';
-    if (percentage <= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return 'Shallow Wet';
-    if (percentage <= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return 'Moderately Wet';
+function getWaterStatus(value) {
+    if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return 'Dry';
+    if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return 'Shallow Wet';
+    if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return 'Moderately Wet';
     return 'Deep Wet';
 }
 
-function getWaterColor(percentage) {
-    if (percentage <= WATER_LEVELS.THRESHOLDS.VERY_WET) return '#e74c3c'; // Red for dry
-    if (percentage <= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return '#f39c12'; // Orange for shallow
-    if (percentage <= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return '#3498db'; // Blue for moderate
-    return '#2ecc71'; // Green for deep
+function getWaterColor(value) {
+    if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return '#3498db';
+    if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return '#2980b9';
+    if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return '#1f618d';
+    return '#154360';
+}
+
+function getWaterPercentage(value) {
+    if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return WATER_LEVELS.PERCENTAGES.VERY_WET;
+    if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return WATER_LEVELS.PERCENTAGES.SHALLOW_WET;
+    if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return WATER_LEVELS.PERCENTAGES.MODERATELY_WET;
+    return WATER_LEVELS.PERCENTAGES.DEEP_WET;
 }
 
 function getSoilStatus(value) {
@@ -905,8 +910,15 @@ function calculateMax(arr) {
     return Math.max(...arr).toFixed(1);
 }
 
-function updateWaterLevel(percentage) {
-    if (percentage == null || isNaN(percentage)) {
+function convertSoilMoistureToWaterLevel(soilMoisture) {
+    if (soilMoisture == null || isNaN(soilMoisture) || soilMoisture > 4095 || soilMoisture < 0) {
+        return 0; // Default to 0 for invalid values
+    }
+    return Math.round(((4095 - soilMoisture) / 4095) * 100); // Match speech module formula
+}
+
+function updateWaterLevel(value) {
+    if (value == null || isNaN(value)) {
         document.getElementById('water-percentage').textContent = '--%';
         document.getElementById('water-status').textContent = 'No Data';
         document.getElementById('water-fill').style.height = '0%';
@@ -914,29 +926,31 @@ function updateWaterLevel(percentage) {
         return;
     }
 
-    const status = getWaterStatus(percentage);
-    const color = getWaterColor(percentage);
+    const displayPercentage = convertSoilMoistureToWaterLevel(value); // Use speech module formula for display
+    const thresholdPercentage = getWaterPercentage(value); // Use original thresholds for status/color
+    const status = getWaterStatus(value);
+    const color = getWaterColor(value);
 
     const waterFill = document.getElementById('water-fill');
     const waterPercentage = document.getElementById('water-percentage');
     const waterStatus = document.getElementById('water-status');
 
-    waterFill.style.height = `${percentage}%`;
+    waterFill.style.height = `${displayPercentage}%`; // Match fill height to displayed percentage
     waterFill.style.backgroundColor = color;
-    waterPercentage.textContent = `${percentage}%`;
+    waterPercentage.textContent = `${displayPercentage}%`;
     waterStatus.textContent = status;
     
     // Update water trend and change
     document.getElementById('water-updated').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     if (historyData.waterLevel.length > 1) {
         const lastValue = historyData.waterLevel[historyData.waterLevel.length - 2];
-        const change = percentage - lastValue;
-        document.getElementById('water-change').textContent = (change >= 0 ? '+' : '') + change.toFixed(1) + '%';
+        const change = thresholdPercentage - lastValue;
+        document.getElementById('water-change').textContent = (change >= 0 ? '+' : '') + change + '%';
     }
 }
 
 function updateRainStatus(rainDetected) {
-    const rainStatus = document.getfullstack_id('rain-status');
+    const rainStatus = document.getElementById('rain-status');
     const rainImage = document.getElementById('rain-image');
     const currentHour = new Date().getHours();
     const currentTime = new Date();
@@ -968,14 +982,6 @@ function updateRainStatus(rainDetected) {
             historyData.rainStartTime = null;
         }
     }
-}
-
-function getSoilStatus(value) {
-    if (value > 2500) return 'Very Dry';
-    if (value > 2000) return 'Dry';
-    if (value > 1500) return 'Slightly Dry';
-    if (value > 1000) return 'Moist';
-    return 'Wet';
 }
 
 function updateCharts(time, data) {
@@ -1083,10 +1089,10 @@ async function updateDashboard() {
         updateCharts(currentTime, data);
         
         if (data.soil_moisture !== null) {
-            const waterLevel = convertSoilMoistureToWaterLevel(data.soil_moisture);
+            const waterLevel = getWaterPercentage(data.soil_moisture);
             historyData.waterLevel.push(waterLevel);
             if (historyData.waterLevel.length > 10) historyData.waterLevel.shift();
-            updateWaterLevel(waterLevel);
+            updateWaterLevel(data.soil_moisture);
         }
         
     } catch (error) {
@@ -1165,20 +1171,19 @@ function generateEnvironmentalAnalysis(data) {
         analysis.push(humidityAnalysis);
     }
     
-    // Soil moisture and water level analysis
+    // Soil moisture analysis
     if (data.soil_moisture !== null) {
-        const waterLevel = convertSoilMoistureToWaterLevel(data.soil_moisture);
         let soilAnalysis = "";
         if (data.soil_moisture > 2500) {
-            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span> (Water level: <span class="analysis-highlight">${waterLevel}%</span>), indicating <span class="analysis-alert">critically dry soil</span>. Immediate watering is recommended to prevent plant wilting and root damage.</p>`;
+            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-alert">critically dry soil</span>. Immediate watering is recommended to prevent plant wilting and root damage.</p>`;
         } else if (data.soil_moisture > 2000) {
-            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span> (Water level: <span class="analysis-highlight">${waterLevel}%</span>), indicating <span class="analysis-alert">dry soil conditions</span>. Watering is recommended within the next 12-24 hours.</p>`;
+            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-alert">dry soil conditions</span>. Watering is recommended within the next 12-24 hours.</p>`;
         } else if (data.soil_moisture > 1500) {
-            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span> (Water level: <span class="analysis-highlight">${waterLevel}%</span>), indicating <span class="analysis-highlight">slightly dry soil</span>. Monitor conditions, especially if weather is hot or windy.</p>`;
+            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-highlight">slightly dry soil</span>. Monitor conditions, especially if weather is hot or windy.</p>`;
         } else if (data.soil_moisture > 1000) {
-            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span> (Water level: <span class="analysis-highlight">${waterLevel}%</span>), indicating <span class="analysis-good">ideal moisture levels</span>. Soil has good moisture content while maintaining adequate aeration for root health.</p>`;
+            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-good">ideal moisture levels</span>. Soil has good moisture content while maintaining adequate aeration for root health.</p>`;
         } else {
-            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span> (Water level: <span class="analysis-highlight">${waterLevel}%</span>), indicating <span class="analysis-alert">very wet conditions</span>. Avoid additional watering to prevent root rot and oxygen deprivation.</p>`;
+            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-alert">very wet conditions</span>. Avoid additional watering to prevent root rot and oxygen deprivation.</p>`;
         }
         analysis.push(soilAnalysis);
     }
@@ -1221,11 +1226,8 @@ function generateEnvironmentalAnalysis(data) {
     
     if (data.humidity !== null && (data.humidity > 85 || data.humidity < 30)) stressPoints += 1;
     
-    if (data.soil_moisture !== null) {
-        const waterLevel = convertSoilMoistureToWaterLevel(data.soil_moisture);
-        if (waterLevel < 20 || waterLevel > 80) stressPoints += 2;
-        else if (waterLevel < 30 || waterLevel > 70) stressPoints += 1;
-    }
+    if (data.soil_moisture !== null && (data.soil_moisture > 2200 || data.soil_moisture < 800)) stressPoints += 2;
+    else if (data.soil_moisture !== null && (data.soil_moisture > 1800 || data.soil_moisture < 900)) stressPoints += 1;
     
     if (stressPoints >= 4) {
         integratedAnalysis += `<span class="analysis-alert">Multiple environmental stressors detected</span>. Immediate attention recommended to prevent plant damage.</p>`;
