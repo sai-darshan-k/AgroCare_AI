@@ -683,289 +683,275 @@
     </div>
 
     <script>
-    // Constants for water level thresholds
-    const WATER_LEVELS = {
-        THRESHOLDS: {
-            VERY_WET: 2500,
-            SHALLOW_WET: 1700,
-            MODERATELY_WET: 1300
-        },
-        PERCENTAGES: {
-            VERY_WET: 0,
-            SHALLOW_WET: 40,
-            MODERATELY_WET: 75,
-            DEEP_WET: 95
-        }
-    };
+// Constants for water level thresholds (now based on percentage)
+const WATER_LEVELS = {
+    THRESHOLDS: {
+        VERY_WET: 0,   // 0% water (dry)
+        SHALLOW_WET: 40,
+        MODERATELY_WET: 60,
+        DEEP_WET: 80
+    }
+};
 
-    // Store historical data for trends
-    const historyData = {
-        temperature: [],
-        humidity: [],
-        rainIntensity: [],
-        soilMoisture: [],
-        waterLevel: [],
-        rainEvents: 0,
-        lastRainDuration: 0,
-        rainStartTime: null
-    };
+// Store historical data for trends
+const historyData = {
+    temperature: [],
+    humidity: [],
+    rainIntensity: [],
+    soilMoisture: [],
+    waterLevel: [], // Store percentages
+    rainEvents: 0,
+    lastRainDuration: 0,
+    rainStartTime: null
+};
 
-    // Initialize charts
-    const rainIntensityChart = new ApexCharts(document.getElementById('rainIntensityChart'), {
-        series: [{
-            name: 'Rain Intensity',
-            data: []
-        }],
-        chart: {
-            height: 200,
-            type: 'area',
-            toolbar: {
-                show: false
-            },
-            animations: {
-                enabled: true,
-                easing: 'easeinout',
-                speed: 800
-            },
-            sparkline: {
-                enabled: false
-            }
-        },
-        stroke: {
-            curve: 'smooth',
-            width: 3
-        },
-        fill: {
-            type: 'gradient',
-            gradient: {
-                shadeIntensity: 1,
-                opacityFrom: 0.7,
-                opacityTo: 0.3,
-                stops: [0, 90, 100],
-                colorStops: [
-                    {
-                        offset: 0,
-                        color: '#3498db',
-                        opacity: 0.7
-                    },
-                    {
-                        offset: 100,
-                        color: '#2ecc71',
-                        opacity: 0.3
-                    }
-                ]
-            }
-        },
-        markers: {
-            size: 0
-        },
-        grid: {
+// Initialize charts (unchanged)
+const rainIntensityChart = new ApexCharts(document.getElementById('rainIntensityChart'), {
+    series: [{
+        name: 'Rain Intensity',
+        data: []
+    }],
+    chart: {
+        height: 200,
+        type: 'area',
+        toolbar: {
             show: false
         },
-        xaxis: {
-            categories: [],
-            labels: {
-                show: true,
-                style: {
-                    fontSize: '10px'
-                }
-            }
+        animations: {
+            enabled: true,
+            easing: 'easeinout',
+            speed: 800
         },
-        yaxis: {
-            min: 0,
-            labels: {
-                style: {
-                    fontSize: '10px'
-                }
-            }
-        },
-        tooltip: {
-            x: {
-                format: 'HH:mm:ss'
-            }
-        },
-        theme: {
-            mode: 'light'
+        sparkline: {
+            enabled: false
         }
-    });
-    rainIntensityChart.render();
-
-    const soilChart = new ApexCharts(document.getElementById('soilChart'), {
-        series: [{
-            name: 'Soil Moisture',
-            data: []
-        }],
-        chart: {
-            height: 200,
-            type: 'line',
-            toolbar: {
-                show: false
-            },
-            animations: {
-                enabled: true,
-                easing: 'easeinout',
-                speed: 800
-            },
-            sparkline: {
-                enabled: false
+    },
+    stroke: {
+        curve: 'smooth',
+        width: 3
+    },
+    fill: {
+        type: 'gradient',
+        gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.7,
+            opacityTo: 0.3,
+            stops: [0, 90, 100],
+            colorStops: [
+                {
+                    offset: 0,
+                    color: '#3498db',
+                    opacity: 0.7
+                },
+                {
+                    offset: 100,
+                    color: '#2ecc71',
+                    opacity: 0.3
+                }
+            ]
+        }
+    },
+    markers: {
+        size: 0
+    },
+    grid: {
+        show: false
+    },
+    xaxis: {
+        categories: [],
+        labels: {
+            show: true,
+            style: {
+                fontSize: '10px'
             }
+        }
+    },
+    yaxis: {
+        min: 0,
+        labels: {
+            style: {
+                fontSize: '10px'
+            }
+        }
+    },
+    tooltip: {
+        x: {
+            format: 'HH:mm:ss'
+        }
+    },
+    theme: {
+        mode: 'light'
+    }
+});
+rainIntensityChart.render();
+
+const soilChart = new ApexCharts(document.getElementById('soilChart'), {
+    series: [{
+        name: 'Soil Moisture',
+        data: []
+    }],
+    chart: {
+        height: 200,
+        type: 'line',
+        toolbar: {
+            show: false
         },
-        stroke: {
-            curve: 'smooth',
-            width: 3
+        animations: {
+            enabled: true,
+            easing: 'easeinout',
+            speed: 800
         },
+        sparkline: {
+            enabled: false
+        }
+    },
+    stroke: {
+        curve: 'smooth',
+        width: 3
+    },
+    colors: ['#e67e22'],
+    markers: {
+        size: 4,
         colors: ['#e67e22'],
-        markers: {
-            size: 4,
-            colors: ['#e67e22'],
-            strokeColors: '#fff',
-            strokeWidth: 2
-        },
-        grid: {
-            show: false
-        },
-        xaxis: {
-            categories: [],
-            labels: {
-                show: true,
-                style: {
-                    fontSize: '10px'
-                }
+        strokeColors: '#fff',
+        strokeWidth: 2
+    },
+    grid: {
+        show: false
+    },
+    xaxis: {
+        categories: [],
+        labels: {
+            show: true,
+            style: {
+                fontSize: '10px'
             }
-        },
-        yaxis: {
-            min: 0,
-            labels: {
-                style: {
-                    fontSize: '10px'
-                }
+        }
+    },
+    yaxis: {
+        min: 0,
+        labels: {
+            style: {
+                fontSize: '10px'
             }
-        },
-        tooltip: {
-            x: {
-                format: 'HH:mm:ss'
-            }
-        },
-        theme: {
-            mode: 'light'
         }
-    });
-    soilChart.render();
-
-    // Helper functions
-    function getWaterStatus(value) {
-        if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return 'Dry';
-        if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return 'Shallow Wet';
-        if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return 'Moderately Wet';
-        return 'Deep Wet';
-    }
-
-    function getWaterColor(value) {
-        if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return '#3498db';
-        if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return '#2980b9';
-        if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return '#1f618d';
-        return '#154360';
-    }
-
-    function getWaterPercentage(value) {
-        if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return WATER_LEVELS.PERCENTAGES.VERY_WET;
-        if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return WATER_LEVELS.PERCENTAGES.SHALLOW_WET;
-        if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return WATER_LEVELS.PERCENTAGES.MODERATELY_WET;
-        return WATER_LEVELS.PERCENTAGES.DEEP_WET;
-    }
-
-    function getSoilStatus(value) {
-        if (value > 2500) return 'Very Dry';
-        if (value > 2000) return 'Dry';
-        if (value > 1500) return 'Slightly Dry';
-        if (value > 1000) return 'Moist';
-        return 'Wet';
-    }
-
-    function getTrendIndicator(currentValue, previousValues, type) {
-        if (previousValues.length < 2) return '—';
-        
-        const avgPrevious = previousValues.slice(-3, -1).reduce((a, b) => a + b, 0) / 2;
-        const diff = currentValue - avgPrevious;
-        const percentage = Math.abs((diff / avgPrevious) * 100).toFixed(1);
-        
-        if (Math.abs(diff) < 0.5) return '—';
-        
-        if (type === 'temp' || type === 'water') {
-            // For temperature and water, rising is visualized with an up arrow
-            if (diff > 0) return `<span class="trend-up">↑ ${percentage}%</span>`;
-            return `<span class="trend-down">↓ ${percentage}%</span>`;
-        } else {
-            // For humidity and soil moisture, rising is generally better
-            if (diff > 0) return `<span class="trend-down">↑ ${percentage}%</span>`;
-            return `<span class="trend-up">↓ ${percentage}%</span>`;
+    },
+    tooltip: {
+        x: {
+            format: 'HH:mm:ss'
         }
+    },
+    theme: {
+        mode: 'light'
+    }
+});
+soilChart.render();
+
+// Helper functions
+function convertSoilMoistureToWaterLevel(soilMoisture) {
+    if (soilMoisture == null || isNaN(soilMoisture) || soilMoisture > 4095 || soilMoisture < 0) {
+        return 0; // Default to 0% if invalid
+    }
+    return Math.round(((4095 - soilMoisture) / 4095) * 100); // Same as speech module
+}
+
+function getWaterStatus(percentage) {
+    if (percentage <= WATER_LEVELS.THRESHOLDS.VERY_WET) return 'Dry';
+    if (percentage <= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return 'Shallow Wet';
+    if (percentage <= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return 'Moderately Wet';
+    return 'Deep Wet';
+}
+
+function getWaterColor(percentage) {
+    if (percentage <= WATER_LEVELS.THRESHOLDS.VERY_WET) return '#e74c3c'; // Red for dry
+    if (percentage <= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return '#f39c12'; // Orange for shallow
+    if (percentage <= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return '#3498db'; // Blue for moderate
+    return '#2ecc71'; // Green for deep
+}
+
+function getSoilStatus(value) {
+    if (value > 2500) return 'Very Dry';
+    if (value > 2000) return 'Dry';
+    if (value > 1500) return 'Slightly Dry';
+    if (value > 1000) return 'Moist';
+    return 'Wet';
+}
+
+function getTrendIndicator(currentValue, previousValues, type) {
+    if (previousValues.length < 2) return '—';
+    
+    const avgPrevious = previousValues.slice(-3, -1).reduce((a, b) => a + b, 0) / 2;
+    const diff = currentValue - avgPrevious;
+    const percentage = Math.abs((diff / avgPrevious) * 100).toFixed(1);
+    
+    if (Math.abs(diff) < 0.5) return '—';
+    
+    if (type === 'temp' || type === 'water') {
+        if (diff > 0) return `<span class="trend-up">↑ ${percentage}%</span>`;
+        return `<span class="trend-down">↓ ${percentage}%</span>`;
+    } else {
+        if (diff > 0) return `<span class="trend-down">↑ ${percentage}%</span>`;
+        return `<span class="trend-up">↓ ${percentage}%</span>`;
+    }
+}
+
+function calculateAverage(arr) {
+    if (arr.length === 0) return 0;
+    return (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1);
+}
+
+function calculateMax(arr) {
+    if (arr.length === 0) return 0;
+    return Math.max(...arr).toFixed(1);
+}
+
+function updateWaterLevel(percentage) {
+    if (percentage == null || isNaN(percentage)) {
+        document.getElementById('water-percentage').textContent = '--%';
+        document.getElementById('water-status').textContent = 'No Data';
+        document.getElementById('water-fill').style.height = '0%';
+        document.getElementById('water-fill').style.backgroundColor = '#ecf0f1';
+        return;
     }
 
-    function calculateAverage(arr) {
-        if (arr.length === 0) return 0;
-        return (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1);
+    const status = getWaterStatus(percentage);
+    const color = getWaterColor(percentage);
+
+    const waterFill = document.getElementById('water-fill');
+    const waterPercentage = document.getElementById('water-percentage');
+    const waterStatus = document.getElementById('water-status');
+
+    waterFill.style.height = `${percentage}%`;
+    waterFill.style.backgroundColor = color;
+    waterPercentage.textContent = `${percentage}%`;
+    waterStatus.textContent = status;
+    
+    // Update water trend and change
+    document.getElementById('water-updated').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    if (historyData.waterLevel.length > 1) {
+        const lastValue = historyData.waterLevel[historyData.waterLevel.length - 2];
+        const change = percentage - lastValue;
+        document.getElementById('water-change').textContent = (change >= 0 ? '+' : '') + change.toFixed(1) + '%';
     }
+}
 
-    function calculateMax(arr) {
-        if (arr.length === 0) return 0;
-        return Math.max(...arr).toFixed(1);
-    }
-
-    function convertSoilMoistureToWaterLevel(soilMoisture) {
-        return soilMoisture; // Direct pass-through as per your existing code
-    }
-
-    function updateWaterLevel(value) {
-        if (value == null || isNaN(value)) {
-            document.getElementById('water-percentage').textContent = '--%';
-            document.getElementById('water-status').textContent = 'No Data';
-            document.getElementById('water-fill').style.height = '0%';
-            document.getElementById('water-fill').style.backgroundColor = '#ecf0f1';
-            return;
-        }
-
-        const percentage = getWaterPercentage(value);
-        const status = getWaterStatus(value);
-        const color = getWaterColor(value);
-
-        const waterFill = document.getElementById('water-fill');
-        const waterPercentage = document.getElementById('water-percentage');
-        const waterStatus = document.getElementById('water-status');
-
-        waterFill.style.height = `${percentage}%`;
-        waterFill.style.backgroundColor = color;
-        waterPercentage.textContent = `${percentage}%`;
-        waterStatus.textContent = status;
-        
-        // Update water trend and change
-        document.getElementById('water-updated').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        if (historyData.waterLevel.length > 1) {
-            const lastValue = historyData.waterLevel[historyData.waterLevel.length - 2];
-            const change = percentage - getWaterPercentage(lastValue);
-            document.getElementById('water-change').textContent = (change >= 0 ? '+' : '') + change + '%';
-        }
-    }
-
-    function updateRainStatus(rainDetected) {
-    const rainStatus = document.getElementById('rain-status');
+function updateRainStatus(rainDetected) {
+    const rainStatus = document.getfullstack_id('rain-status');
     const rainImage = document.getElementById('rain-image');
     const currentHour = new Date().getHours();
     const currentTime = new Date();
 
-    // Check rain_detected value, which is a string from the Arduino
     if (rainDetected === "Rain Detected") {
         rainStatus.innerHTML = 'Rain Detected';
         rainStatus.className = 'rain-status rain-active';
         rainImage.innerHTML = '<img src="https://media.tenor.com/YefQKTdi3hUAAAAj/rafsdesign-rafsdesigns.gif" alt="Rain" width="120" height="120">';
         
-        // Track rain events
         if (historyData.rainStartTime === null) {
             historyData.rainStartTime = currentTime;
             historyData.rainEvents++;
             document.getElementById('rain-day-count').textContent = historyData.rainEvents;
         }
-    } else { // "No Rain" or any other value
+    } else {
         rainStatus.innerHTML = 'No Rain';
         rainStatus.className = 'rain-status rain-inactive';
         
@@ -975,9 +961,8 @@
             rainImage.innerHTML = '<img src="https://media.tenor.com/DTIl6DWhrZwAAAAj/moon-spacedoodles.gif" alt="Moonlight" width="120" height="120">';
         }
         
-        // Calculate rain duration if it was raining
         if (historyData.rainStartTime !== null) {
-            const duration = Math.round((currentTime - historyData.rainStartTime) / 60000); // in minutes
+            const duration = Math.round((currentTime - historyData.rainStartTime) / 60000);
             historyData.lastRainDuration = duration;
             document.getElementById('rain-duration').textContent = duration + ' min';
             historyData.rainStartTime = null;
@@ -985,40 +970,44 @@
     }
 }
 
-    function updateCharts(time, data) {
-        // Update rain intensity chart
-        if (data.rain_intensity !== null) {
-            const series = rainIntensityChart.w.globals.series[0];
-            const categories = rainIntensityChart.w.globals.categoryLabels;
-            
-            // Keep only the last 10 data points
-            if (series.length >= 10) {
-                series.shift();
-                categories.shift();
-            }
-            
-            series.push(data.rain_intensity);
-            categories.push(time);
-            
-            rainIntensityChart.updateOptions({
-                series: [{
-                    data: series
-                }],
-                xaxis: {
-                    categories: categories
-                }
-            });
-            
-            // Update max and avg intensity
-            document.getElementById('max-intensity').textContent = calculateMax(series);
-            document.getElementById('avg-intensity').textContent = calculateAverage(series);
+function getSoilStatus(value) {
+    if (value > 2500) return 'Very Dry';
+    if (value > 2000) return 'Dry';
+    if (value > 1500) return 'Slightly Dry';
+    if (value > 1000) return 'Moist';
+    return 'Wet';
+}
+
+function updateCharts(time, data) {
+    if (data.rain_intensity !== null) {
+        const series = rainIntensityChart.w.globals.series[0];
+        const categories = rainIntensityChart.w.globals.categoryLabels;
+        
+        if (series.length >= 10) {
+            series.shift();
+            categories.shift();
         }
         
-        if (data.soil_moisture !== null) {
+        series.push(data.rain_intensity);
+        categories.push(time);
+        
+        rainIntensityChart.updateOptions({
+            series: [{
+                data: series
+            }],
+            xaxis: {
+                categories: categories
+            }
+        });
+        
+        document.getElementById('max-intensity').textContent = calculateMax(series);
+        document.getElementById('avg-intensity').textContent = calculateAverage(series);
+    }
+    
+    if (data.soil_moisture !== null) {
         const series = soilChart.w.globals.series[0];
         const categories = soilChart.w.globals.categoryLabels;
         
-        // Keep only the last 10 data points
         if (series.length >= 10) {
             series.shift();
             categories.shift();
@@ -1036,7 +1025,6 @@
             }
         });
         
-        // Update soil status and trend
         document.getElementById('soil-status').textContent = getSoilStatus(data.soil_moisture);
         historyData.soilMoisture.push(data.soil_moisture);
         if (historyData.soilMoisture.length > 10) historyData.soilMoisture.shift();
@@ -1056,55 +1044,44 @@ async function updateDashboard() {
         
         const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
         
-        // Update temperature
         if (data.temperature !== null) {
             document.getElementById('temp-value').textContent = data.temperature.toFixed(1);
-            document.getElementById('temp-updated').textContent = currentTime.slice(0, -3); // Remove seconds
+            document.getElementById('temp-updated').textContent = currentTime.slice(0, -3);
             
-            // Store temperature for trend calculation
             historyData.temperature.push(data.temperature);
             if (historyData.temperature.length > 10) historyData.temperature.shift();
             
-            // Update temperature trend
             document.getElementById('temp-trend').innerHTML = getTrendIndicator(
                 data.temperature, 
                 historyData.temperature, 
                 'temp'
             );
             
-            // Update average temperature
             document.getElementById('temp-avg').textContent = calculateAverage(historyData.temperature);
         }
         
-        // Update humidity
         if (data.humidity !== null) {
             document.getElementById('humidity-value').textContent = data.humidity.toFixed(1);
-            document.getElementById('humidity-updated').textContent = currentTime.slice(0, -3); // Remove seconds
+            document.getElementById('humidity-updated').textContent = currentTime.slice(0, -3);
             
-            // Store humidity for trend calculation
             historyData.humidity.push(data.humidity);
             if (historyData.humidity.length > 10) historyData.humidity.shift();
             
-            // Update humidity trend
             document.getElementById('humidity-trend').innerHTML = getTrendIndicator(
                 data.humidity, 
                 historyData.humidity, 
                 'humidity'
             );
             
-            // Update average humidity
             document.getElementById('humidity-avg').textContent = calculateAverage(historyData.humidity);
         }
         
-        // Update rain detection status
         if (data.rain_detected !== null) {
             updateRainStatus(data.rain_detected);
         }
         
-        // Update charts
         updateCharts(currentTime, data);
         
-        // Update water level
         if (data.soil_moisture !== null) {
             const waterLevel = convertSoilMoistureToWaterLevel(data.soil_moisture);
             historyData.waterLevel.push(waterLevel);
@@ -1117,25 +1094,19 @@ async function updateDashboard() {
     }
 }
 
-// Update date and time
 function updateDateTime() {
     const now = new Date();
     document.getElementById('current-time').textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
     document.getElementById('current-date').textContent = now.toLocaleDateString([], {weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'});
 }
 
-// Initialize dashboard
 function initDashboard() {
     updateDateTime();
     updateDashboard();
     
-    // Set interval for time updates (every second)
     setInterval(updateDateTime, 1000);
-    
-    // Set interval for dashboard updates (every 5 seconds)
     const updateInterval = setInterval(updateDashboard, 5000);
     
-    // Pause updates when tab is not visible to save resources
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             clearInterval(updateInterval);
@@ -1146,9 +1117,7 @@ function initDashboard() {
     });
 }
 
-// Run initialization
 window.addEventListener('DOMContentLoaded', initDashboard);
-
 
 function generateEnvironmentalAnalysis(data) {
     if (!data || 
@@ -1164,7 +1133,7 @@ function generateEnvironmentalAnalysis(data) {
     const hour = currentTime.getHours();
     const isDay = hour >= 6 && hour < 18;
     
-    // Temperature analysis (unchanged)
+    // Temperature analysis
     if (data.temperature !== null) {
         let tempAnalysis = "";
         if (data.temperature > 30) {
@@ -1181,7 +1150,7 @@ function generateEnvironmentalAnalysis(data) {
         analysis.push(tempAnalysis);
     }
     
-    // Humidity analysis (unchanged)
+    // Humidity analysis
     if (data.humidity !== null) {
         let humidityAnalysis = "";
         if (data.humidity > 85) {
@@ -1196,31 +1165,30 @@ function generateEnvironmentalAnalysis(data) {
         analysis.push(humidityAnalysis);
     }
     
-    // Soil moisture analysis (unchanged)
+    // Soil moisture and water level analysis
     if (data.soil_moisture !== null) {
+        const waterLevel = convertSoilMoistureToWaterLevel(data.soil_moisture);
         let soilAnalysis = "";
         if (data.soil_moisture > 2500) {
-            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-alert">critically dry soil</span>. Immediate watering is recommended to prevent plant wilting and root damage.</p>`;
+            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span> (Water level: <span class="analysis-highlight">${waterLevel}%</span>), indicating <span class="analysis-alert">critically dry soil</span>. Immediate watering is recommended to prevent plant wilting and root damage.</p>`;
         } else if (data.soil_moisture > 2000) {
-            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-alert">dry soil conditions</span>. Watering is recommended within the next 12-24 hours.</p>`;
+            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span> (Water level: <span class="analysis-highlight">${waterLevel}%</span>), indicating <span class="analysis-alert">dry soil conditions</span>. Watering is recommended within the next 12-24 hours.</p>`;
         } else if (data.soil_moisture > 1500) {
-            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-highlight">slightly dry soil</span>. Monitor conditions, especially if weather is hot or windy.</p>`;
+            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span> (Water level: <span class="analysis-highlight">${waterLevel}%</span>), indicating <span class="analysis-highlight">slightly dry soil</span>. Monitor conditions, especially if weather is hot or windy.</p>`;
         } else if (data.soil_moisture > 1000) {
-            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-good">ideal moisture levels</span>. Soil has good moisture content while maintaining adequate aeration for root health.</p>`;
+            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span> (Water level: <span class="analysis-highlight">${waterLevel}%</span>), indicating <span class="analysis-good">ideal moisture levels</span>. Soil has good moisture content while maintaining adequate aeration for root health.</p>`;
         } else {
-            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-alert">very wet conditions</span>. Avoid additional watering to prevent root rot and oxygen deprivation.</p>`;
+            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span> (Water level: <span class="analysis-highlight">${waterLevel}%</span>), indicating <span class="analysis-alert">very wet conditions</span>. Avoid additional watering to prevent root rot and oxygen deprivation.</p>`;
         }
         analysis.push(soilAnalysis);
     }
     
-    // Rain analysis (updated)
+    // Rain analysis
     if (data.rain_detected !== null) {
         let rainAnalysis = "";
         if (data.rain_detected === "Rain Detected") {
-            // Rain is detected when rain_intensity < 2000
             if (data.rain_intensity !== null) {
-                // Invert intensity logic: lower values mean heavier rain
-                const intensityLevel = 4095 - data.rain_intensity; // Assuming 4095 is max analog value for your sensor
+                const intensityLevel = 4095 - data.rain_intensity;
                 if (data.rain_intensity < 500) {
                     rainAnalysis = `<p><span class="analysis-alert">Heavy rainfall detected</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity}</span>). This indicates significant precipitation, which may lead to soil erosion and nutrient leaching. Consider checking drainage systems and protecting sensitive plants.</p>`;
                 } else if (data.rain_intensity < 1000) {
@@ -1231,10 +1199,8 @@ function generateEnvironmentalAnalysis(data) {
             } else {
                 rainAnalysis = `<p><span class="analysis-good">Rainfall detected</span>. This natural precipitation benefits plants by providing moisture. No intensity data available for further analysis.</p>`;
             }
-            
-            // Add irrigation recommendation
             rainAnalysis += `<p>With natural rainfall occurring, <span class="analysis-good">automated irrigation should be paused</span> to prevent overwatering.</p>`;
-        } else { // "No Rain"
+        } else {
             if (isDay && data.temperature > 25 && data.humidity < 40 && data.soil_moisture > 1800) {
                 rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity || '--'}</span>) with high temperature, low humidity, and drying soil. <span class="analysis-alert">Consider irrigation</span> to prevent plant stress, especially for shallow-rooted plants.</p>`;
             } else if (data.soil_moisture > 2200) {
@@ -1246,7 +1212,7 @@ function generateEnvironmentalAnalysis(data) {
         analysis.push(rainAnalysis);
     }
     
-    // Integrated analysis and recommendations (unchanged)
+    // Integrated analysis
     let integratedAnalysis = "<p><strong>Overall Assessment:</strong> ";
     
     let stressPoints = 0;
@@ -1255,8 +1221,11 @@ function generateEnvironmentalAnalysis(data) {
     
     if (data.humidity !== null && (data.humidity > 85 || data.humidity < 30)) stressPoints += 1;
     
-    if (data.soil_moisture !== null && (data.soil_moisture > 2200 || data.soil_moisture < 800)) stressPoints += 2;
-    else if (data.soil_moisture !== null && (data.soil_moisture > 1800 || data.soil_moisture < 900)) stressPoints += 1;
+    if (data.soil_moisture !== null) {
+        const waterLevel = convertSoilMoistureToWaterLevel(data.soil_moisture);
+        if (waterLevel < 20 || waterLevel > 80) stressPoints += 2;
+        else if (waterLevel < 30 || waterLevel > 70) stressPoints += 1;
+    }
     
     if (stressPoints >= 4) {
         integratedAnalysis += `<span class="analysis-alert">Multiple environmental stressors detected</span>. Immediate attention recommended to prevent plant damage.</p>`;
@@ -1281,20 +1250,15 @@ function generateEnvironmentalAnalysis(data) {
     return analysis.join("");
 }
 
-// Function to update the analysis section
 function updateAnalysis() {
     const analysisElement = document.getElementById('analysis-text');
     const analysisTimeElement = document.getElementById('analysis-time');
     
-    // Get the current sensor data
     fetch('/sensor-data')
         .then(response => response.json())
         .then(data => {
-            // Generate analysis
             const analysisContent = generateEnvironmentalAnalysis(data);
             analysisElement.innerHTML = analysisContent;
-            
-            // Update timestamp
             const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             analysisTimeElement.textContent = currentTime;
         })
@@ -1304,13 +1268,11 @@ function updateAnalysis() {
         });
 }
 
-// Add event listener for manual refresh
 document.getElementById('refresh-analysis').addEventListener('click', updateAnalysis);
 
-// Update analysis initially and at regular intervals
 updateAnalysis();
-setInterval(updateAnalysis, 30000); // Update every 30 seconds
-    </script>
+setInterval(updateAnalysis, 30000);
+</script>
    
     </body>
     </html>
