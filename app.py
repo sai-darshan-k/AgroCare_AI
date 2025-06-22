@@ -411,16 +411,20 @@ def ask_speech():
         sensor_data = fetch_sensor_data()
         if all(v is None for v in sensor_data.values()):
             sensor_context = "No sensor data available. Please ensure the sensor device is connected and sending data."
+            water_level = 0
         else:
             # Calculate water level percentage based on soil_moisture (4095 = dry, 0 = wet)
             soil_moisture = sensor_data.get('soil_moisture', 0)
-            # Map 4095 to 0% (dry), 0 to 100% (wet)
-            water_level = round(((4095 - soil_moisture) / 4095) * 100) if soil_moisture <= 4095 else 0
+            if soil_moisture > 4095:
+                soil_moisture = 4095  # Cap at max value
+            elif soil_moisture < 0:
+                soil_moisture = 0  # Cap at min value
+            water_level = round(((4095 - soil_moisture) / 4095) * 100, 2)  # Calculate percentage
 
             sensor_context = (
                 f"Current sensor data: "
-                f"Soil Moisture: {soil_moisture or 'N/A'}, "
-                f"Water Level: {water_level}%, "
+                f"Soil Moisture: {soil_moisture}, "
+                f"Water Level: {water_level}% (0% is dry, 100% is wet), "
                 f"Water Layer: {sensor_data['water_layer'] or 'N/A'}, "
                 f"Temperature: {sensor_data['temperature'] or 'N/A'}°C, "
                 f"Humidity: {sensor_data['humidity'] or 'N/A'}%, "
@@ -432,9 +436,9 @@ def ask_speech():
         # Fetch weather forecast
         weather_context = fetch_weather_forecast()
 
-        # Enhanced prompt with corrected soil moisture interpretation
+        # Enhanced prompt with clear instructions
         enhanced_speech_prompt = """
-        (System: You are a crop assistant for {crop_type}. Use sensor data ({sensor_context}) and weather ({weather_context}) to give concise irrigation/soil advice in English. Soil moisture: 4095 is dry (0% water level), 0 is wet (100%). Focus on soil moisture, water level, and water layer for actionable recommendations. Recommend watering for soil moisture ≥2500. Limit to 500 characters. Do not repeat points.)
+        (System: You are a crop assistant for {crop_type}. Use sensor data ({sensor_context}) and weather ({weather_context}) to provide concise irrigation/soil advice in English. Soil moisture ranges from 4095 (0% water level, dry) to 0 (100% water level, wet). Recommend watering if soil moisture is ≥ 2500 (water level ≤ 38.88%). Base advice on the provided water level percentage and weather forecast. Limit response to 500 characters. Do not repeat points.)
 
         (user: Question: {question_en})
         """
