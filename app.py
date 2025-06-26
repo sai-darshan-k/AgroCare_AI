@@ -412,6 +412,7 @@ def ask_speech():
         if all(v is None for v in sensor_data.values()):
             sensor_context = "No sensor data available. Please ensure the sensor device is connected and sending data."
             water_level = 0
+            irrigation_advice = "No sensor data available to assess soil moisture. Check your plants manually and water if the soil feels dry."
         else:
             # Calculate water level percentage based on soil_moisture (4095 = dry, 0 = wet)
             soil_moisture = sensor_data.get('soil_moisture', 0)
@@ -421,6 +422,14 @@ def ask_speech():
                 soil_moisture = 0  # Cap at min value
             water_level = round(((4095 - soil_moisture) / 4095) * 100, 2)  # Calculate percentage
 
+            # Corrected irrigation logic
+            irrigation_advice = (
+                f"Soil moisture is {soil_moisture}, with a water level of {water_level}%. "
+                f"Water level is {'above' if water_level >= 38.88 else 'below'} the 38.88% threshold. "
+                f"{'No watering is needed now.' if water_level >= 38.88 else 'Water your plants to maintain optimal soil moisture.'}"
+            )
+
+            # Sensor context for the prompt
             sensor_context = (
                 f"Current sensor data: "
                 f"Soil Moisture: {soil_moisture}, "
@@ -436,9 +445,9 @@ def ask_speech():
         # Fetch weather forecast
         weather_context = fetch_weather_forecast()
 
-        # Enhanced prompt with clear instructions
+        # Corrected prompt with clear irrigation logic
         enhanced_speech_prompt = """
-        (System: You are a crop assistant for {crop_type}. Use sensor data ({sensor_context}) and weather ({weather_context}) to provide concise irrigation/soil advice in English. Soil moisture ranges from 4095 (0% water level, dry) to 0 (100% water level, wet). Recommend watering if soil moisture is ≥ 2500 (water level ≤ 38.88%). Base advice on the provided water level percentage and weather forecast. Limit response to 500 characters. Do not repeat points.)
+        (System: You are a crop assistant for {crop_type}. Always prioritize answering category-specific responses. Provide irrigation or soil advice using sensor data ({sensor_context}) and weather ({weather_context}) only if the question relates to plant care or environmental conditions. Soil moisture ranges from 4095 (dry) to 0 (wet); recommend watering only if water level is below 38.88%. Keep responses under 500 characters. Avoid repeating information.)
 
         (user: Question: {question_en})
         """
@@ -452,6 +461,11 @@ def ask_speech():
             'sensor_context': sensor_context,
             'weather_context': weather_context
         })
+
+        # Incorporate irrigation advice into the response
+        if "what should I do for my plants" in question_en.lower():
+            answer_en = f"{irrigation_advice} {answer_en}"
+
         # Clean Markdown formatting
         answer_en = re.sub(r'[\*]+', '', answer_en)
         logging.info(f"Cleaned English response: {answer_en}")
