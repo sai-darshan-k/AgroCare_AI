@@ -379,11 +379,10 @@ def ask_speech():
     data = request.json
     question = data.get('question')
     language = data.get('language', 'en-US')
-    crop_type = data.get('crop_type', 'generic')  # Default crop type
+    crop_type = data.get('crop_type', 'generic')
     logging.info(f"Received speech question: {question} in language: {language}, crop_type: {crop_type}")
 
     try:
-        # Map language codes to translate library language codes
         lang_map = {
             'en-US': 'en',
             'kn-IN': 'kn',
@@ -393,47 +392,39 @@ def ask_speech():
         }
         target_lang = lang_map.get(language, 'en')
 
-        # Initialize translator for the target language
         translator_to_en = Translator(to_lang='en', from_lang=target_lang)
         translator_to_target = Translator(to_lang=target_lang, from_lang='en')
 
-        # Translate question to English if not in English
         question_en = question
         if target_lang != 'en':
             try:
                 question_en = translator_to_en.translate(question)
                 logging.info(f"Translated question to English: {question_en}")
             except Exception as e:
-                logging.error(f"Error translating question to English: {str(e)}")
+                logging.error(f"Error translating question: {str(e)}")
                 return jsonify({'answer': f'Error translating question: {str(e)}'}), 500
 
-        # Fetch sensor data
+        # Sensor defaults
         sensor_data = fetch_sensor_data()
-        if all(v is None for v in sensor_data.values()):
-            sensor_context = "No sensor data available. Please ensure the sensor device is connected and sending data."
-            water_level = 0
-            irrigation_advice = "No sensor data available to assess soil moisture. Check your plants manually and water if the soil feels dry."
-        else:
-            # Calculate water level percentage based on soil_moisture (4095 = dry, 0 = wet)
-            soil_moisture = sensor_data.get('soil_moisture', 0)
-            if soil_moisture > 4095:
-                soil_moisture = 4095  # Cap at max value
-            elif soil_moisture < 0:
-                soil_moisture = 0  # Cap at min value
-            water_level = round(((4095 - soil_moisture) / 4095) * 100, 2)  # Calculate percentage
+        weather_context = fetch_weather_forecast()
 
-            # Corrected irrigation logic
+        if all(v is None for v in sensor_data.values()):
+            sensor_context = "Sensor data unavailable. Check device connection."
+            water_level = 0
+            irrigation_advice = "Sensor data unavailable. Manually check soil moisture before watering."
+        else:
+            soil_moisture = sensor_data.get('soil_moisture', 0)
+            soil_moisture = max(0, min(soil_moisture, 4095))
+            water_level = round(((4095 - soil_moisture) / 4095) * 100, 2)
+
             irrigation_advice = (
-                f"Soil moisture is {soil_moisture}, with a water level of {water_level}%. "
-                f"Water level is {'above' if water_level >= 38.88 else 'below'} the 38.88% threshold. "
-                f"{'No watering is needed now.' if water_level >= 38.88 else 'Water your plants to maintain optimal soil moisture.'}"
+                f"Soil moisture is {soil_moisture}, water level is {water_level}%. "
+                f"{'No watering needed.' if water_level >= 38.88 else 'Water your plants to maintain moisture.'}"
             )
 
-            # Sensor context for the prompt
             sensor_context = (
-                f"Current sensor data: "
                 f"Soil Moisture: {soil_moisture}, "
-                f"Water Level: {water_level}% (0% is dry, 100% is wet), "
+                f"Water Level: {water_level}%, "
                 f"Water Layer: {sensor_data['water_layer'] or 'N/A'}, "
                 f"Temperature: {sensor_data['temperature'] or 'N/A'}°C, "
                 f"Humidity: {sensor_data['humidity'] or 'N/A'}%, "
@@ -442,19 +433,16 @@ def ask_speech():
                 f"Last Update: {sensor_data['last_update'] or 'N/A'}"
             )
 
-        # Fetch weather forecast
-        weather_context = fetch_weather_forecast()
-
-        # Corrected prompt with clear irrigation logic
+        # Smart prompt: sensor/weather only when needed
         enhanced_speech_prompt = """
-        (System: You are a crop assistant for {crop_type}. Always prioritize answering category-specific responses. Provide irrigation or soil advice using sensor data ({sensor_context}) and weather ({weather_context}) only if the question relates to plant care or environmental conditions. Soil moisture ranges from 4095 (dry) to 0 (wet); recommend watering only if water level is below 38.88%. Keep responses under 500 characters. Avoid repeating information.)
+        (System: You are a crop assistant for {crop_type}. First, clearly and concisely answer the user's specific question. If and only if the question relates to plant care, wilting, watering, or environmental concerns, then incorporate insights from sensor data ({sensor_context}) and weather forecast ({weather_context}). 
+        Soil moisture ranges from 4095 (dry) to 0 (wet); recommend watering only if soil moisture > 2500 (i.e., water level < 38.88%). Keep responses under 500 characters and do not repeat content.)
 
         (user: Question: {question_en})
         """
-        enhanced_promptinstance = ChatPromptTemplate.from_template(enhanced_speech_prompt)
+        prompt = ChatPromptTemplate.from_template(enhanced_speech_prompt)
 
-        # Get response from the model in English
-        response = enhanced_promptinstance | groqllm | StrOutputParser()
+        response = prompt | groqllm | StrOutputParser()
         answer_en = response.invoke({
             'question_en': question_en,
             'crop_type': crop_type,
@@ -462,46 +450,36 @@ def ask_speech():
             'weather_context': weather_context
         })
 
-        # Incorporate irrigation advice into the response
-        if "what should I do for my plants" in question_en.lower():
-            answer_en = f"{irrigation_advice} {answer_en}"
-
-        # Clean Markdown formatting
         answer_en = re.sub(r'[\*]+', '', answer_en)
-        logging.info(f"Cleaned English response: {answer_en}")
+        logging.info(f"Model response: {answer_en}")
         formatted_answer_en = format_answer(answer_en)
 
-        # Translate response back to the target language if not English
+        # Translate response
         answer_translated = answer_en
         if target_lang != 'en':
             try:
                 answer_translated = translate_long_text(answer_en, translator_to_target)
                 if answer_translated.startswith("Translation error"):
                     raise Exception(answer_translated)
-                logging.info(f"Translated response to {target_lang}: {answer_translated}")
+                logging.info(f"Translated to {target_lang}: {answer_translated}")
             except Exception as e:
-                logging.error(f"Error translating response to {target_lang}: {str(e)}")
+                logging.error(f"Translation error: {str(e)}")
                 return jsonify({'answer': f'Error translating response: {str(e)}'}), 500
 
-        # Log the text for audio generation
-        logging.info(f"Text for audio generation: {answer_translated}")
-
-        # Format the translated answer for display
         formatted_answer = format_answer(answer_translated)
-
-        # Generate audio in the target language
         audio_filename = generate_audio(answer_translated, target_lang)
         if not audio_filename:
-            logging.error("Failed to generate audio file")
-            return jsonify({'answer': 'Error generating audio file'}), 500
+            return jsonify({'answer': 'Error generating audio'}), 500
 
         return jsonify({
             'answer': formatted_answer,
             'audio_url': f"/static/audio/{audio_filename}?t={int(time.time())}"
         })
+
     except Exception as e:
-        logging.error(f"Error in speech response: {str(e)}")
+        logging.error(f"ask_speech error: {str(e)}")
         return jsonify({'answer': f'Error processing your request: {str(e)}'}), 500
+
     
 @app.route('/ask', methods=['POST'])
 def ask():
