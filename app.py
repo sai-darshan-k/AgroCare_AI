@@ -404,7 +404,7 @@ def ask_speech():
                 logging.error(f"Error translating question: {str(e)}")
                 return jsonify({'answer': f'Error translating question: {str(e)}'}), 500
 
-        # Sensor defaults
+        # Fetch sensor and weather data
         sensor_data = fetch_sensor_data()
         weather_context = fetch_weather_forecast()
 
@@ -414,29 +414,35 @@ def ask_speech():
             irrigation_advice = "Sensor data unavailable. Manually check soil moisture before watering."
         else:
             soil_moisture = sensor_data.get('soil_moisture', 0)
-            soil_moisture = max(0, min(soil_moisture, 4095))
+            soil_moisture = max(0, min(soil_moisture, 4095))  # clamp
             water_level = round(((4095 - soil_moisture) / 4095) * 100, 2)
 
-            irrigation_advice = (
-                f"Soil moisture is {soil_moisture}, water level is {water_level}%. "
-                f"{'No watering needed.' if water_level >= 38.88 else 'Water your plants to maintain moisture.'}"
-            )
+            if water_level < 38.88:
+                irrigation_advice = (
+                    f"Water level is {water_level}%. Please water your plants to maintain soil moisture."
+                )
+            else:
+                irrigation_advice = (
+                    f"Water level is {water_level}%. No watering needed currently."
+                )
 
             sensor_context = (
-                f"Soil Moisture: {soil_moisture}, "
                 f"Water Level: {water_level}%, "
                 f"Water Layer: {sensor_data['water_layer'] or 'N/A'}, "
                 f"Temperature: {sensor_data['temperature'] or 'N/A'}°C, "
                 f"Humidity: {sensor_data['humidity'] or 'N/A'}%, "
                 f"Rain Intensity: {sensor_data['rain_intensity'] or 'N/A'}, "
                 f"Rain Detected: {sensor_data['rain_detected'] or 'N/A'}, "
-                f"Last Update: {sensor_data['last_update'] or 'N/A'}"
+                f"Last Update: {sensor_data['last_update'] or 'N/A'}. "
+                f"{irrigation_advice}"
             )
 
-        # Smart prompt: sensor/weather only when needed
+        # Prepare prompt
         enhanced_speech_prompt = """
-        (System: You are a crop assistant for {crop_type}. First, clearly and concisely answer the user's specific question. If and only if the question relates to plant care, wilting, watering, or environmental concerns, then incorporate insights from sensor data ({sensor_context}) and weather forecast ({weather_context}). 
-        Soil moisture ranges from 4095 (dry) to 0 (wet); recommend watering only if soil moisture > 2500 (i.e., water level < 38.88%). Keep responses under 500 characters and do not repeat content.)
+        (System: You are a crop assistant for {crop_type}. First, clearly and concisely answer the user's specific question. 
+        If and only if the question relates to plant care, wilting, watering, or environmental concerns, then incorporate insights from sensor data ({sensor_context}) and weather forecast ({weather_context}). 
+        Recommend watering only if water level is below 38.88%. 
+        Keep responses under 500 characters and do not repeat content.)
 
         (user: Question: {question_en})
         """
@@ -454,7 +460,7 @@ def ask_speech():
         logging.info(f"Model response: {answer_en}")
         formatted_answer_en = format_answer(answer_en)
 
-        # Translate response
+        # Translate if needed
         answer_translated = answer_en
         if target_lang != 'en':
             try:
@@ -480,7 +486,6 @@ def ask_speech():
         logging.error(f"ask_speech error: {str(e)}")
         return jsonify({'answer': f'Error processing your request: {str(e)}'}), 500
 
-    
 @app.route('/ask', methods=['POST'])
 def ask():
     question = request.json.get('question')
