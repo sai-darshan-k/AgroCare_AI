@@ -1,15 +1,10 @@
+
 import os
 import re
 import numpy as np
 import joblib
-from tensorflow import lite
-from flask import Flask, render_template, request, jsonify
 import tensorflow as tf
-from werkzeug.utils import secure_filename
-import threading
-import datetime
-from PIL import Image
-from tensorflow.keras.preprocessing.image import load_img, img_to_array
+from tensorflow import lite
 from flask import Flask, render_template, request, jsonify, flash, send_from_directory, session, redirect, url_for
 from flask_babel import Babel, _
 from werkzeug.utils import secure_filename
@@ -39,6 +34,11 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 from dateutil import parser
 from translate import Translator
+from PIL import Image
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
+import threading
+from influxdb_client import InfluxDBClient
+from influxdb_client.client.write_api import WritePrecision
 
 # Ensure consistent language detection
 DetectorFactory.seed = 0
@@ -58,9 +58,17 @@ db = SQLAlchemy(app)
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
+# InfluxDB configuration
+INFLUXDB_URL = "https://us-east-1-1.aws.cloud2.influxdata.com"
+INFLUXDB_TOKEN = "nZ49M1MTGbHtRCrc2OJhx-kVIBWuwvereT-o1mcq2COz3urUNuUuIIMjysObK8oOEHn8352w7LKFyrX8PQpdsA=="
+INFLUXDB_ORG = "Agri"
+INFLUXDB_BUCKET = "smart_agri"
+
+# Initialize InfluxDB client
+influx_client = InfluxDBClient(url=INFLUXDB_URL, token=INFLUXDB_TOKEN, org=INFLUXDB_ORG)
+
 def keep_alive():
     try:
-        # Ping the public Render URL
         response = requests.get("https://agrocare-ai-v1vn.onrender.com/", timeout=5)
         logging.info(f"Keep-alive ping sent, status code: {response.status_code}")
     except Exception as e:
@@ -175,7 +183,7 @@ class Product(db.Model):
     
     def __repr__(self):
         return f'<Product {self.name}>'
-    
+
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -282,7 +290,6 @@ def translate_long_text(text, translator, max_length=500):
     """Split text into chunks under max_length and translate each chunk."""
     if not text:
         return ""
-    # Split text into sentences or chunks
     sentences = []
     current_chunk = ""
     for sentence in text.split('. '):  # Split by sentence
@@ -295,7 +302,6 @@ def translate_long_text(text, translator, max_length=500):
     if current_chunk:
         sentences.append(current_chunk.strip())
     
-    # Translate each chunk
     translated_chunks = []
     for chunk in sentences:
         try:
@@ -306,15 +312,82 @@ def translate_long_text(text, translator, max_length=500):
             return f"Translation error: {str(e)}"
     return " ".join(translated_chunks)
 
-def fetch_sensor_data():
+def fetch_weather_forecast():
     try:
-        response = requests.get('https://iot-delta-vert.vercel.app/sensor-data', timeout=5)
+        api_key = "e10f65c590d431935edaaf55555c6146"
+        lat, lon = 12.9716, 77.5946  # Bangalore coordinates
+        url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}&units=metric"
+        response = requests.get(url, timeout=5)
         response.raise_for_status()
         data = response.json()
-        logging.info(f"Fetched sensor data: {data}")
-        return data
+        
+        forecast = []
+        for entry in data['list'][:8]:  # Next 24 hours (3-hour intervals)
+            dt = datetime.fromtimestamp(entry['dt']).strftime("%Y-%m-%d %H:%M")
+            temp = entry['main']['temp']
+            weather = entry['weather'][0]['description']
+            forecast.append(f"{dt}: {temp}°C, {weather}")
+        
+        forecast_summary = f"Weather forecast for Bangalore: " + "; ".join(forecast)
+        logging.info(f"Fetched weather forecast: {forecast_summary}")
+        return forecast_summary
     except requests.RequestException as e:
-        logging.error(f"Error fetching sensor data: {str(e)}")
+        logging.error(f"Error fetching weather forecast: {str(e)}")
+        return "No weather forecast available. Please try again later."
+
+def fetch_sensor_data():
+    try:
+        query_api = influx_client.query_api()
+        query = f'''
+        from(bucket: "{INFLUXDB_BUCKET}")
+            |> range(start: -5m)
+            |> filter(fn: (r) => r._measurement == "sensor_data" and r.location == "field")
+            |> last()
+        '''
+        tables = query_api.query(query, org=INFLUXDB_ORG)
+        
+        sensor_data = {
+            "temperature": None,
+            "humidity": None,
+            "rain_intensity": None,
+            "rain_detected": None,
+            "soil_moisture": None,
+            "water_layer": None,
+            "last_update": None
+        }
+        
+        for table in tables:
+            for record in table.records:
+                field = record.get_field()
+                value = record.get_value()
+                time = record.get_time()
+                
+                if field == "temperature":
+                    sensor_data["temperature"] = float(value) if value is not None else None
+                elif field == "humidity":
+                    sensor_data["humidity"] = float(value) if value is not None else None
+                elif field == "rain_intensity":
+                    sensor_data["rain_intensity"] = int(value) if value is not None else None
+                    sensor_data["rain_detected"] = "Rain Detected" if value is not None and value <= 2000 else "No Rain"
+                elif field == "soil_moisture":
+                    sensor_data["soil_moisture"] = int(value) if value is not None else None
+                    if value is not None:
+                        if value > 2500:
+                            sensor_data["water_layer"] = "Layer 1 (Surface)"
+                        elif value > 1700:
+                            sensor_data["water_layer"] = "Layer 2 (Shallow)"
+                        elif value > 1300:
+                            sensor_data["water_layer"] = "Layer 3 (Moderate)"
+                        elif value > 1000:
+                            sensor_data["water_layer"] = "Layer 4 (Deep)"
+                        else:
+                            sensor_data["water_layer"] = "Layer 5 (Very Deep)"
+                sensor_data["last_update"] = time.strftime("%Y-%m-%d %H:%M:%S") if time else None
+        
+        logging.info(f"Fetched sensor data from InfluxDB: {sensor_data}")
+        return sensor_data
+    except Exception as e:
+        logging.error(f"Error fetching sensor data from InfluxDB: {str(e)}")
         return {
             "temperature": None,
             "humidity": None,
@@ -324,55 +397,6 @@ def fetch_sensor_data():
             "water_layer": None,
             "last_update": None
         }
-
-# Add this function after existing imports and before any routes (e.g., after fetch_sensor_data)
-def fetch_weather_forecast():
-    try:
-        api_key = "e10f65c590d431935edaaf55555c6146"
-        lat, lon = 12.9716, 77.5946  # Bangalore coordinates
-        url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}&units=metric"
-        response = requests.get(url, timeout=5)
-        response.raise_for_status()
-        data = response.json()
-        
-        # Extract relevant forecast data (next 24 hours, simplified)
-        forecast = []
-        for entry in data['list'][:8]:  # Next 24 hours (3-hour intervals)
-            dt = datetime.fromtimestamp(entry['dt']).strftime("%Y-%m-%d %H:%M")
-            temp = entry['main']['temp']
-            weather = entry['weather'][0]['description']
-            forecast.append(f"{dt}: {temp}°C, {weather}")
-        
-        forecast_summary = f"Weather forecast for Bangalore: " + "; ".join(forecast)
-        logging.info(f"Fetched weather forecast: {forecast_summary}")
-        return forecast_summary
-    except requests.RequestException as e:
-        logging.error(f"Error fetching weather forecast: {str(e)}")
-        return "No weather forecast available. Please try again later."
-
-def fetch_weather_forecast():
-    try:
-        api_key = "e10f65c590d431935edaaf55555c6146"
-        lat, lon = 12.9716, 77.5946  # Bangalore coordinates
-        url = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}&units=metric"
-        response = requests.get(url, timeout=5)
-        response.raise_for_status()
-        data = response.json()
-        
-        # Extract relevant forecast data (next 24 hours, simplified)
-        forecast = []
-        for entry in data['list'][:8]:  # Next 24 hours (3-hour intervals)
-            dt = datetime.fromtimestamp(entry['dt']).strftime("%Y-%m-%d %H:%M")
-            temp = entry['main']['temp']
-            weather = entry['weather'][0]['description']
-            forecast.append(f"{dt}: {temp}°C, {weather}")
-        
-        forecast_summary = f"Weather forecast for Bangalore: " + "; ".join(forecast)
-        logging.info(f"Fetched weather forecast: {forecast_summary}")
-        return forecast_summary
-    except requests.RequestException as e:
-        logging.error(f"Error fetching weather forecast: {str(e)}")
-        return "No weather forecast available. Please try again later."
 
 @app.route('/ask_speech', methods=['POST'])
 def ask_speech():
@@ -440,7 +464,7 @@ def ask_speech():
         # Prepare prompt
         enhanced_speech_prompt = """
         (System: You are a crop assistant for {crop_type}. First, clearly and concisely answer the user's specific question. 
-        If and only if the question relates to plant care, wilting, watering, or environmental concerns, then incorporate insights from sensor data ({sensor_context}) and weather forecast ({weather_context}). 
+        If and only if the question relates to plant care, weed removal, wilting, watering, or environmental concerns, then incorporate insights from sensor data ({sensor_context}) and weather forecast ({weather_context}). 
         Recommend watering only if water level is below 38.88%. 
         Keep responses under 500 characters and do not repeat content.)
 
@@ -507,19 +531,16 @@ def strip_html_tags(text):
 
 def generate_audio(text, lang='en'):
     try:
-        # Strip HTML tags and clean text
         clean_text = strip_html_tags(text)
-        # Remove Markdown formatting (asterisks, etc.)
-        clean_text = re.sub(r'[\*]+', '', clean_text)  # Remove * or **
+        clean_text = re.sub(r'[\*]+', '', clean_text)
         clean_text = clean_text.strip()
         if not clean_text:
             logging.error("Cleaned text is empty after processing")
             return None
         logging.info(f"Generating audio for text: {clean_text} (lang: {lang})")
-        audio_filename = f"response_{lang}_{int(time.time())}.mp3"  # Unique filename
+        audio_filename = f"response_{lang}_{int(time.time())}.mp3"
         audio_path = os.path.join(AUDIO_DIR, audio_filename)
         
-        # Delete all existing audio files in the AUDIO_DIR
         for existing_file in os.listdir(AUDIO_DIR):
             existing_file_path = os.path.join(AUDIO_DIR, existing_file)
             try:
@@ -529,7 +550,6 @@ def generate_audio(text, lang='en'):
             except Exception as e:
                 logging.error(f"Error deleting existing audio file {existing_file_path}: {str(e)}")
         
-        # Generate and save the new audio file
         tts = gTTS(text=clean_text, lang=lang, slow=False)
         tts.save(audio_path)
         logging.info(f"Audio file generated: {audio_path}")
@@ -1475,32 +1495,17 @@ def upload_file():
     return jsonify({"error": "File type not allowed"}), 400
 
 # Sensor Dashboard
-sensor_data = {
-    "temperature": None,
-    "humidity": None,
-    "rain_intensity": None,
-    "rain_detected": None,
-    "soil_moisture": None,
-    "water_layer": None,
-    "last_update": None
-}
-
-data_lock = threading.Lock()
-
 @app.route('/sensor-data', methods=['POST', 'GET'])
 def update_sensor_data():
-    global sensor_data
     if request.method == 'POST':
         if request.is_json:
-            with data_lock:
-                data = request.get_json()
-                sensor_data.update(data)
-                sensor_data["last_update"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            return jsonify({"message": "Data updated", "timestamp": sensor_data["last_update"]}), 200
+            data = request.get_json()
+            logging.info(f"Received POST data: {data}")
+            return jsonify({"message": "Data received (POST not used for InfluxDB)", "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}), 200
         return jsonify({"error": "Invalid JSON"}), 400
     elif request.method == 'GET':
-        with data_lock:
-            return jsonify(sensor_data), 200
+        sensor_data = fetch_sensor_data()
+        return jsonify(sensor_data), 200
 
 @app.route('/sensor-dashboard')
 def sensor_dashboard():
@@ -1510,5 +1515,8 @@ def sensor_dashboard():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Create database tables
-    port = int(os.getenv("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    try:
+        port = int(os.getenv("PORT", 5000))
+        app.run(host="0.0.0.0", port=port, debug=False)
+    finally:
+        influx_client.close()  # Explicitly close InfluxDB client
