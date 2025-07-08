@@ -1,4 +1,3 @@
-
 import os
 import re
 import numpy as np
@@ -353,6 +352,8 @@ def fetch_sensor_data():
             "rain_detected": None,
             "soil_moisture": None,
             "water_layer": None,
+            "motion_detected": None,
+            "pir_state": None,
             "last_update": None
         }
         
@@ -368,7 +369,7 @@ def fetch_sensor_data():
                     sensor_data["humidity"] = float(value) if value is not None else None
                 elif field == "rain_intensity":
                     sensor_data["rain_intensity"] = int(value) if value is not None else None
-                    sensor_data["rain_detected"] = "Rain Detected" if value is not None and value <= 2000 else "No Rain"
+                    sensor_data["rain_detected"] = get_rain_status(int(value)) if value is not None else None
                 elif field == "soil_moisture":
                     sensor_data["soil_moisture"] = int(value) if value is not None else None
                     if value is not None:
@@ -382,6 +383,10 @@ def fetch_sensor_data():
                             sensor_data["water_layer"] = "Layer 4 (Deep)"
                         else:
                             sensor_data["water_layer"] = "Layer 5 (Very Deep)"
+                elif field == "motion_detected":
+                    sensor_data["motion_detected"] = int(value) if value is not None else None
+                elif field == "pir_state":
+                    sensor_data["pir_state"] = int(value) if value is not None else None
                 sensor_data["last_update"] = time.strftime("%Y-%m-%d %H:%M:%S") if time else None
         
         logging.info(f"Fetched sensor data from InfluxDB: {sensor_data}")
@@ -395,8 +400,23 @@ def fetch_sensor_data():
             "rain_detected": None,
             "soil_moisture": None,
             "water_layer": None,
+            "motion_detected": None,
+            "pir_state": None,
             "last_update": None
         }
+
+def get_rain_status(rain_value):
+    """Convert rain intensity to status based on Arduino thresholds."""
+    if rain_value < 500:
+        return "Heavy Rain"
+    elif rain_value < 1500:
+        return "Moderate Rain"
+    elif rain_value < 2500:
+        return "Light Rain"
+    elif rain_value < 3500:
+        return "Very Light"
+    else:
+        return "No Rain"
 
 @app.route('/ask_speech', methods=['POST'])
 def ask_speech():
@@ -457,6 +477,8 @@ def ask_speech():
                 f"Humidity: {sensor_data['humidity'] or 'N/A'}%, "
                 f"Rain Intensity: {sensor_data['rain_intensity'] or 'N/A'}, "
                 f"Rain Detected: {sensor_data['rain_detected'] or 'N/A'}, "
+                f"Motion Detected: {sensor_data['motion_detected'] or 'N/A'}, "
+                f"PIR State: {'HIGH' if sensor_data['pir_state'] == 1 else 'LOW' if sensor_data['pir_state'] == 0 else 'N/A'}, "
                 f"Last Update: {sensor_data['last_update'] or 'N/A'}. "
                 f"{irrigation_advice}"
             )
@@ -1510,7 +1532,7 @@ def update_sensor_data():
 @app.route('/sensor-dashboard')
 def sensor_dashboard():
     """Render the sensor dashboard page"""
-    return render_template('sensor_dashboard.html')
+    return render_template('sensor_dashboard.html')  # Updated to match the provided HTML file
 
 if __name__ == '__main__':
     with app.app_context():

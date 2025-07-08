@@ -139,6 +139,7 @@
         .soil-card { grid-column: span 6; grid-row: span 2; }
         .water-card { grid-column: span 6; grid-row: span 2; }
         .rain-intensity-card { grid-column: span 6; grid-row: span 2; }
+        .motion-card { grid-column: span 6; grid-row: span 2; }
 
         .gauge-container {
             position: relative;
@@ -166,13 +167,13 @@
             color: var(--text-light);
         }
 
-        .rain-info {
+        .rain-info, .motion-info {
             display: flex;
             height: 100%;
             flex-direction: column;
         }
 
-        .rain-status {
+        .rain-status, .motion-status {
             margin-top: 1rem;
             padding: 0.8rem;
             border-radius: 10px;
@@ -182,17 +183,17 @@
             transition: var(--transition);
         }
 
-        .rain-active { background-color: var(--danger); color: white; }
-        .rain-inactive { background-color: var(--success); color: white; }
+        .rain-active, .motion-active { background-color: var(--danger); color: white; }
+        .rain-inactive, .motion-inactive { background-color: var(--success); color: white; }
 
-        .rain-image {
+        .rain-image, .motion-image {
             flex-grow: 1;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        .rain-image img {
+        .rain-image img, .motion-image img {
             max-width: 120px;
             max-height: 120px;
         }
@@ -220,7 +221,7 @@
             border: 6px solid var(--light);
             overflow: hidden;
             box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
-            margin-top: 73px
+            margin-top: 73px;
         }
 
         .water-fill {
@@ -268,7 +269,6 @@
             animation: wave 3s linear infinite;
         }
 
-        /* Weather icons */
         .wi {
             display: inline-block;
             font-size: 2rem;
@@ -348,14 +348,14 @@
                 grid-template-columns: repeat(6, 1fr);
             }
             .temp-card, .humidity-card { grid-column: span 3; }
-            .rain-card, .soil-card, .water-card, .rain-intensity-card { grid-column: span 6; }
+            .rain-card, .soil-card, .water-card, .rain-intensity-card, .motion-card { grid-column: span 6; }
         }
 
         @media (max-width: 768px) {
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
-            .temp-card, .humidity-card, .rain-card, .soil-card, .water-card, .rain-intensity-card { 
+            .temp-card, .humidity-card, .rain-card, .soil-card, .water-card, .rain-intensity-card, .motion-card { 
                 grid-column: span 1; 
             }
             .dashboard-header {
@@ -369,7 +369,6 @@
             }
         }
 
-        /* Animated background */
         .animated-bg {
             position: fixed;
             top: 0;
@@ -426,121 +425,118 @@
         }
 
         .analysis-card {
-    grid-column: span 12;
-    grid-row: span 2;
-}
+            grid-column: span 12;
+            grid-row: span 2;
+        }
 
-.analysis-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
+        .analysis-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
 
-.analysis-text {
-    flex-grow: 1;
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 10px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
-    overflow-y: auto;
-    max-height: 200px;
-}
+        .analysis-text {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+            overflow-y: auto;
+            max-height: 200px;
+        }
 
-.analysis-text p {
-    margin-bottom: 0.8rem;
-    line-height: 1.6;
-}
+        .analysis-text p {
+            margin-bottom: 0.8rem;
+            line-height: 1.6;
+        }
 
-.analysis-loading {
-    color: var(--text-light);
-    text-align: center;
-    font-style: italic;
-}
+        .analysis-loading {
+            color: var(--text-light);
+            text-align: center;
+            font-style: italic;
+        }
 
-.analysis-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        .analysis-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-.analysis-timestamp {
-    color: var(--text-light);
-    font-size: 0.9rem;
-}
+        .analysis-timestamp {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
 
-.analysis-refresh {
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: var(--transition);
-}
+        .analysis-refresh {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
 
-.analysis-refresh:hover {
-    background: var(--accent-dark);
-}
+        .analysis-refresh:hover {
+            background: var(--accent-dark);
+        }
 
-.analysis-highlight {
-    font-weight: 500;
-    color: var(--accent-dark);
-}
+        .analysis-highlight {
+            font-weight: 500;
+            color: var(--accent-dark);
+        }
 
-.analysis-alert {
-    color: var(--danger);
-    font-weight: 500;
-}
+        .analysis-alert {
+            color: var(--danger);
+            font-weight: 500;
+        }
 
-.analysis-good {
-    color: var(--success);
-    font-weight: 500;
-}
+        .analysis-good {
+            color: var(--success);
+            font-weight: 500;
+        }
 
-@media (max-width: 1200px) {
-    .analysis-card {
-        grid-column: span 6;
-    }
-}
+        @media (max-width: 1200px) {
+            .analysis-card {
+                grid-column: span 6;
+            }
+        }
 
-@media (max-width: 768px) {
-    .analysis-card {
-        grid-column: span 1;
-    }
-}
-.tree-container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: 2;
-    pointer-events: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+        @media (max-width: 768px) {
+            .analysis-card {
+                grid-column: span 1;
+            }
+        }
 
-.tree-image {
-    height: 60%; /* Reduced size */
-    position: relative;
-    bottom: 5%; /* Adjust positioning */
-}
+        .tree-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 2;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
+        .tree-image {
+            height: 60%;
+            position: relative;
+            bottom: 5%;
+        }
 
-/* Ensure water is visible through/around tree */
-.water-fill {
-    z-index: 1;
-}
+        .water-fill {
+            z-index: 1;
+        }
 
-/* Make text readable over the tree */
-.water-text {
-    z-index: 3;
-    text-shadow: 0 0 5px white, 0 0 5px white; /* Add shadow to make text readable */
-}
-
+        .water-text {
+            z-index: 3;
+            text-shadow: 0 0 5px white, 0 0 5px white;
+        }
     </style>
 </head>
 <body>
@@ -561,6 +557,7 @@
             <div class="dashboard-status">System Online</div>
         </div>
     </div>
+
     <div class="card analysis-card">
         <div class="card-header">
             <h3 class="card-title">Environmental Analysis</h3>
@@ -576,6 +573,7 @@
             </div>
         </div>
     </div>
+
     <div class="dashboard-grid">
         <div class="card temp-card">
             <div class="card-header">
@@ -680,601 +678,611 @@
                 <span>Change: <span id="water-change">--</span></span>
             </div>
         </div>
+
+        <div class="card motion-card">
+            <div class="card-header">
+                <h3 class="card-title">Motion Detection</h3>
+                <div class="card-icon">🕵️</div>
+            </div>
+            <div class="motion-info">
+                <div id="motion-status" class="motion-status">No Data</div>
+                <div class="motion-image" id="motion-image"></div>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-value" id="motion-count">--</div>
+                        <div class="status-label">Detections Today</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-value" id="last-motion-time">--</div>
+                        <div class="status-label">Last Detection</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
- <script>
-// Constants for water level thresholds
-const WATER_LEVELS = {
-    THRESHOLDS: {
-        VERY_WET: 2500,
-        SHALLOW_WET: 1700,
-        MODERATELY_WET: 1300
-    },
-    PERCENTAGES: {
-        VERY_WET: 0,
-        SHALLOW_WET: 40,
-        MODERATELY_WET: 75,
-        DEEP_WET: 95
-    }
-};
+    <script>
+        // Constants for water level thresholds
+        const WATER_LEVELS = {
+            THRESHOLDS: {
+                VERY_WET: 2500,
+                SHALLOW_WET: 1700,
+                MODERATELY_WET: 1300
+            },
+            PERCENTAGES: {
+                VERY_WET: 0,
+                SHALLOW_WET: 40,
+                MODERATELY_WET: 75,
+                DEEP_WET: 95
+            }
+        };
 
-// Store historical data for trends
-const historyData = {
-    temperature: [],
-    humidity: [],
-    rainIntensity: [],
-    soilMoisture: [],
-    waterLevel: [],
-    rainEvents: 0,
-    lastRainDuration: 0,
-    rainStartTime: null
-};
+        // Store historical data for trends
+        const historyData = {
+            temperature: [],
+            humidity: [],
+            rainIntensity: [],
+            soilMoisture: [],
+            waterLevel: [],
+            rainEvents: 0,
+            lastRainDuration: 0,
+            rainStartTime: null,
+            motionEvents: 0,
+            lastMotionTime: null,
+            motionStartTime: null
+        };
 
-// Initialize charts
-const rainIntensityChart = new ApexCharts(document.getElementById('rainIntensityChart'), {
-    series: [{
-        name: 'Rain Intensity',
-        data: []
-    }],
-    chart: {
-        height: 200,
-        type: 'area',
-        toolbar: {
-            show: false
-        },
-        animations: {
-            enabled: true,
-            easing: 'easeinout',
-            speed: 800
-        },
-        sparkline: {
-            enabled: false
-        }
-    },
-    stroke: {
-        curve: 'smooth',
-        width: 3
-    },
-    fill: {
-        type: 'gradient',
-        gradient: {
-            shadeIntensity: 1,
-            opacityFrom: 0.7,
-            opacityTo: 0.3,
-            stops: [0, 90, 100],
-            colorStops: [
-                {
-                    offset: 0,
-                    color: '#3498db',
-                    opacity: 0.7
+        // Initialize charts
+        const rainIntensityChart = new ApexCharts(document.getElementById('rainIntensityChart'), {
+            series: [{
+                name: 'Rain Intensity',
+                data: []
+            }],
+            chart: {
+                height: 200,
+                type: 'area',
+                toolbar: { show: false },
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800
                 },
-                {
-                    offset: 100,
-                    color: '#2ecc71',
-                    opacity: 0.3
+                sparkline: { enabled: false }
+            },
+            stroke: { curve: 'smooth', width: 3 },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.7,
+                    opacityTo: 0.3,
+                    stops: [0, 90, 100],
+                    colorStops: [
+                        { offset: 0, color: '#3498db', opacity: 0.7 },
+                        { offset: 100, color: '#2ecc71', opacity: 0.3 }
+                    ]
                 }
-            ]
-        }
-    },
-    markers: {
-        size: 0
-    },
-    grid: {
-        show: false
-    },
-    xaxis: {
-        categories: [],
-        labels: {
-            show: true,
-            style: {
-                fontSize: '10px'
-            }
-        }
-    },
-    yaxis: {
-        min: 0,
-        labels: {
-            style: {
-                fontSize: '10px'
-            }
-        }
-    },
-    tooltip: {
-        x: {
-            format: 'HH:mm:ss'
-        }
-    },
-    theme: {
-        mode: 'light'
-    }
-});
-rainIntensityChart.render();
-
-const soilChart = new ApexCharts(document.getElementById('soilChart'), {
-    series: [{
-        name: 'Soil Moisture',
-        data: []
-    }],
-    chart: {
-        height: 200,
-        type: 'line',
-        toolbar: {
-            show: false
-        },
-        animations: {
-            enabled: true,
-            easing: 'easeinout',
-            speed: 800
-        },
-        sparkline: {
-            enabled: false
-        }
-    },
-    stroke: {
-        curve: 'smooth',
-        width: 3
-    },
-    colors: ['#e67e22'],
-    markers: {
-        size: 4,
-        colors: ['#e67e22'],
-        strokeColors: '#fff',
-        strokeWidth: 2
-    },
-    grid: {
-        show: false
-    },
-    xaxis: {
-        categories: [],
-        labels: {
-            show: true,
-            style: {
-                fontSize: '10px'
-            }
-        }
-    },
-    yaxis: {
-        min: 0,
-        labels: {
-            style: {
-                fontSize: '10px'
-            }
-        }
-    },
-    tooltip: {
-        x: {
-            format: 'HH:mm:ss'
-        }
-    },
-    theme: {
-        mode: 'light'
-    }
-});
-soilChart.render();
-
-// Helper functions
-function getWaterStatus(value) {
-    if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return 'Dry';
-    if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return 'Shallow Wet';
-    if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return 'Moderately Wet';
-    return 'Deep Wet';
-}
-
-function getWaterColor(value) {
-    if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return '#3498db';
-    if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return '#2980b9';
-    if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return '#1f618d';
-    return '#154360';
-}
-
-function getWaterPercentage(value) {
-    if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return WATER_LEVELS.PERCENTAGES.VERY_WET;
-    if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return WATER_LEVELS.PERCENTAGES.SHALLOW_WET;
-    if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return WATER_LEVELS.PERCENTAGES.MODERATELY_WET;
-    return WATER_LEVELS.PERCENTAGES.DEEP_WET;
-}
-
-function getSoilStatus(value) {
-    if (value > 2500) return 'Very Dry';
-    if (value > 2000) return 'Dry';
-    if (value > 1500) return 'Slightly Dry';
-    if (value > 1000) return 'Moist';
-    return 'Wet';
-}
-
-function getTrendIndicator(currentValue, previousValues, type) {
-    if (previousValues.length < 2) return '—';
-    
-    const avgPrevious = previousValues.slice(-3, -1).reduce((a, b) => a + b, 0) / 2;
-    const diff = currentValue - avgPrevious;
-    const percentage = Math.abs((diff / avgPrevious) * 100).toFixed(1);
-    
-    if (Math.abs(diff) < 0.5) return '—';
-    
-    if (type === 'temp' || type === 'water') {
-        if (diff > 0) return `<span class="trend-up">↑ ${percentage}%</span>`;
-        return `<span class="trend-down">↓ ${percentage}%</span>`;
-    } else {
-        if (diff > 0) return `<span class="trend-down">↑ ${percentage}%</span>`;
-        return `<span class="trend-up">↓ ${percentage}%</span>`;
-    }
-}
-
-function calculateAverage(arr) {
-    if (arr.length === 0) return 0;
-    return (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1);
-}
-
-function calculateMax(arr) {
-    if (arr.length === 0) return 0;
-    return Math.max(...arr).toFixed(1);
-}
-
-function convertSoilMoistureToWaterLevel(soilMoisture) {
-    if (soilMoisture == null || isNaN(soilMoisture) || soilMoisture > 4095 || soilMoisture < 0) {
-        return 0; // Default to 0 for invalid values
-    }
-    return Math.round(((4095 - soilMoisture) / 4095) * 100); // Match speech module formula
-}
-
-function updateWaterLevel(value) {
-    if (value == null || isNaN(value)) {
-        document.getElementById('water-percentage').textContent = '--%';
-        document.getElementById('water-status').textContent = 'No Data';
-        document.getElementById('water-fill').style.height = '0%';
-        document.getElementById('water-fill').style.backgroundColor = '#ecf0f1';
-        return;
-    }
-
-    const displayPercentage = convertSoilMoistureToWaterLevel(value); // Use speech module formula for display
-    const thresholdPercentage = getWaterPercentage(value); // Use original thresholds for status/color
-    const status = getWaterStatus(value);
-    const color = getWaterColor(value);
-
-    const waterFill = document.getElementById('water-fill');
-    const waterPercentage = document.getElementById('water-percentage');
-    const waterStatus = document.getElementById('water-status');
-
-    waterFill.style.height = `${displayPercentage}%`; // Match fill height to displayed percentage
-    waterFill.style.backgroundColor = color;
-    waterPercentage.textContent = `${displayPercentage}%`;
-    waterStatus.textContent = status;
-    
-    // Update water trend and change
-    document.getElementById('water-updated').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    if (historyData.waterLevel.length > 1) {
-        const lastValue = historyData.waterLevel[historyData.waterLevel.length - 2];
-        const change = thresholdPercentage - lastValue;
-        document.getElementById('water-change').textContent = (change >= 0 ? '+' : '') + change + '%';
-    }
-}
-
-function updateRainStatus(rainDetected) {
-    const rainStatus = document.getElementById('rain-status');
-    const rainImage = document.getElementById('rain-image');
-    const currentHour = new Date().getHours();
-    const currentTime = new Date();
-
-    if (rainDetected === "Rain Detected") {
-        rainStatus.innerHTML = 'Rain Detected';
-        rainStatus.className = 'rain-status rain-active';
-        rainImage.innerHTML = '<img src="https://media.tenor.com/YefQKTdi3hUAAAAj/rafsdesign-rafsdesigns.gif" alt="Rain" width="120" height="120">';
-        
-        if (historyData.rainStartTime === null) {
-            historyData.rainStartTime = currentTime;
-            historyData.rainEvents++;
-            document.getElementById('rain-day-count').textContent = historyData.rainEvents;
-        }
-    } else {
-        rainStatus.innerHTML = 'No Rain';
-        rainStatus.className = 'rain-status rain-inactive';
-        
-        if (currentHour >= 6 && currentHour < 18) {
-            rainImage.innerHTML = '<img src="https://media1.tenor.com/m/gUKy0QmrNHIAAAAC/sun-sunlight.gif" alt="Sunlight" width="120" height="120">';
-        } else {
-            rainImage.innerHTML = '<img src="https://media.tenor.com/DTIl6DWhrZwAAAAj/moon-spacedoodles.gif" alt="Moonlight" width="120" height="120">';
-        }
-        
-        if (historyData.rainStartTime !== null) {
-            const duration = Math.round((currentTime - historyData.rainStartTime) / 60000);
-            historyData.lastRainDuration = duration;
-            document.getElementById('rain-duration').textContent = duration + ' min';
-            historyData.rainStartTime = null;
-        }
-    }
-}
-
-function updateCharts(time, data) {
-    if (data.rain_intensity !== null) {
-        const series = rainIntensityChart.w.globals.series[0];
-        const categories = rainIntensityChart.w.globals.categoryLabels;
-        
-        if (series.length >= 10) {
-            series.shift();
-            categories.shift();
-        }
-        
-        series.push(data.rain_intensity);
-        categories.push(time);
-        
-        rainIntensityChart.updateOptions({
-            series: [{
-                data: series
-            }],
+            },
+            markers: { size: 0 },
+            grid: { show: false },
             xaxis: {
-                categories: categories
-            }
+                categories: [],
+                labels: { show: true, style: { fontSize: '10px' } }
+            },
+            yaxis: {
+                min: 0,
+                labels: { style: { fontSize: '10px' } }
+            },
+            tooltip: { x: { format: 'HH:mm:ss' } },
+            theme: { mode: 'light' }
         });
-        
-        document.getElementById('max-intensity').textContent = calculateMax(series);
-        document.getElementById('avg-intensity').textContent = calculateAverage(series);
-    }
-    
-    if (data.soil_moisture !== null) {
-        const series = soilChart.w.globals.series[0];
-        const categories = soilChart.w.globals.categoryLabels;
-        
-        if (series.length >= 10) {
-            series.shift();
-            categories.shift();
-        }
-        
-        series.push(data.soil_moisture);
-        categories.push(time);
-        
-        soilChart.updateOptions({
+        rainIntensityChart.render();
+
+        const soilChart = new ApexCharts(document.getElementById('soilChart'), {
             series: [{
-                data: series
+                name: 'Soil Moisture',
+                data: []
             }],
+            chart: {
+                height: 200,
+                type: 'line',
+                toolbar: { show: false },
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800
+                },
+                sparkline: { enabled: false }
+            },
+            stroke: { curve: 'smooth', width: 3 },
+            colors: ['#e67e22'],
+            markers: {
+                size: 4,
+                colors: ['#e67e22'],
+                strokeColors: '#fff',
+                strokeWidth: 2
+            },
+            grid: { show: false },
             xaxis: {
-                categories: categories
-            }
+                categories: [],
+                labels: { show: true, style: { fontSize: '10px' } }
+            },
+            yaxis: {
+                min: 0,
+                labels: { style: { fontSize: '10px' } }
+            },
+            tooltip: { x: { format: 'HH:mm:ss' } },
+            theme: { mode: 'light' }
         });
-        
-        document.getElementById('soil-status').textContent = getSoilStatus(data.soil_moisture);
-        historyData.soilMoisture.push(data.soil_moisture);
-        if (historyData.soilMoisture.length > 10) historyData.soilMoisture.shift();
-        document.getElementById('soil-trend').innerHTML = getTrendIndicator(
-            data.soil_moisture, 
-            historyData.soilMoisture, 
-            'soil'
-        );
-    }
-}
+        soilChart.render();
 
-async function updateDashboard() {
-    try {
-        const response = await fetch('/sensor-data');
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-        
-        const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-        
-        if (data.temperature !== null) {
-            document.getElementById('temp-value').textContent = data.temperature.toFixed(1);
-            document.getElementById('temp-updated').textContent = currentTime.slice(0, -3);
-            
-            historyData.temperature.push(data.temperature);
-            if (historyData.temperature.length > 10) historyData.temperature.shift();
-            
-            document.getElementById('temp-trend').innerHTML = getTrendIndicator(
-                data.temperature, 
-                historyData.temperature, 
-                'temp'
-            );
-            
-            document.getElementById('temp-avg').textContent = calculateAverage(historyData.temperature);
+        // Helper functions
+        function getWaterStatus(value) {
+            if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return 'Dry';
+            if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return 'Shallow Wet';
+            if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return 'Moderately Wet';
+            return 'Deep Wet';
         }
-        
-        if (data.humidity !== null) {
-            document.getElementById('humidity-value').textContent = data.humidity.toFixed(1);
-            document.getElementById('humidity-updated').textContent = currentTime.slice(0, -3);
-            
-            historyData.humidity.push(data.humidity);
-            if (historyData.humidity.length > 10) historyData.humidity.shift();
-            
-            document.getElementById('humidity-trend').innerHTML = getTrendIndicator(
-                data.humidity, 
-                historyData.humidity, 
-                'humidity'
-            );
-            
-            document.getElementById('humidity-avg').textContent = calculateAverage(historyData.humidity);
-        }
-        
-        if (data.rain_detected !== null) {
-            updateRainStatus(data.rain_detected);
-        }
-        
-        updateCharts(currentTime, data);
-        
-        if (data.soil_moisture !== null) {
-            const waterLevel = getWaterPercentage(data.soil_moisture);
-            historyData.waterLevel.push(waterLevel);
-            if (historyData.waterLevel.length > 10) historyData.waterLevel.shift();
-            updateWaterLevel(data.soil_moisture);
-        }
-        
-    } catch (error) {
-        console.error('Error fetching sensor data:', error);
-    }
-}
 
-function updateDateTime() {
-    const now = new Date();
-    document.getElementById('current-time').textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-    document.getElementById('current-date').textContent = now.toLocaleDateString([], {weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'});
-}
+        function getWaterColor(value) {
+            if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return '#3498db';
+            if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return '#2980b9';
+            if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return '#1f618d';
+            return '#154360';
+        }
 
-function initDashboard() {
-    updateDateTime();
-    updateDashboard();
-    
-    setInterval(updateDateTime, 1000);
-    const updateInterval = setInterval(updateDashboard, 5000);
-    
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            clearInterval(updateInterval);
-        } else {
-            updateDashboard();
-            setInterval(updateDashboard, 5000);
+        function getWaterPercentage(value) {
+            if (value >= WATER_LEVELS.THRESHOLDS.VERY_WET) return WATER_LEVELS.PERCENTAGES.VERY_WET;
+            if (value >= WATER_LEVELS.THRESHOLDS.SHALLOW_WET) return WATER_LEVELS.PERCENTAGES.SHALLOW_WET;
+            if (value >= WATER_LEVELS.THRESHOLDS.MODERATELY_WET) return WATER_LEVELS.PERCENTAGES.MODERATELY_WET;
+            return WATER_LEVELS.PERCENTAGES.DEEP_WET;
         }
-    });
-}
 
-window.addEventListener('DOMContentLoaded', initDashboard);
+        function getSoilStatus(value) {
+            if (value > 2500) return 'Very Dry';
+            if (value > 2000) return 'Dry';
+            if (value > 1500) return 'Slightly Dry';
+            if (value > 1000) return 'Moist';
+            return 'Wet';
+        }
 
-function generateEnvironmentalAnalysis(data) {
-    if (!data || 
-        (data.temperature === null && 
-         data.humidity === null && 
-         data.soil_moisture === null && 
-         data.rain_detected === null)) {
-        return "<p class='analysis-loading'>Waiting for sensor data to generate analysis...</p>";
-    }
-    
-    let analysis = [];
-    const currentTime = new Date();
-    const hour = currentTime.getHours();
-    const isDay = hour >= 6 && hour < 18;
-    
-    // Temperature analysis
-    if (data.temperature !== null) {
-        let tempAnalysis = "";
-        if (data.temperature > 30) {
-            tempAnalysis = `<p>The current temperature is <span class="analysis-highlight">${data.temperature.toFixed(1)}°C</span>, which is <span class="analysis-alert">significantly above the ideal range</span>. This may cause plant stress and increased water evaporation. Consider providing shade and increasing watering frequency.</p>`;
-        } else if (data.temperature > 25) {
-            tempAnalysis = `<p>The current temperature is <span class="analysis-highlight">${data.temperature.toFixed(1)}°C</span>, which is <span class="analysis-alert">slightly elevated</span> but within manageable range. Monitor plants for signs of heat stress, especially during peak sun hours.</p>`;
-        } else if (data.temperature > 15) {
-            tempAnalysis = `<p>The current temperature is <span class="analysis-highlight">${data.temperature.toFixed(1)}°C</span>, which is in the <span class="analysis-good">ideal range</span> for most plants. Growth conditions are optimal at this temperature.</p>`;
-        } else if (data.temperature > 5) {
-            tempAnalysis = `<p>The current temperature is <span class="analysis-highlight">${data.temperature.toFixed(1)}°C</span>, which is <span class="analysis-alert">cooler than optimal</span> for many plants. Growth may slow down but is still possible for cold-tolerant varieties.</p>`;
-        } else {
-            tempAnalysis = `<p>The current temperature is <span class="analysis-highlight">${data.temperature.toFixed(1)}°C</span>, which is <span class="analysis-alert">critically low</span>. Frost damage is possible. Consider protective measures if growing sensitive plants.</p>`;
+        function getTrendIndicator(currentValue, previousValues, type) {
+            if (previousValues.length < 2) return '—';
+            
+            const avgPrevious = previousValues.slice(-3, -1).reduce((a, b) => a + b, 0) / 2;
+            const diff = currentValue - avgPrevious;
+            const percentage = Math.abs((diff / avgPrevious) * 100).toFixed(1);
+            
+            if (Math.abs(diff) < 0.5) return '—';
+            
+            if (type === 'temp' || type === 'water') {
+                if (diff > 0) return `<span class="trend-up">↑ ${percentage}%</span>`;
+                return `<span class="trend-down">↓ ${percentage}%</span>`;
+            } else {
+                if (diff > 0) return `<span class="trend-down">↑ ${percentage}%</span>`;
+                return `<span class="trend-up">↓ ${percentage}%</span>`;
+            }
         }
-        analysis.push(tempAnalysis);
-    }
-    
-    // Humidity analysis
-    if (data.humidity !== null) {
-        let humidityAnalysis = "";
-        if (data.humidity > 85) {
-            humidityAnalysis = `<p>Current humidity is <span class="analysis-highlight">${data.humidity.toFixed(1)}%</span>, which is <span class="analysis-alert">very high</span>. This increases the risk of fungal diseases and mold. Consider improving air circulation and reducing overhead watering.</p>`;
-        } else if (data.humidity > 60) {
-            humidityAnalysis = `<p>Current humidity is <span class="analysis-highlight">${data.humidity.toFixed(1)}%</span>, which is <span class="analysis-good">good for most tropical plants</span> but may be high for desert species. This promotes healthy leaf development and reduces transpiration stress.</p>`;
-        } else if (data.humidity > 40) {
-            humidityAnalysis = `<p>Current humidity is <span class="analysis-highlight">${data.humidity.toFixed(1)}%</span>, which is in the <span class="analysis-good">ideal range</span> for most plants, providing a good balance between growth and disease prevention.</p>`;
-        } else {
-            humidityAnalysis = `<p>Current humidity is <span class="analysis-highlight">${data.humidity.toFixed(1)}%</span>, which is <span class="analysis-alert">low</span>. This may lead to increased water loss through transpiration. Consider misting sensitive plants or using a humidifier nearby.</p>`;
+
+        function calculateAverage(arr) {
+            if (arr.length === 0) return 0;
+            return (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1);
         }
-        analysis.push(humidityAnalysis);
-    }
-    
-    // Soil moisture analysis
-    if (data.soil_moisture !== null) {
-        let soilAnalysis = "";
-        if (data.soil_moisture > 2500) {
-            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-alert">critically dry soil</span>. Immediate watering is recommended to prevent plant wilting and root damage.</p>`;
-        } else if (data.soil_moisture > 2000) {
-            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-alert">dry soil conditions</span>. Watering is recommended within the next 12-24 hours.</p>`;
-        } else if (data.soil_moisture > 1500) {
-            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-highlight">slightly dry soil</span>. Monitor conditions, especially if weather is hot or windy.</p>`;
-        } else if (data.soil_moisture > 1000) {
-            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-good">ideal moisture levels</span>. Soil has good moisture content while maintaining adequate aeration for root health.</p>`;
-        } else {
-            soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-alert">very wet conditions</span>. Avoid additional watering to prevent root rot and oxygen deprivation.</p>`;
+
+        function calculateMax(arr) {
+            if (arr.length === 0) return 0;
+            return Math.max(...arr).toFixed(1);
         }
-        analysis.push(soilAnalysis);
-    }
-    
-    // Rain analysis
-    if (data.rain_detected !== null) {
-        let rainAnalysis = "";
-        if (data.rain_detected === "Rain Detected") {
-            if (data.rain_intensity !== null) {
-                const intensityLevel = 4095 - data.rain_intensity;
-                if (data.rain_intensity < 500) {
-                    rainAnalysis = `<p><span class="analysis-alert">Heavy rainfall detected</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity}</span>). This indicates significant precipitation, which may lead to soil erosion and nutrient leaching. Consider checking drainage systems and protecting sensitive plants.</p>`;
-                } else if (data.rain_intensity < 1000) {
-                    rainAnalysis = `<p><span class="analysis-highlight">Moderate rainfall detected</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity}</span>). This provides good moisture for plants while not being too intense. Ideal for natural irrigation.</p>`;
+
+        function convertSoilMoistureToWaterLevel(soilMoisture) {
+            if (soilMoisture == null || isNaN(soilMoisture) || soilMoisture > 4095 || soilMoisture < 0) {
+                return 0;
+            }
+            return Math.round(((4095 - soilMoisture) / 4095) * 100);
+        }
+
+        function updateWaterLevel(value) {
+            if (value == null || isNaN(value)) {
+                document.getElementById('water-percentage').textContent = '--%';
+                document.getElementById('water-status').textContent = 'No Data';
+                document.getElementById('water-fill').style.height = '0%';
+                document.getElementById('water-fill').style.backgroundColor = '#ecf0f1';
+                return;
+            }
+
+            const displayPercentage = convertSoilMoistureToWaterLevel(value);
+            const thresholdPercentage = getWaterPercentage(value);
+            const status = getWaterStatus(value);
+            const color = getWaterColor(value);
+
+            const waterFill = document.getElementById('water-fill');
+            const waterPercentage = document.getElementById('water-percentage');
+            const waterStatus = document.getElementById('water-status');
+
+            waterFill.style.height = `${displayPercentage}%`;
+            waterFill.style.backgroundColor = color;
+            waterPercentage.textContent = `${displayPercentage}%`;
+            waterStatus.textContent = status;
+            
+            document.getElementById('water-updated').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            if (historyData.waterLevel.length > 1) {
+                const lastValue = historyData.waterLevel[historyData.waterLevel.length - 2];
+                const change = thresholdPercentage - lastValue;
+                document.getElementById('water-change').textContent = (change >= 0 ? '+' : '') + change + '%';
+            }
+        }
+
+        function updateRainStatus(rainDetected) {
+            const rainStatus = document.getElementById('rain-status');
+            const rainImage = document.getElementById('rain-image');
+            const currentHour = new Date().getHours();
+            const currentTime = new Date();
+
+            if (rainDetected !== 'No Rain' && rainDetected !== 'Very Light') {
+                rainStatus.innerHTML = rainDetected;
+                rainStatus.className = 'rain-status rain-active';
+                rainImage.innerHTML = '<img src="https://media.tenor.com/YefQKTdi3hUAAAAj/rafsdesign-rafsdesigns.gif" alt="Rain" width="120" height="120">';
+                
+                if (historyData.rainStartTime === null) {
+                    historyData.rainStartTime = currentTime;
+                    historyData.rainEvents++;
+                    document.getElementById('rain-day-count').textContent = historyData.rainEvents;
+                }
+            } else {
+                rainStatus.innerHTML = 'No Rain';
+                rainStatus.className = 'rain-status rain-inactive';
+                
+                if (currentHour >= 6 && currentHour < 18) {
+                    rainImage.innerHTML = '<img src="https://media1.tenor.com/m/gUKy0QmrNHIAAAAC/sun-sunlight.gif" alt="Sunlight" width="120" height="120">';
                 } else {
-                    rainAnalysis = `<p><span class="analysis-good">Light rainfall detected</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity}</span>). This gentle precipitation is excellent for plants as it allows slow absorption without soil compaction or runoff.</p>`;
+                    rainImage.innerHTML = '<img src="https://media.tenor.com/DTIl6DWhrZwAAAAj/moon-spacedoodles.gif" alt="Moonlight" width="120" height="120">';
+                }
+                
+                if (historyData.rainStartTime !== null) {
+                    const duration = Math.round((currentTime - historyData.rainStartTime) / 60000);
+                    historyData.lastRainDuration = duration;
+                    document.getElementById('rain-duration').textContent = duration + ' min';
+                    historyData.rainStartTime = null;
+                }
+            }
+        }
+
+function updateMotionStatus(motionDetected, pirState) {
+    const motionStatus = document.getElementById('motion-status');
+    const motionImage = document.getElementById('motion-image');
+    const currentTime = new Date();
+
+    if (motionDetected === 1) {
+        motionStatus.innerHTML = 'Motion Detected';
+        motionStatus.className = 'motion-status motion-active';
+        motionImage.innerHTML = '<img src="https://www.route66sodas.com/wp-content/uploads/2019/01/Alert.gif" alt="Motion Detected" width="120" height="120">';
+        
+        if (historyData.motionStartTime === null) {
+            historyData.motionEvents++;
+            historyData.motionStartTime = currentTime;
+            document.getElementById('motion-count').textContent = historyData.motionEvents;
+            document.getElementById('last-motion-time').textContent = currentTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+    } else {
+        motionStatus.innerHTML = 'No Motion';
+        motionStatus.className = 'motion-status motion-inactive';
+        motionImage.innerHTML = '<img src="https://cdn.pixabay.com/animation/2023/03/15/17/17/17-17-42-929_512.gif" alt="No Motion" width="120" height="120">';
+        
+        historyData.motionStartTime = null;
+    }
+}
+
+
+        function updateCharts(time, data) {
+            if (data.rain_intensity !== null) {
+                const series = rainIntensityChart.w.globals.series[0];
+                const categories = rainIntensityChart.w.globals.categoryLabels;
+                
+                if (series.length >= 10) {
+                    series.shift();
+                    categories.shift();
+                }
+                
+                series.push(data.rain_intensity);
+                categories.push(time);
+                
+                rainIntensityChart.updateOptions({
+                    series: [{ data: series }],
+                    xaxis: { categories: categories }
+                });
+                
+                document.getElementById('max-intensity').textContent = calculateMax(series);
+                document.getElementById('avg-intensity').textContent = calculateAverage(series);
+            }
+            
+            if (data.soil_moisture !== null) {
+                const series = soilChart.w.globals.series[0];
+                const categories = soilChart.w.globals.categoryLabels;
+                
+                if (series.length >= 10) {
+                    series.shift();
+                    categories.shift();
+                }
+                
+                series.push(data.soil_moisture);
+                categories.push(time);
+                
+                soilChart.updateOptions({
+                    series: [{ data: series }],
+                    xaxis: { categories: categories }
+                });
+                
+                document.getElementById('soil-status').textContent = getSoilStatus(data.soil_moisture);
+                historyData.soilMoisture.push(data.soil_moisture);
+                if (historyData.soilMoisture.length > 10) historyData.soilMoisture.shift();
+                document.getElementById('soil-trend').innerHTML = getTrendIndicator(
+                    data.soil_moisture, 
+                    historyData.soilMoisture, 
+                    'soil'
+                );
+            }
+        }
+
+        async function updateDashboard() {
+            try {
+                const response = await fetch('/sensor-data');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                
+                const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+                
+                if (data.temperature !== null) {
+                    document.getElementById('temp-value').textContent = data.temperature.toFixed(1);
+                    document.getElementById('temp-updated').textContent = currentTime.slice(0, -3);
+                    
+                    historyData.temperature.push(data.temperature);
+                    if (historyData.temperature.length > 10) historyData.temperature.shift();
+                    
+                    document.getElementById('temp-trend').innerHTML = getTrendIndicator(
+                        data.temperature, 
+                        historyData.temperature, 
+                        'temp'
+                    );
+                    
+                    document.getElementById('temp-avg').textContent = calculateAverage(historyData.temperature);
+                }
+                
+                if (data.humidity !== null) {
+                    document.getElementById('humidity-value').textContent = data.humidity.toFixed(1);
+                    document.getElementById('humidity-updated').textContent = currentTime.slice(0, -3);
+                    
+                    historyData.humidity.push(data.humidity);
+                    if (historyData.humidity.length > 10) historyData.humidity.shift();
+                    
+                    document.getElementById('humidity-trend').innerHTML = getTrendIndicator(
+                        data.humidity, 
+                        historyData.humidity, 
+                        'humidity'
+                    );
+                    
+                    document.getElementById('humidity-avg').textContent = calculateAverage(historyData.humidity);
+                }
+                
+                if (data.rain_detected !== null) {
+                    updateRainStatus(data.rain_detected);
+                }
+                
+                if (data.motion_detected !== null && data.pir_state !== null) {
+                    updateMotionStatus(data.motion_detected, data.pir_state);
+                }
+                
+                updateCharts(currentTime, data);
+                
+                if (data.soil_moisture !== null) {
+                    const waterLevel = getWaterPercentage(data.soil_moisture);
+                    historyData.waterLevel.push(waterLevel);
+                    if (historyData.waterLevel.length > 10) historyData.waterLevel.shift();
+                    updateWaterLevel(data.soil_moisture);
+                }
+                
+            } catch (error) {
+                console.error('Error fetching sensor data:', error);
+            }
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+            document.getElementById('current-date').textContent = now.toLocaleDateString([], {weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'});
+        }
+
+        function initDashboard() {
+            updateDateTime();
+            updateDashboard();
+            
+            setInterval(updateDateTime, 1000);
+            const updateInterval = setInterval(updateDashboard, 5000);
+            
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    clearInterval(updateInterval);
+                } else {
+                    updateDashboard();
+                    setInterval(updateDashboard, 5000);
+                }
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', initDashboard);
+
+        function generateEnvironmentalAnalysis(data) {
+            if (!data || 
+                (data.temperature === null && 
+                 data.humidity === null && 
+                 data.soil_moisture === null && 
+                 data.rain_detected === null && 
+                 data.motion_detected === null)) {
+                return "<p class='analysis-loading'>Waiting for sensor data to generate analysis...</p>";
+            }
+            
+            let analysis = [];
+            const currentTime = new Date();
+            const hour = currentTime.getHours();
+            const isDay = hour >= 6 && hour < 18;
+            
+            // Temperature analysis
+            if (data.temperature !== null) {
+                let tempAnalysis = "";
+                if (data.temperature > 30) {
+                    tempAnalysis = `<p>The current temperature is <span class="analysis-highlight">${data.temperature.toFixed(1)}°C</span>, which is <span class="analysis-alert">significantly above the ideal range</span>. This may cause plant stress and increased water evaporation. Consider providing shade and increasing watering frequency.</p>`;
+                } else if (data.temperature > 25) {
+                    tempAnalysis = `<p>The current temperature is <span class="analysis-highlight">${data.temperature.toFixed(1)}°C</span>, which is <span class="analysis-alert">slightly elevated</span> but within manageable range. Monitor plants for signs of heat stress, especially during peak sun hours.</p>`;
+                } else if (data.temperature > 15) {
+                    tempAnalysis = `<p>The current temperature is <span class="analysis-highlight">${data.temperature.toFixed(1)}°C</span>, which is in the <span class="analysis-good">ideal range</span> for most plants. Growth conditions are optimal at this temperature.</p>`;
+                } else if (data.temperature > 5) {
+                    tempAnalysis = `<p>The current temperature is <span class="analysis-highlight">${data.temperature.toFixed(1)}°C</span>, which is <span class="analysis-alert">cooler than optimal</span> for many plants. Growth may slow down but is still possible for cold-tolerant varieties.</p>`;
+                } else {
+                    tempAnalysis = `<p>The current temperature is <span class="analysis-highlight">${data.temperature.toFixed(1)}°C</span>, which is <span class="analysis-alert">critically low</span>. Frost damage is possible. Consider protective measures if growing sensitive plants.</p>`;
+                }
+                analysis.push(tempAnalysis);
+            }
+            
+            // Humidity analysis
+            if (data.humidity !== null) {
+                let humidityAnalysis = "";
+                if (data.humidity > 85) {
+                    humidityAnalysis = `<p>Current humidity is <span class="analysis-highlight">${data.humidity.toFixed(1)}%</span>, which is <span class="analysis-alert">very high</span>. This increases the risk of fungal diseases and mold. Consider improving air circulation and reducing overhead watering.</p>`;
+                } else if (data.humidity > 60) {
+                    humidityAnalysis = `<p>Current humidity is <span class="analysis-highlight">${data.humidity.toFixed(1)}%</span>, which is <span class="analysis-good">good for most tropical plants</span> but may be high for desert species. This promotes healthy leaf development and reduces transpiration stress.</p>`;
+                } else if (data.humidity > 40) {
+                    humidityAnalysis = `<p>Current humidity is <span class="analysis-highlight">${data.humidity.toFixed(1)}%</span>, which is in the <span class="analysis-good">ideal range</span> for most plants, providing a good balance between growth and disease prevention.</p>`;
+                } else {
+                    humidityAnalysis = `<p>Current humidity is <span class="analysis-highlight">${data.humidity.toFixed(1)}%</span>, which is <span class="analysis-alert">low</span>. This may lead to increased water loss through transpiration. Consider misting sensitive plants or using a humidifier nearby.</p>`;
+                }
+                analysis.push(humidityAnalysis);
+            }
+            
+            // Soil moisture analysis
+            if (data.soil_moisture !== null) {
+                let soilAnalysis = "";
+                if (data.soil_moisture > 2500) {
+                    soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-alert">critically dry soil</span>. Immediate watering is recommended to prevent plant wilting and root damage.</p>`;
+                } else if (data.soil_moisture > 2000) {
+                    soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-alert">dry soil conditions</span>. Watering is recommended within the next 12-24 hours.</p>`;
+                } else if (data.soil_moisture > 1500) {
+                    soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-highlight">slightly dry soil</span>. Monitor conditions, especially if weather is hot or windy.</p>`;
+                } else if (data.soil_moisture > 1000) {
+                    soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-good">ideal moisture levels</span>. Soil has good moisture content while maintaining adequate aeration for root health.</p>`;
+                } else {
+                    soilAnalysis = `<p>Soil moisture reading is <span class="analysis-highlight">${data.soil_moisture}</span>, indicating <span class="analysis-alert">very wet conditions</span>. Avoid additional watering to prevent root rot and oxygen deprivation.</p>`;
+                }
+                analysis.push(soilAnalysis);
+            }
+            
+            // Rain analysis
+            if (data.rain_detected !== null) {
+                let rainAnalysis = "";
+                if (data.rain_detected !== 'No Rain' && data.rain_detected !== 'Very Light') {
+                    if (data.rain_intensity !== null) {
+                        const intensityLevel = 4095 - data.rain_intensity;
+                        if (data.rain_intensity < 500) {
+                            rainAnalysis = `<p><span class="analysis-alert">Heavy rainfall detected</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity}</span>). This indicates significant precipitation, which may lead to soil erosion and nutrient leaching. Consider checking drainage systems and protecting sensitive plants.</p>`;
+                        } else if (data.rain_intensity < 1500) {
+                            rainAnalysis = `<p><span class="analysis-highlight">Moderate rainfall detected</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity}</span>). This provides good moisture for plants while not being too intense. Ideal for natural irrigation.</p>`;
+                        } else {
+                            rainAnalysis = `<p><span class="analysis-good">Light rainfall detected</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity}</span>). This gentle precipitation is excellent for plants as it allows slow absorption without soil compaction or runoff.</p>`;
+                        }
+                    } else {
+                        rainAnalysis = `<p><span class="analysis-good">Rainfall detected</span>. This natural precipitation benefits plants by providing moisture. No intensity data available for further analysis.</p>`;
+                    }
+                    rainAnalysis += `<p>With natural rainfall occurring, <span class="analysis-good">automated irrigation should be paused</span> to prevent overwatering.</p>`;
+                } else {
+                    if (isDay && data.temperature > 25 && data.humidity < 40 && data.soil_moisture > 1800) {
+                        rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity || '--'}</span>) with high temperature, low humidity, and drying soil. <span class="analysis-alert">Consider irrigation</span> to prevent plant stress, especially for shallow-rooted plants.</p>`;
+                    } else if (data.soil_moisture > 2200) {
+                        rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity || '--'}</span>) with soil moisture readings indicating dry conditions. <span class="analysis-alert">Watering is recommended</span> based on soil moisture status.</p>`;
+                    } else {
+                        rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity || '--'}</span>), but soil moisture levels are adequate. No immediate irrigation needed.</p>`;
+                    }
+                }
+                analysis.push(rainAnalysis);
+            }
+            
+            // Motion detection analysis
+            if (data.motion_detected !== null) {
+                let motionAnalysis = "";
+                if (data.motion_detected === 1) {
+                    motionAnalysis = `<p><span class="analysis-alert">Motion detected in the field</span>. Potential presence of animals or unauthorized personnel. Consider checking the area or reviewing security footage if available.</p>`;
+                } else {
+                    motionAnalysis = `<p><span class="analysis-good">No motion detected</span>. The field appears secure based on the latest sensor data.</p>`;
+                }
+                if (historyData.motionEvents > 3) {
+                    motionAnalysis += `<p><span class="analysis-alert">Multiple motion events (${historyData.motionEvents}) detected today</span>. This could indicate increased activity in the field area. Enhanced monitoring or physical checks recommended.</p>`;
+                }
+                analysis.push(motionAnalysis);
+            }
+            
+            // Integrated analysis
+            let integratedAnalysis = "<p><strong>Overall Assessment:</strong> ";
+            
+            let stressPoints = 0;
+            if (data.temperature !== null && (data.temperature > 30 || data.temperature < 5)) stressPoints += 2;
+            else if (data.temperature !== null && (data.temperature > 28 || data.temperature < 10)) stressPoints += 1;
+            
+            if (data.humidity !== null && (data.humidity > 85 || data.humidity < 30)) stressPoints += 1;
+            
+            if (data.soil_moisture !== null && (data.soil_moisture > 2200 || data.soil_moisture < 800)) stressPoints += 2;
+            else if (data.soil_moisture !== null && (data.soil_moisture > 1800 || data.soil_moisture < 900)) stressPoints += 1;
+            
+            if (data.motion_detected === 1) stressPoints += 1;
+            if (historyData.motionEvents > 3) stressPoints += 1;
+            
+            if (stressPoints >= 4) {
+                integratedAnalysis += `<span class="analysis-alert">Multiple environmental stressors detected</span>. Immediate attention recommended to prevent plant damage and ensure field security.</p>`;
+            } else if (stressPoints >= 2) {
+                integratedAnalysis += `<span class="analysis-highlight">Moderate stress conditions</span>. Some intervention may be needed to maintain optimal growing conditions and monitor field activity.</p>`;
+            } else {
+                integratedAnalysis += `<span class="analysis-good">Environmental conditions are favorable</span> for healthy plant growth and field security.</p>`;
+            }
+            
+            if (isDay) {
+                if (data.temperature !== null && data.temperature > 28 && data.humidity !== null && data.humidity < 40) {
+                    integratedAnalysis += `<p><strong>Time-specific recommendation:</strong> Consider <span class="analysis-highlight">misting plants during mid-day</span> to reduce heat stress during peak sun hours.</p>`;
+                }
+                if (data.motion_detected === 1) {
+                    integratedAnalysis += `<p><strong>Security recommendation:</strong> <span class="analysis-highlight">Check field during daylight hours</span> to investigate motion detection.</p>`;
                 }
             } else {
-                rainAnalysis = `<p><span class="analysis-good">Rainfall detected</span>. This natural precipitation benefits plants by providing moisture. No intensity data available for further analysis.</p>`;
+                if (data.temperature !== null && data.temperature < 10) {
+                    integratedAnalysis += `<p><strong>Time-specific recommendation:</strong> <span class="analysis-highlight">Cover sensitive plants</span> tonight to protect from potential cold damage.</p>`;
+                }
+                if (data.motion_detected === 1) {
+                    integratedAnalysis += `<p><strong>Security recommendation:</strong> <span class="analysis-highlight">Activate night security measures</span> due to detected motion in the field.</p>`;
+                }
             }
-            rainAnalysis += `<p>With natural rainfall occurring, <span class="analysis-good">automated irrigation should be paused</span> to prevent overwatering.</p>`;
-        } else {
-            if (isDay && data.temperature > 25 && data.humidity < 40 && data.soil_moisture > 1800) {
-                rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity || '--'}</span>) with high temperature, low humidity, and drying soil. <span class="analysis-alert">Consider irrigation</span> to prevent plant stress, especially for shallow-rooted plants.</p>`;
-            } else if (data.soil_moisture > 2200) {
-                rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity || '--'}</span>) with soil moisture readings indicating dry conditions. <span class="analysis-alert">Watering is recommended</span> based on soil moisture status.</p>`;
-            } else {
-                rainAnalysis = `<p>Currently <span class="analysis-highlight">no rainfall</span> (intensity reading: <span class="analysis-highlight">${data.rain_intensity || '--'}</span>), but soil moisture levels are adequate. No immediate irrigation needed.</p>`;
-            }
+            
+            analysis.push(integratedAnalysis);
+            
+            return analysis.join("");
         }
-        analysis.push(rainAnalysis);
-    }
-    
-    // Integrated analysis
-    let integratedAnalysis = "<p><strong>Overall Assessment:</strong> ";
-    
-    let stressPoints = 0;
-    if (data.temperature !== null && (data.temperature > 30 || data.temperature < 5)) stressPoints += 2;
-    else if (data.temperature !== null && (data.temperature > 28 || data.temperature < 10)) stressPoints += 1;
-    
-    if (data.humidity !== null && (data.humidity > 85 || data.humidity < 30)) stressPoints += 1;
-    
-    if (data.soil_moisture !== null && (data.soil_moisture > 2200 || data.soil_moisture < 800)) stressPoints += 2;
-    else if (data.soil_moisture !== null && (data.soil_moisture > 1800 || data.soil_moisture < 900)) stressPoints += 1;
-    
-    if (stressPoints >= 4) {
-        integratedAnalysis += `<span class="analysis-alert">Multiple environmental stressors detected</span>. Immediate attention recommended to prevent plant damage.</p>`;
-    } else if (stressPoints >= 2) {
-        integratedAnalysis += `<span class="analysis-highlight">Moderate stress conditions</span>. Some intervention may be needed to maintain optimal growing conditions.</p>`;
-    } else {
-        integratedAnalysis += `<span class="analysis-good">Environmental conditions are favorable</span> for healthy plant growth and development.</p>`;
-    }
-    
-    if (isDay) {
-        if (data.temperature !== null && data.temperature > 28 && data.humidity !== null && data.humidity < 40) {
-            integratedAnalysis += `<p><strong>Time-specific recommendation:</strong> Consider <span class="analysis-highlight">misting plants during mid-day</span> to reduce heat stress during peak sun hours.</p>`;
+
+        function updateAnalysis() {
+            const analysisElement = document.getElementById('analysis-text');
+            const analysisTimeElement = document.getElementById('analysis-time');
+            
+            fetch('/sensor-data')
+                .then(response => response.json())
+                .then(data => {
+                    const analysisContent = generateEnvironmentalAnalysis(data);
+                    analysisElement.innerHTML = analysisContent;
+                    const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    analysisTimeElement.textContent = currentTime;
+                })
+                .catch(error => {
+                    console.error('Error fetching data for analysis:', error);
+                    analysisElement.innerHTML = "<p class='analysis-loading'>Error connecting to sensors. Please try again later.</p>";
+                });
         }
-    } else {
-        if (data.temperature !== null && data.temperature < 10) {
-            integratedAnalysis += `<p><strong>Time-specific recommendation:</strong> <span class="analysis-highlight">Cover sensitive plants</span> tonight to protect from potential cold damage.</p>`;
-        }
-    }
-    
-    analysis.push(integratedAnalysis);
-    
-    return analysis.join("");
-}
 
-function updateAnalysis() {
-    const analysisElement = document.getElementById('analysis-text');
-    const analysisTimeElement = document.getElementById('analysis-time');
-    
-    fetch('/sensor-data')
-        .then(response => response.json())
-        .then(data => {
-            const analysisContent = generateEnvironmentalAnalysis(data);
-            analysisElement.innerHTML = analysisContent;
-            const currentTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            analysisTimeElement.textContent = currentTime;
-        })
-        .catch(error => {
-            console.error('Error fetching data for analysis:', error);
-            analysisElement.innerHTML = "<p class='analysis-loading'>Error connecting to sensors. Please try again later.</p>";
-        });
-}
+        document.getElementById('refresh-analysis').addEventListener('click', updateAnalysis);
 
-document.getElementById('refresh-analysis').addEventListener('click', updateAnalysis);
-
-updateAnalysis();
-setInterval(updateAnalysis, 30000);
-</script>
-   
-    </body>
-    </html>
+        updateAnalysis();
+        setInterval(updateAnalysis, 30000);
+    </script>
+</body>
+</html>
