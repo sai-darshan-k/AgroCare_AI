@@ -1,4 +1,4 @@
-﻿Flask1
+﻿Flask
 Flask-SQLAlchemy
 flask_babel
 langchain-core
@@ -25,3 +25,4 @@ beautifulsoup4
 scikit-learn
 apscheduler
 influxdb-client
+
