@@ -103,7 +103,7 @@ interpreter.allocate_tensors()
 logging.info('Model loaded. Check http://127.0.0.1:5000/')
 
 # Load the language model
-groqllm = ChatGroq(model="llama3-8b-8192", temperature=0)
+groqllm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
 prompt = """(System: You are a crop assistant designed to give responses in English. The system receives questions in English (translated from the user's input language) and should provide clear, concise answers in English. Do not repeat points.)
 
 (user: Question: {question})"""
