@@ -6,6 +6,7 @@
     <title>Speech Functionality - AgroCare</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        /* Existing CSS unchanged */
         * {
             margin: 0;
             padding: 0;
@@ -437,7 +438,7 @@
         <header>
             <div class="logo">
                 <img src="{{ url_for('static', filename='mainlogo.png') }}" alt="AgroCare">
-                <h1>Kissan 4.0</h1>
+                <h1>Krishi-AI</h1>
             </div>
             <div class="title">
                 <h2>🎤 Voice Assistant for Farmers</h2>
@@ -626,55 +627,64 @@
             messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        function submitQuestion(question, lang) {
-            $.ajax({
-                url: '/ask_speech',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ question: question, language: lang }),
-                success: function(response) {
-                    hideLoading();
-                    showSuccess();
-                    
-                    const answer = response.answer;
-                    const audioUrl = response.audio_url;
+function submitQuestion(question, lang) {
+    $.ajax({
+        url: '/ask_speech',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ question: question, language: lang }),
+        success: function(response) {
+            hideLoading();
+            showSuccess();
+            
+            const answer = response.answer;
+            const audioUrl = response.audio_url;
+            const redirectUrl = response.redirect_url; // Check for redirect_url
 
-                    // Display the response
-                    displayMessage(answer, 'answer');
-                    
-                    // Update audio player
-                    if (audioUrl) {
-                        const audioContainer = document.getElementById('audioContainer');
-                        const audioElement = document.getElementById('audioPlayer');
-                        audioElement.src = audioUrl;
-                        audioContainer.style.display = 'block';
-                        
-                        // Auto-play the audio
-                        setTimeout(() => {
-                            audioElement.play().catch(e => {
-                                console.log('Auto-play prevented by browser');
-                            });
-                        }, 500);
-                    }
-                    
-                    updateSpeechStatus('Response ready! ' + (isMobile ? 'Hold microphone for another question.' : 'Hold SPACE for another question.'));
-                },
-                error: function(xhr, status, error) {
-                    hideLoading();
-                    console.error('Error:', error);
-                    
-                    let errorMessage = 'Error occurred while processing your question.';
-                    if (xhr.status === 0) {
-                        errorMessage = 'Network error. Please check your connection.';
-                    } else if (xhr.status >= 500) {
-                        errorMessage = 'Server error. Please try again later.';
-                    }
-                    
-                    displayMessage(errorMessage, 'answer');
-                    updateSpeechStatus('Error occurred. ' + (isMobile ? 'Hold microphone to try again.' : 'Hold SPACE to try again.'));
-                }
-            });
+            // Display the response
+            displayMessage(answer, 'answer');
+            
+            // Update audio player
+            if (audioUrl) {
+                const audioContainer = document.getElementById('audioContainer');
+                const audioElement = document.getElementById('audioPlayer');
+                audioElement.src = audioUrl;
+                audioContainer.style.display = 'block';
+                
+                // Auto-play the audio
+                setTimeout(() => {
+                    audioElement.play().catch(e => {
+                        console.log('Auto-play prevented by browser:', e);
+                    });
+                }, 500);
+            }
+            
+            // Handle redirect if present
+            if (redirectUrl) {
+                setTimeout(() => {
+                    console.log('Redirecting to:', redirectUrl);
+                    window.location.href = redirectUrl;
+                }, 2000); // Delay to allow audio playback
+            }
+            
+            updateSpeechStatus('Response ready! ' + (isMobile ? 'Hold microphone for another question.' : 'Hold SPACE for another question.'));
+        },
+        error: function(xhr, status, error) {
+            hideLoading();
+            console.error('Error:', error);
+            
+            let errorMessage = 'Error occurred while processing your question.';
+            if (xhr.status === 0) {
+                errorMessage = 'Network error. Please check your connection.';
+            } else if (xhr.status >= 500) {
+                errorMessage = 'Server error. Please try again later.';
+            }
+            
+            displayMessage(errorMessage, 'answer');
+            updateSpeechStatus('Error occurred. ' + (isMobile ? 'Hold microphone to try again.' : 'Hold SPACE to try again.'));
         }
+    });
+}
 
         // Setup event listeners based on device type
         const micButton = document.getElementById('startSpeechButton');

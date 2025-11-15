@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kissan E-Market</title>
+  <title>KrishiPro E-Market</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='commerce.css') }}">
   <!-- Assuming you're using Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
   <header class="header">
-    <h1>Kissan E-Market</h1>
+    <h1>KrishiPro E-Market</h1>
     <div class="user-section">
       {% if not session.user %}
         <a href="{{ url_for('e_market.register') }}?user_type=farmer">Farmer Registration</a> |
